@@ -52,7 +52,7 @@ def main():
     flags = [cc, "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror", "-I", str(root / "include")]
     builds = [flags + ["-include", str(root / "tests/io_faults.h"), str(root / "tests/fault_probe.c"), *sources,
                        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc", "-o", str(probe)],
-              flags + [str(root / "tests/booking_ui_main.c"), str(root / "src/ui.c"), *sources, "-o", str(ui)]]
+              flags + [str(root / "tests/booking_ui_main.c"), str(root / "src/ui.c"), str(root / "src/stats.c"), *sources, "-o", str(ui)]]
     for i, command in enumerate(builds):
         built = subprocess.run(command, capture_output=True, timeout=90)
         (run_root / f"build-{i}.log").write_bytes(built.stdout + built.stderr)
@@ -389,13 +389,13 @@ def main():
     check("UI学生完整上报/确认/中文说明",ui_student)
     def ui_admin():
         d=case("ui-admin",report(),LINKED)
-        actions=[2,1,4,2,3,1,4,0,5,1,1,1,0,1,3,20261020,3,4,"U1",1,5,6,3,3,4]
+        actions=[2,1,4,2,3,1,4,0,5,1,1,1,0,1,3,20261020,3,4,"U1",1,5,0,6,3,3,4]
         r=run(d,[str(ui)],lines(1,2,"Admin",PASSWORD,*actions))
-        for text in ["报告处理成功","预约人数不代表签到","姓名：张三","历史预约总数","统计尚未开放","该功能尚未开放"]:
+        for text in ["报告处理成功","预约人数不代表签到","姓名：张三","历史预约总数","学生菜单6按预约记录实时查询","实验室统计"]:
             assert text.encode() in r.stdout
         assert b"01[!]" in r.stdout and statuses(d)[3]==0
         assert "登录状态已清除".encode() in r.stdout
-    check("UI维护/报告过滤处理/真实查询/公共座位刷新/P4占位",ui_admin)
+    check("UI维护/报告过滤处理/真实查询/公共座位刷新/P4统计入口",ui_admin)
     for i,actions in enumerate([[5], [5,1], [5,1,"说明"], [5,1,"x"*256], [5,1,"汉"*86], [5,"abc"], [5,1,"说明",0,7,3,4]]):
         def ui_input(i=i,actions=actions):
             d=case(f"ui-input-{i}")

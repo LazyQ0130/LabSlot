@@ -342,3 +342,11 @@ int utils_slot_future(const LabTime *now, int date, int slot)
     return date > now->date || (date == now->date &&
         (OPEN_HOUR + slot) * 3600 > now->hour * 3600 + now->minute * 60 + now->second);
 }
+
+/* 功能、参数和返回值见utils.h；按结束而非开始判断，不把进行中预约计为完成。 */
+int utils_slot_ended(const LabTime *now, int date, int slot)
+{
+    if (!utils_time_valid(now) || !utils_valid_date(date) || slot < 0 || slot >= SLOT_COUNT) { return 0; }
+    return date < now->date || (date == now->date &&
+        (OPEN_HOUR + slot + 1) * 3600 <= now->hour * 3600 + now->minute * 60 + now->second);
+}

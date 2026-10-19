@@ -13,6 +13,7 @@
 #define RESERVATIONS_PATH DATA_DIRECTORY "/reservations.txt"
 #define REPORTS_PATH DATA_DIRECTORY "/error.txt"
 #define COUNTS_PATH DATA_DIRECTORY "/count.txt"
+#define COUNTS_TEMP_PATH DATA_DIRECTORY "/count.txt.tmp"
 #define COMPUTERS_TEMP_PATH DATA_DIRECTORY "/computers.txt.tmp"
 #define ADMINS_TEMP_PATH DATA_DIRECTORY "/admins.txt.tmp"
 #define STUDENTS_TEMP_PATH DATA_DIRECTORY "/students.txt.tmp"
@@ -116,5 +117,20 @@ StorageResult storage_recover_maintenance(void);
  * 不提供数据库事务；意图发布后失败返回 RECOVERY_REQUIRED，启动时继续而非假装成功。
  */
 StorageResult storage_apply_maintenance(MaintenanceAction action, int no, int report_id, const LabTime *cutoff);
+
+/* 功能：安全扩容快照，不改count，失败不改原集合。参数：已初始化集合/需要容量。返回：StorageResult。 */
+StorageResult storage_reserve_daily_counts(DailyCountList *list, size_t needed);
+/* 功能：释放并清零自有快照集合。参数：list可空。返回：无。 */
+void storage_free_daily_counts(DailyCountList *list);
+/* 功能：校验全部字段、聚合关系和严格递增日期。参数：只读集合。返回：StorageResult。 */
+StorageResult storage_validate_daily_counts(const DailyCountList *list);
+/* 功能：严格加载count.txt，空文件合法，缺失/损坏是错误。参数：自有输出集合。
+ * 返回：StorageResult；完整成功才替换输出，不偷偷初始化或修改源文件。
+ */
+StorageResult storage_load_daily_counts(DailyCountList *list);
+/* 功能：验证全表、检查恢复门禁、复用独占临时快照和替换。参数：只读完整集合。
+ * 返回：StorageResult；失败保留旧文件及可能的草稿，调用方须先保留其他日期记录。
+ */
+StorageResult storage_save_daily_counts(const DailyCountList *list);
 
 #endif

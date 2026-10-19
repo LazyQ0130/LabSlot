@@ -108,8 +108,8 @@ def main():
                 assert fields[3] == "0"
             content = account_file(directory, role).read_bytes()
             timestamp = account_file(directory, role).stat().st_mtime_ns
-            # P3 开放管理员2～4、学生5；进入新流程并返回/放弃，保留原持久化和角色断言。
-            options = [1, 2, 0, 3, 20000101, 0, 4, "Missing", 5] if role == 1 else [1, 20000101, 0, 2, 20000101, 0, 3, 0, 4, 5, 1, "课程报障", 0, 6]
+            # P4 开放管理员5和学生6；统计只读/返回，保留原持久化和角色断言。
+            options = [1, 2, 0, 3, 20000101, 0, 4, "Missing", 5, 0] if role == 1 else [1, 20000101, 0, 2, 20000101, 0, 3, 0, 4, 5, 1, "课程报障", 0, 6]
             result = run(directory, login(role, menu=options))
             assert result.returncode == 0 and not result.stderr
             assert "登录成功".encode() in result.stdout
@@ -117,7 +117,8 @@ def main():
             other = "------ 学生菜单 ------" if role == 1 else "------ 管理员菜单 ------"
             assert expected.encode() in result.stdout and other.encode() not in result.stdout
             assert b"01[*]" in result.stdout and b"40[*]" in result.stdout
-            assert result.stdout.count("该功能尚未开放".encode()) == 1
+            assert result.stdout.count("该功能尚未开放".encode()) == 0
+            assert ("实验室统计" if role == 1 else "我的实验室预约统计").encode() in result.stdout
             if role == 2:
                 assert "时段已经开始或日期已过去".encode() in result.stdout
                 assert "我的有效预约".encode() in result.stdout and "可取消预约".encode() in result.stdout
@@ -126,7 +127,7 @@ def main():
             assert timestamp == account_file(directory, role).stat().st_mtime_ns
             for name in ["reservations.txt", "error.txt", "count.txt"]:
                 assert (directory / "data" / name).read_bytes() == b""
-        verify(label + ": 注册/重启登录/角色菜单/退出/未开放功能", happy)
+        verify(label + ": 注册/重启登录/角色菜单/退出/统计入口", happy)
 
         def multiple(role=role, label=label):
             """同角色多账户注册不丢失已有记录，重复注册不改文件。"""

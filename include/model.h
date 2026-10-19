@@ -21,6 +21,8 @@
 #define MAX_RESERVATIONS 100000
 #define BOOKING_WINDOW_DAYS 7 /* 今天起共七个自然日，即今天至第六天。 */
 #define MAX_REPORTS 10000
+#define DAILY_CAPACITY (COMPUTER_COUNT * SLOT_COUNT) /* 固定理论座位小时容量。 */
+#define MAX_DAILY_COUNTS 100000 /* 导出日期快照上限，含零预约日期。 */
 
 /* 电脑的持久状态；预约占用独立存储，不属于电脑固定属性。 */
 typedef enum {
@@ -59,7 +61,7 @@ typedef struct {
     char id[ID_LEN];             /* 唯一学号。 */
     char name[NAME_LEN];         /* UTF-8 姓名。 */
     char password[PASSWORD_LEN]; /* 教学演示密码。 */
-    int time;                   /* 已过去且未取消的预约小时数，并非实际签到时间。 */
+    int time;                   /* 兼容旧账户文件的缓存；P4不写回，权威值从已结束有效预约动态计算。 */
 } Student;
 
 /* 一次操作的一种角色账户集合；role 决定有效成员，由调用方在堆上分配。 */
@@ -109,5 +111,21 @@ typedef struct {
     size_t count;      /* 已初始化条数。 */
     size_t capacity;   /* 已分配条数，上限 MAX_REPORTS。 */
 } FaultReportList;
+
+/* 一天的持久化预约快照；全部是非敏感聚合整数，不存完成小时/时刻或身份。 */
+typedef struct {
+    int date;                         /* YYYYMMDD。 */
+    int reservation_count;            /* 有效预约数，0～360。 */
+    int student_count;                /* 该日按学号去重人数。 */
+    int reserved_hours;               /* 每条一小时，必须等于有效预约数。 */
+    int slot_counts[SLOT_COUNT];      /* 0～8时段各0～40条，总和等于预约数。 */
+} DailyCount;
+
+/* 自有堆上快照集合，零初始化；按日期严格递增；最终 storage_free_daily_counts。 */
+typedef struct {
+    DailyCount *items;
+    size_t count;
+    size_t capacity; /* 最多 MAX_DAILY_COUNTS，不可浅复制后各自释放。 */
+} DailyCountList;
 
 #endif

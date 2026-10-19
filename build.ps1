@@ -1,4 +1,4 @@
-# Build from the project root; optionally run P0, P1, P2 and P3 integration suites.
+# Build from the project root; optionally run P0, P1, P2, P3 and P4 integration suites.
 # Parameters: -Test enables tests; -Compiler selects gcc.exe. Exit nonzero on failure.
 param(
     [switch]$Test,
@@ -31,7 +31,7 @@ try {
     if ($Test) {
         # Python is a development dependency; the C executable does not need it.
         $env:PYTHONIOENCODING = 'utf-8'
-        foreach ($testScript in @('tests/test_p0.py', 'tests/test_p1.py', 'tests/test_p2.py', 'tests/test_p3.py')) {
+        foreach ($testScript in @('tests/test_p0.py', 'tests/test_p1.py', 'tests/test_p2.py', 'tests/test_p3.py', 'tests/test_p4.py')) {
             & python $testScript '--executable' 'smart-lab.exe' '--cc' $Compiler
             if ($LASTEXITCODE -ne 0) {
                 exit $LASTEXITCODE

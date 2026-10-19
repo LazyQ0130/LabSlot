@@ -1,0 +1,123 @@
+# P3 实际执行结果
+
+通过：119/119
+
+- PASS 上报/持久化/重启/编号/同机重复/本人过滤/无维护副作用
+- PASS 业务角色隔离 submit/none
+- PASS 业务角色隔离 submit/admin
+- PASS 业务角色隔离 change/U1
+- PASS 业务角色隔离 preview/U1
+- PASS 业务角色隔离 process/U1
+- PASS 业务角色隔离 get/U1
+- PASS 业务角色隔离 usage/U1
+- PASS 业务角色隔离 student/U1
+- PASS 业务角色隔离 reports/none
+- PASS 会话账户必须真实存在 ghost
+- PASS 会话账户必须真实存在 ghostadmin
+- PASS 故障说明字段拒绝 0
+- PASS 故障说明字段拒绝 1
+- PASS 故障说明字段拒绝 2
+- PASS 故障说明字段拒绝 3
+- PASS 故障说明字段拒绝 4
+- PASS 故障说明字段拒绝 5
+- PASS 故障说明字段拒绝 6
+- PASS 故障说明字段拒绝 7
+- PASS 故障说明字段拒绝 8
+- PASS 电脑编号边界 0
+- PASS 电脑编号边界 -1
+- PASS 电脑编号边界 41
+- PASS 电脑编号边界 2147483647
+- PASS 255字节UTF-8说明完整往返
+- PASS 失败及非法时钟拒绝写入
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 0
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 1
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 2
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 3
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 4
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 5
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 6
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 7
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 8
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 9
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 10
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 11
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 12
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 13
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 14
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 15
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 16
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 17
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 18
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 19
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 20
+- PASS 损坏报告拒绝/输出不变/禁止覆盖 21
+- PASS CRLF/已处理同机历史允许/新编号不复用
+- PASS INT_MAX报告编号耗尽无溢出
+- PASS 报告容量边界 10000+0
+- PASS 报告容量边界 10000+1
+- PASS 故障联动/过去开始记录保留/故障优先/恢复/重新预约编号
+- PASS 严格开始时刻边界 20261019,11,0,0
+- PASS 严格开始时刻边界 20261019,10,59,59
+- PASS 严格开始时刻边界 20261020,11,0,0
+- PASS 报告动作 1/状态分离/重复处理
+- PASS 报告动作 2/状态分离/重复处理
+- PASS 报告动作 3/状态分离/重复处理
+- PASS 报告确认已故障电脑仍完成预约联动
+- PASS 相关文件预验证失败 change
+- PASS 相关文件预验证失败 process
+- PASS 相关文件预验证失败 usage
+- PASS 相关文件预验证失败 student
+- PASS 管理员真实预约/姓名/人数/精确学号/空表/参数边界
+- PASS 学生查询有效与全部历史计数/取消保留
+- PASS 预约引用缺失账户明确报错
+- PASS 真实write失败 第1快照/门禁/冻结时刻恢复/幂等
+- PASS 真实flush失败 第1快照/门禁/冻结时刻恢复/幂等
+- PASS 真实close失败 第1快照/门禁/冻结时刻恢复/幂等
+- PASS 真实write失败 第2快照/门禁/冻结时刻恢复/幂等
+- PASS 真实flush失败 第2快照/门禁/冻结时刻恢复/幂等
+- PASS 真实close失败 第2快照/门禁/冻结时刻恢复/幂等
+- PASS 真实write失败 第3快照/门禁/冻结时刻恢复/幂等
+- PASS 真实flush失败 第3快照/门禁/冻结时刻恢复/幂等
+- PASS 真实close失败 第3快照/门禁/冻结时刻恢复/幂等
+- PASS 真实write失败 第4快照/门禁/冻结时刻恢复/幂等
+- PASS 真实flush失败 第4快照/门禁/冻结时刻恢复/幂等
+- PASS 真实close失败 第4快照/门禁/冻结时刻恢复/幂等
+- PASS 真实进程_Exit 第2快照/正式程序重启恢复
+- PASS 真实进程_Exit 第3快照/正式程序重启恢复
+- PASS 真实进程_Exit 第4快照/正式程序重启恢复
+- PASS 恢复源文件损坏/启动失败/全部保存门禁/保留证据
+- PASS 损坏维护日志拒绝恢复 0
+- PASS 损坏维护日志拒绝恢复 1
+- PASS 损坏维护日志拒绝恢复 2
+- PASS 损坏维护日志拒绝恢复 3
+- PASS 遗留临时路径不覆盖 error.txt.tmp
+- PASS 遗留临时路径不覆盖 computers.txt.tmp
+- PASS 遗留临时路径不覆盖 reservations.txt.tmp
+- PASS 遗留临时路径不覆盖 maintenance.txt.tmp
+- PASS 每次动态分配失败输出/释放/恢复 submit
+- PASS 每次动态分配失败输出/释放/恢复 load
+- PASS 每次动态分配失败输出/释放/恢复 usage
+- PASS 每次动态分配失败输出/释放/恢复 student
+- PASS 每次动态分配失败输出/释放/恢复 preview
+- PASS 每次动态分配失败输出/释放/恢复 process
+- PASS UI学生完整上报/确认/中文说明
+- PASS UI维护/报告过滤处理/真实查询/公共座位刷新/P4统计入口
+- PASS UI EOF/超长/非数字/放弃 0
+- PASS UI EOF/超长/非数字/放弃 1
+- PASS UI EOF/超长/非数字/放弃 2
+- PASS UI EOF/超长/非数字/放弃 3
+- PASS UI EOF/超长/非数字/放弃 4
+- PASS UI EOF/超长/非数字/放弃 5
+- PASS UI EOF/超长/非数字/放弃 6
+- PASS UI读取失败不伪装零预约
+- PASS 上报真实I/O失败保留旧报告 write
+- PASS 上报真实I/O失败保留旧报告 flush
+- PASS 上报真实I/O失败保留旧报告 close
+- PASS 真实Windows替换失败/恢复重试 computers.txt
+- PASS 真实Windows替换失败/恢复重试 reservations.txt
+- PASS 真实Windows替换失败/恢复重试 error.txt
+- PASS 真实Windows替换失败/恢复重试 maintenance.done.txt
+- PASS 真实Windows报告读取失败不当空表
+- PASS 恢复源缺失时禁止启动补建/修复源后继续恢复
+- PASS 最终确认时钟重查/日志冻结新边界
+- PASS 真实开发数据完全不变/所有用例保护账户及累计时间

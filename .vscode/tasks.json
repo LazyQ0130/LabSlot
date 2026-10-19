@@ -11,7 +11,7 @@
       "problemMatcher": ["$gcc"]
     },
     {
-      "label": "LabSlot: Build and test P0 + P1 + P2 + P3",
+      "label": "LabSlot: Build and test P0 + P1 + P2 + P3 + P4",
       "type": "process",
       "command": "powershell.exe",
       "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Test"],

@@ -7,13 +7,13 @@ HEADERS = $(wildcard include/*.h)
 TARGET = smart-lab.exe
 PYTHON = python
 
-.PHONY: all test test-p0 test-p1 test-p2 test-p3
+.PHONY: all test test-p0 test-p1 test-p2 test-p3 test-p4
 all: $(TARGET)
 
 $(TARGET): $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(SOURCES) -o $@
 
-test: test-p0 test-p1 test-p2 test-p3
+test: test-p0 test-p1 test-p2 test-p3 test-p4
 
 test-p0: $(TARGET)
 	$(PYTHON) tests/test_p0.py --executable $(TARGET) --cc "$(CC)"
@@ -26,5 +26,8 @@ test-p2: $(TARGET)
 
 test-p3: $(TARGET)
 	$(PYTHON) tests/test_p3.py --executable $(TARGET) --cc "$(CC)"
+
+test-p4: $(TARGET)
+	$(PYTHON) tests/test_p4.py --executable $(TARGET) --cc "$(CC)"
 
 # 不提供批量删除的 clean 目标；测试输出与运行数据由使用者按需保留。

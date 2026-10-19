@@ -88,4 +88,9 @@ int utils_time_valid(const LabTime *now);
 /* 功能：用固定时间快照判断时段是否严格未开始。参数：now/date/slot。返回：未开始 1，否则 0。 */
 int utils_slot_future(const LabTime *now, int date, int slot);
 
+/* 功能：判断预约时段结束时刻是否不晚于固定当前时刻（相等计入）。
+ * 参数：now/date/slot。返回：已结束1，未结束或参数非法0；与尚未开始判断独立。
+ */
+int utils_slot_ended(const LabTime *now, int date, int slot);
+
 #endif

@@ -9,6 +9,7 @@
 #include "storage.h"
 #include "fault.h"
 #include "admin.h"
+#include "stats.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -436,7 +437,7 @@ static InputResult admin_student_flow(const AuthSession *session)
     printf("学号：%s；姓名：%s；有效预约：%zu；历史预约总数（含有效和已取消）：%zu。\n",
            info.student_id, info.name, info.active_count, info.history_count);
     puts("有效预约："); print_reservations(&info.records);
-    puts("累计实验时间统计尚未开放（P4）。\n1. 查看全部历史预约\n0. 返回管理员菜单");
+    puts("累计完成预约小时数由学生菜单6按预约记录实时查询。\n1. 查看全部历史预约\n0. 返回管理员菜单");
     input = read_menu(1, &choice);
     if (input != INPUT_OK || !choice) { goto done; }
     result = admin_query_student(session, id, BOOKING_QUERY_ALL, &info);
@@ -444,6 +445,101 @@ static InputResult admin_student_flow(const AuthSession *session)
     else { printf("查询失败：%s。\n", fault_result_message(result)); }
 done:
     admin_free_student(&info); return input;
+}
+
+
+/* 功能：读取独立统计日期，不读取时段。参数：date输出。返回：InputResult。 */
+static InputResult read_stats_date(int *date)
+{
+    char text[10];
+    InputResult input = utils_read_field("统计日期（YYYYMMDD，周统计可输入任意一天）：", text, sizeof text, 0);
+    if (input != INPUT_OK) { return input; }
+    return strlen(text) == 8 && utils_parse_int(text, 10000101, 99991231, date) && utils_valid_date(*date) ? INPUT_OK : INPUT_INVALID;
+}
+
+/* 功能：显示日报与九时段指标，两位小数，明确理论口径。参数：daily。返回：无。 */
+static void print_daily_stats(const DailyStats *daily)
+{
+    int slot;
+    const DailyCount *c = &daily->counts;
+    printf("\n------ 每日预约统计 ------\n日期：%04d-%02d-%02d\n", c->date/10000, c->date/100%100, c->date%100);
+    printf("电脑数量：%d；开放时段：%d；理论容量：%d 座位小时。\n", COMPUTER_COUNT, SLOT_COUNT, DAILY_CAPACITY);
+    printf("有效预约：%d 条\n预约小时数：%d 小时\n预约学生人数：%d 人\n预约利用率：%.2f%%\n",
+           c->reservation_count, c->reserved_hours, c->student_count, daily->utilization);
+    printf("已结束有效预约：%d 小时（截至 %08d %02d:%02d:%02d）。\n", daily->completed_hours,
+           daily->as_of.date, daily->as_of.hour, daily->as_of.minute, daily->as_of.second);
+    puts("时段          预约数    预约率");
+    for (slot = 0; slot < SLOT_COUNT; ++slot) {
+        char period[16];
+        utils_format_slot(slot, period, sizeof period);
+        printf("%-13s %4d     %6.2f%%\n", period, c->slot_counts[slot], daily->slot_utilization[slot]);
+    }
+    puts("预约利用率使用固定理论容量，不代表实际设备使用率或签到时长。");
+}
+
+/* 功能：显示完整周与各日指标。参数：week。返回：无。 */
+static void print_weekly_stats(const WeeklyStats *week)
+{
+    int day;
+    printf("\n------ 每周预约统计 ------\n周一至周日：%08d 至 %08d\n", week->start_date, week->end_date);
+    puts("日期       预约小时  当日去重人数  预约利用率");
+    for (day = 0; day < 7; ++day) {
+        const DailyStats *d = &week->days[day];
+        printf("%08d   %4d       %4d       %6.2f%%\n", d->counts.date, d->counts.reserved_hours, d->counts.student_count, d->utilization);
+    }
+    printf("整周有效预约：%d 条\n整周预约总小时：%d 小时\n整周去重学生：%d 人\n日均预约小时：%.2f\n整周预约利用率：%.2f%%\n",
+           week->reservation_count, week->reservation_count, week->student_count, week->average_daily_hours, week->utilization);
+    printf("整周理论容量：%d 座位小时；整周人数独立去重，不相加每日人数。\n", DAILY_CAPACITY*7);
+    puts("仅表示预约情况，不代表实际上机或签到；周查询不写统计快照。");
+}
+
+/* 功能：管理员统计二级菜单，导出须显式确认，其余只读。参数：时钟/会话。返回：InputResult。 */
+static InputResult admin_stats_flow(const BookingContext *context, const AuthSession *session)
+{
+    for (;;) {
+        int choice, date, confirm;
+        DailyStats daily;
+        WeeklyStats week;
+        StatsResult result;
+        InputResult input;
+        puts("\n------ 实验室统计 ------\n1. 每日预约统计\n2. 导出每日统计\n3. 每周预约统计\n0. 返回管理员菜单");
+        input = read_menu(3, &choice);
+        if (input != INPUT_OK || choice == 0) { return input; }
+        input = read_stats_date(&date);
+        if (input == INPUT_EOF || input == INPUT_ERROR) { return input; }
+        if (input == INPUT_INVALID) { puts("日期无效，本次统计已取消。"); continue; }
+        if (choice == 3) {
+            result = stats_compute_week(context, session, date, &week);
+            if (result == STATS_OK) { print_weekly_stats(&week); }
+            else { printf("统计失败：%s。\n", stats_result_message(result)); }
+            continue;
+        }
+        result = stats_compute_daily(context, session, date, &daily);
+        if (result != STATS_OK) { printf("统计失败：%s。\n", stats_result_message(result)); continue; }
+        print_daily_stats(&daily);
+        if (choice == 1) { continue; }
+        puts("count.txt 是导出时的快照，后续预约/取消会使其过时；确认时重新计算并更新该日。\n1. 确认导出\n0. 放弃");
+        input = read_menu(1, &confirm);
+        if (input != INPUT_OK) { return input; }
+        if (!confirm) { puts("已放弃导出，统计快照未改动。"); continue; }
+        result = stats_export_daily(context, session, date, &daily);
+        if (result == STATS_OK) {
+            printf("导出成功：日期 %08d，预约 %d 条，已保存至 data/count.txt。\n", date, daily.counts.reservation_count);
+        } else { printf("导出失败：%s；原统计文件未更新。\n", stats_result_message(result)); }
+    }
+}
+
+/* 功能：只显示当前学生的实时累计，绝不写回旧缓存。参数：时钟/学生会话。返回：无。 */
+static void student_stats_flow(const BookingContext *context, const AuthSession *session)
+{
+    StudentStats stats;
+    StatsResult result = stats_query_student(context, session, &stats);
+    if (result != STATS_OK) { printf("统计失败：%s。\n", stats_result_message(result)); return; }
+    printf("\n------ 我的实验室预约统计 ------\n学号：%s\n姓名：%s\n累计完成预约：%d 小时\n有效预约总数：%d 条\n已结束有效预约：%d 条\n尚未完成：%d 条\n已取消预约：%d 条\n",
+           stats.student_id, stats.name, stats.completed_hours, stats.active_count, stats.completed_count, stats.pending_count, stats.cancelled_count);
+    printf("截至 %08d %02d:%02d:%02d；仅按已结束且未取消的预约计时，结束时刻相等计入。\n",
+           stats.as_of.date, stats.as_of.hour, stats.as_of.minute, stats.as_of.second);
+    puts("不代表实际上机签到时间；账户中的旧累计缓存不作为统计来源。");
 }
 
 /* 功能：显示已认证角色菜单，进入及每轮均检查同一角色权限。
@@ -490,10 +586,12 @@ static InputResult user_menu(UserRole role, AuthSession *session,
             if (input == INPUT_INVALID) { puts("输入无效，本次预约操作已取消。"); }
         } else {
             if (role == ROLE_STUDENT && choice == 5) { input = submit_fault_flow(context, session); }
+            else if (role == ROLE_STUDENT && choice == 6) { student_stats_flow(context, session); }
             else if (role == ROLE_ADMIN && choice == 1) { show_current_computers(); }
             else if (role == ROLE_ADMIN && choice == 2) { input = maintenance_flow(context, session); }
             else if (role == ROLE_ADMIN && choice == 3) { input = admin_usage_flow(session); }
             else if (role == ROLE_ADMIN && choice == 4) { input = admin_student_flow(session); }
+            else if (role == ROLE_ADMIN && choice == 5) { input = admin_stats_flow(context, session); }
             else { puts("该功能尚未开放"); }
             if (input == INPUT_EOF || input == INPUT_ERROR) { auth_logout(session); return input; }
             if (input == INPUT_INVALID) { puts("输入无效，本次操作已取消。"); }

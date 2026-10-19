@@ -1070,3 +1070,133 @@ StorageResult storage_recover_maintenance(void)
     if (!valid_intent(&intent)) { return STORAGE_RECOVERY_REQUIRED; }
     return execute_maintenance(&intent, 1);
 }
+
+
+/* 功能：仅验证快照内存形状，不访问记录。参数：list。返回：有效1。 */
+static int daily_count_shape(const DailyCountList *list)
+{
+    return list != NULL && list->count <= list->capacity && list->capacity <= MAX_DAILY_COUNTS &&
+        ((list->capacity == 0 && list->items == NULL) || (list->capacity > 0 && list->items != NULL));
+}
+
+/* 功能、参数及返回值见storage.h中的扩容契约。 */
+StorageResult storage_reserve_daily_counts(DailyCountList *list, size_t needed)
+{
+    size_t capacity;
+    DailyCount *grown;
+    if (needed > MAX_DAILY_COUNTS) { return STORAGE_CAPACITY; }
+    if (!daily_count_shape(list)) { return STORAGE_ERROR; }
+    if (needed <= list->capacity) { return STORAGE_OK; }
+    capacity = list->capacity == 0 ? 32 : list->capacity;
+    while (capacity < needed) { capacity = capacity > MAX_DAILY_COUNTS / 2 ? MAX_DAILY_COUNTS : capacity * 2; }
+    if (capacity > SIZE_MAX / sizeof *grown) { return STORAGE_CAPACITY; }
+    grown = realloc(list->items, capacity * sizeof *grown);
+    if (grown == NULL) { return STORAGE_NO_MEMORY; }
+    list->items = grown; list->capacity = capacity;
+    return STORAGE_OK;
+}
+
+/* 功能：释放并清零；参数及返回值见storage.h。 */
+void storage_free_daily_counts(DailyCountList *list)
+{
+    if (list != NULL) { free(list->items); memset(list, 0, sizeof *list); }
+}
+
+/* 功能：校验单日聚合关系。参数：record。返回：有效1，无副作用。 */
+static int valid_daily_count(const DailyCount *record)
+{
+    int slot, sum = 0, maximum = 0;
+    if (!utils_valid_date(record->date) || record->reservation_count < 0 || record->reservation_count > DAILY_CAPACITY ||
+        record->reserved_hours != record->reservation_count || record->student_count < 0 ||
+        record->student_count > record->reservation_count) { return 0; }
+    for (slot = 0; slot < SLOT_COUNT; ++slot) {
+        int count = record->slot_counts[slot];
+        if (count < 0 || count > COMPUTER_COUNT) { return 0; }
+        sum += count;
+        if (count > maximum) { maximum = count; }
+    }
+    /* 同一学生同一时段只能一座，人数至少为单时段最大预约量；空日人数必须为0。 */
+    return sum == record->reservation_count && record->student_count >= maximum;
+}
+
+/* 功能：完整验证13字段数值和递增唯一日期；参数/返回值见storage.h。 */
+StorageResult storage_validate_daily_counts(const DailyCountList *list)
+{
+    size_t i;
+    if (list != NULL && list->count > MAX_DAILY_COUNTS) { return STORAGE_CAPACITY; }
+    if (!daily_count_shape(list)) { return STORAGE_ERROR; }
+    for (i = 0; i < list->count; ++i) {
+        if (!valid_daily_count(&list->items[i]) || (i > 0 && list->items[i-1].date >= list->items[i].date)) { return STORAGE_ERROR; }
+    }
+    return STORAGE_OK;
+}
+
+/* 功能：严格解析日期/三项汇总/九时段。参数：可改行/成功输出。返回：有效1。 */
+static int parse_daily_count(char *line, DailyCount *record)
+{
+    char *fields[4 + SLOT_COUNT];
+    int slot;
+    if (!split_fields(line, fields, 4 + SLOT_COUNT) || strlen(fields[0]) != 8 ||
+        !reservation_number(fields[0], 10000101, 99991231, &record->date) ||
+        !reservation_number(fields[1], 0, DAILY_CAPACITY, &record->reservation_count) ||
+        !reservation_number(fields[2], 0, DAILY_CAPACITY, &record->student_count) ||
+        !reservation_number(fields[3], 0, DAILY_CAPACITY, &record->reserved_hours)) { return 0; }
+    for (slot = 0; slot < SLOT_COUNT; ++slot) {
+        if (!reservation_number(fields[4+slot], 0, COMPUTER_COUNT, &record->slot_counts[slot])) { return 0; }
+    }
+    return valid_daily_count(record);
+}
+
+/* 功能：全量加载，部分读取/分配失败不发布；参数/返回值见storage.h。 */
+StorageResult storage_load_daily_counts(DailyCountList *list)
+{
+    DailyCountList loaded = {0};
+    StorageResult result = STORAGE_OK;
+    FILE *file;
+    char line[INPUT_LINE_CAPACITY];
+    if (!daily_count_shape(list) || check_path(COUNTS_PATH, 0) != 1) {
+        fputs("统计快照文件缺失、不可访问或输出集合无效。\n", stderr); return STORAGE_ERROR;
+    }
+    file = fopen(COUNTS_PATH, "rb");
+    if (file == NULL) { report_file_error("打开统计快照", COUNTS_PATH); return STORAGE_ERROR; }
+    for (;;) {
+        DailyCount record = {0};
+        LineResult read = utils_read_line(file, line, sizeof line);
+        if (read == LINE_EOF) { break; }
+        if (read != LINE_OK || !parse_daily_count(line, &record) ||
+            (loaded.count > 0 && loaded.items[loaded.count-1].date >= record.date)) {
+            fprintf(stderr, "统计文件 '%s' 第 %zu 行损坏、日期重复/无序或读取失败。\n", COUNTS_PATH, loaded.count+1);
+            result = STORAGE_ERROR; break;
+        }
+        result = storage_reserve_daily_counts(&loaded, loaded.count+1);
+        if (result != STORAGE_OK) { break; }
+        loaded.items[loaded.count++] = record;
+    }
+    if (!close_input(file, COUNTS_PATH)) { result = STORAGE_ERROR; }
+    if (result == STORAGE_OK) { storage_free_daily_counts(list); *list = loaded; }
+    else { storage_free_daily_counts(&loaded); fputs("统计快照加载失败，原文件和输出保持不变。\n", stderr); }
+    return result;
+}
+
+/* 功能：完整验证、门禁、独占快照保存，复用既有替换；参数/返回值见storage.h。 */
+StorageResult storage_save_daily_counts(const DailyCountList *list)
+{
+    StorageResult result;
+    FILE *file;
+    size_t i;
+    int slot, success = 1;
+    if (!storage_writes_allowed()) { return STORAGE_RECOVERY_REQUIRED; }
+    result = storage_validate_daily_counts(list);
+    if (result != STORAGE_OK) { return result; }
+    file = open_snapshot(COUNTS_TEMP_PATH);
+    if (file == NULL) { return STORAGE_ERROR; }
+    for (i = 0; i < list->count && success; ++i) {
+        const DailyCount *r = &list->items[i];
+        if (fprintf(file, "%08d|%d|%d|%d", r->date, r->reservation_count, r->student_count, r->reserved_hours) < 0) { success = 0; }
+        for (slot = 0; slot < SLOT_COUNT && success; ++slot) {
+            if (fprintf(file, "|%d", r->slot_counts[slot]) < 0) { success = 0; }
+        }
+        if (success && fprintf(file, "\n") < 0) { success = 0; }
+    }
+    return finish_snapshot(file, COUNTS_PATH, COUNTS_TEMP_PATH, success) ? STORAGE_OK : STORAGE_ERROR;
+}

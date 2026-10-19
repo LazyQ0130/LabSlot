@@ -44,7 +44,7 @@ def main():
     sources = [str(root / "src" / f"{name}.c") for name in ["auth", "storage", "utils", "lab", "booking"]]
     builds = [flags + ["-include", str(root / "tests/io_faults.h"), str(root / "tests/booking_probe.c"), *sources,
                       "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc", "-o", str(probe)],
-              flags + [str(root / "tests/booking_ui_main.c"), str(root / "src/ui.c"), str(root / "src/fault.c"), str(root / "src/admin.c"), *sources, "-o", str(ui)]]
+              flags + [str(root / "tests/booking_ui_main.c"), str(root / "src/ui.c"), str(root / "src/fault.c"), str(root / "src/admin.c"), str(root / "src/stats.c"), *sources, "-o", str(ui)]]
     for i, command in enumerate(builds):
         result = subprocess.run(command, capture_output=True, timeout=60)
         (run_root / f"build-{i}.log").write_bytes(result.stdout + result.stderr)
