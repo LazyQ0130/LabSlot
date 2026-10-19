@@ -1,0 +1,158 @@
+python tests/test_p2.py --executable smart-lab.exe --cc "gcc"
+PASS 正常创建/不同日期时段/唯一编号/两类冲突/重启
+PASS 本人取消/他人和重复拒绝/取消保留/座位释放/重新预约
+PASS 取消开始/过去拒绝 20261018-8
+PASS 取消开始/过去拒绝 20261019-2
+PASS 取消开始/过去拒绝 20261019-0
+PASS 尚未开始的远期旧记录可取消
+PASS 时间规则 20261018/slot=8/now=20261019,10,15,0
+PASS 时间规则 20261019/slot=2/now=20261019,10,15,0
+PASS 时间规则 20261019/slot=3/now=20261019,10,15,0
+PASS 时间规则 20261020/slot=0/now=20261019,10,15,0
+PASS 时间规则 20261025/slot=8/now=20261019,10,15,0
+PASS 时间规则 20261026/slot=0/now=20261019,10,15,0
+PASS 时间规则 20261301/slot=0/now=20261019,10,15,0
+PASS 时间规则 20260431/slot=0/now=20261019,10,15,0
+PASS 时间规则 20260229/slot=0/now=20261019,10,15,0
+PASS 时间规则 20261020/slot=-1/now=20261019,10,15,0
+PASS 时间规则 20261020/slot=9/now=20261019,10,15,0
+PASS 时间规则 20261019/slot=3/now=20261019,11,0,0
+PASS 时间规则 20261019/slot=3/now=20261019,10,59,59
+PASS 时间规则 20240229/slot=0/now=20240228,10,15,0
+PASS 时间规则 19000229/slot=0/now=19000228,10,15,0
+PASS 时间规则 20000229/slot=0/now=20000228,10,15,0
+PASS 时间规则 21000229/slot=0/now=21000228,10,15,0
+PASS 时间规则 20270106/slot=0/now=20261231,16,30,0
+PASS 时间规则 20270107/slot=0/now=20261231,16,30,0
+PASS 时间规则 20240305/slot=0/now=20240228,16,30,0
+PASS 时间规则 20240306/slot=0/now=20240228,16,30,0
+PASS 时间规则 99991231/slot=8/now=99991230,10,15,0
+PASS 时间规则 20261019/slot=0/now=20261019,7,59,59
+PASS 时间规则 20261019/slot=0/now=20261019,8,0,0
+PASS 时间规则 20261019/slot=8/now=20261019,16,0,0
+PASS 公历推进/时段格式 0
+PASS 公历推进/时段格式 1
+PASS 公历推进/时段格式 2
+PASS 公历推进/时段格式 3
+PASS 公历推进/时段格式 4
+PASS 公历推进/时段格式 5
+PASS 公历推进/时段格式 6
+PASS 公历推进/时段格式 7
+PASS 业务权限 create-none
+PASS 业务权限 create-admin
+PASS 业务权限 create-ghost
+PASS 业务权限 cancel-none
+PASS 业务权限 cancel-admin
+PASS 业务权限 cancel-ghost
+PASS 业务权限 query-none
+PASS 业务权限 query-admin
+PASS 业务权限 query-ghost
+PASS 学生文件损坏与账户不存在分离
+PASS 异常时间源安全失败/历史查询不依赖时钟
+PASS 业务输入参数边界
+PASS 确认后重新加载冲突与归属
+PASS 业务读文件缺失/空电脑表不初始化
+PASS 故障拒绝与座位符号优先级
+PASS 个人过滤/有效与全部历史/排序/查询不写入
+PASS 损坏预约保护 garbage
+PASS 损坏预约保护 blank
+PASS 损坏预约保护 empty-id
+PASS 损坏预约保护 duplicate-id
+PASS 损坏预约保护 duplicate-cancelled-id
+PASS 损坏预约保护 seat-conflict
+PASS 损坏预约保护 student-conflict
+PASS 损坏预约保护 no-zero
+PASS 损坏预约保护 no-large
+PASS 损坏预约保护 bad-date
+PASS 损坏预约保护 long-date
+PASS 损坏预约保护 bad-slot
+PASS 损坏预约保护 negative-slot
+PASS 损坏预约保护 bad-status
+PASS 损坏预约保护 suffix
+PASS 损坏预约保护 extra-field
+PASS 损坏预约保护 missing-field
+PASS 损坏预约保护 overflow-id
+PASS 损坏预约保护 zero-id
+PASS 损坏预约保护 negative-id
+PASS 损坏预约保护 invalid-student
+PASS 损坏预约保护 long-student
+PASS 损坏预约保护 nul
+PASS 损坏预约保护 bom
+PASS 损坏预约保护 huge-line
+PASS 损坏预约保护 numeric-space
+PASS 乱序/CRLF/末行无换行/取消编号不复用
+PASS 编号INT_MAX边界安全拒绝
+PASS 保存前完整校验 1
+PASS 保存前完整校验 2
+PASS 保存前完整校验 3
+PASS 保存前完整校验 4
+PASS 保存前完整校验 5
+PASS 保存前完整校验 6
+PASS 保存前完整校验 7
+PASS 保存前完整校验 8
+PASS 保存前完整校验 9
+PASS 保存前完整校验 10
+PASS 真实MAX_RESERVATIONS边界 +0
+PASS 真实MAX_RESERVATIONS边界 +1
+PASS 分配故障 create-1
+PASS 分配故障 create-2
+PASS 分配故障 create-3
+PASS 分配故障 create-4
+PASS 分配故障 create-5
+PASS 分配故障 create-6
+PASS 内存故障同进程恢复 create
+PASS 分配故障 cancel-1
+PASS 分配故障 cancel-2
+PASS 分配故障 cancel-3
+PASS 分配故障 cancel-4
+PASS 分配故障 cancel-5
+PASS 内存故障同进程恢复 cancel
+PASS 分配故障 query-1
+PASS 分配故障 query-2
+PASS 分配故障 query-3
+PASS 分配故障 query-4
+PASS 分配故障 query-5
+PASS 内存故障同进程恢复 query
+PASS 分配故障 seats-1
+PASS 分配故障 seats-2
+PASS 内存故障同进程恢复 seats
+PASS 部分读取/扩容失败输出保持 1
+PASS 部分读取/扩容失败输出保持 2
+PASS 部分读取/扩容失败输出保持 3
+PASS realloc失败保留原指针并可恢复
+PASS 写失败回滚 create-stale
+PASS 写失败回滚 create-directory
+PASS 写失败回滚 create-write
+PASS 写失败回滚 create-flush
+PASS 写失败回滚 create-close
+PASS 写失败回滚 cancel-stale
+PASS 写失败回滚 cancel-directory
+PASS 写失败回滚 cancel-write
+PASS 写失败回滚 cancel-flush
+PASS 写失败回滚 cancel-close
+PASS 真实Windows锁失败 create
+PASS 真实Windows锁失败 cancel
+PASS 真实Windows锁失败 query
+PASS 写入时间边界重查 create
+PASS 写入时间边界重查 cancel
+PASS 固定时间UI完整预约/查询/取消/释放
+PASS UI预约与取消放弃确认不写入
+PASS UI业务EOF清理 0
+PASS UI业务EOF清理 1
+PASS UI业务EOF清理 2
+PASS UI业务EOF清理 3
+PASS UI业务EOF清理 4
+PASS UI业务EOF清理 5
+PASS UI业务EOF清理 6
+PASS UI业务EOF清理 7
+PASS UI业务EOF清理 8
+PASS UI预约非法输入 0
+PASS UI预约非法输入 1
+PASS UI预约非法输入 2
+PASS UI预约非法输入 3
+PASS UI预约非法输入 4
+PASS UI损坏文件不能显示暂无记录
+PASS 正式程序P2只读查询与日期座位流程
+PASS 真实开发数据及学生累计时间不变
+
+155/155 passed; report: tests\runs\p2-20261019-095141-da55c0da

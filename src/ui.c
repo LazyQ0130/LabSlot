@@ -2,9 +2,11 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "auth.h"
 #include "lab.h"
 #include "utils.h"
+#include "storage.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -32,7 +34,7 @@ void ui_print_seat_map(const Lab computers[COMPUTER_COUNT])
     int row; /* 座位图行号。 */
     int col; /* 座位图列号。 */
     puts("\n实验室座位图（5 排 × 8 列）");
-    puts("* 正常/空闲    ! 故障    # 已预约（P2 尚未开放）");
+    puts("* 正常/基础空闲    ! 故障（指定日期/时段预约状态请在学生菜单查看）");
     for (row = 0; row < LAB_ROWS; ++row) {
         for (col = 0; col < LAB_COLUMNS; ++col) {
             const Lab *seat = &computers[row * LAB_COLUMNS + col]; /* 当前座位。 */
@@ -112,11 +114,140 @@ done:
     return input;
 }
 
+/* 功能：读取真实日期和时段。参数：date/slot 输出。返回：InputResult。 */
+static InputResult read_booking_target(int *date, int *slot)
+{
+    char text[10]; /* 八位日期、结尾及一位超长检测空间。 */
+    InputResult input = utils_read_field("预约日期（YYYYMMDD）：", text, sizeof text, 0); /* 日期行。 */
+    int i; /* 九个时段。 */
+    if (input != INPUT_OK) { return input; }
+    if (strlen(text) != 8 || !utils_parse_int(text, 10000101, 99991231, date) || !utils_valid_date(*date)) {
+        return INPUT_INVALID;
+    }
+    for (i = 0; i < SLOT_COUNT; ++i) {
+        char period[16]; /* 时段说明。 */
+        utils_format_slot(i, period, sizeof period);
+        printf("%d. %s\n", i, period);
+    }
+    return utils_read_int_range("时段索引（0～8）：", 0, SLOT_COUNT - 1, slot);
+}
+
+/* 功能：绘制指定日期/时段真实视图。参数：date/slot/view 成功业务结果。返回：无。 */
+static void print_booking_seats(int date, int slot, const BookingSeats *view)
+{
+    char period[16]; /* 格式化时段。 */
+    int i; /* 电脑数组下标。 */
+    utils_format_slot(slot, period, sizeof period);
+    printf("\n实验室座位图\n日期：%04d-%02d-%02d\n时间：%s\n", date / 10000, date / 100 % 100, date % 100, period);
+    puts("* 空闲    # 已预约    ! 故障（故障优先）");
+    for (i = 0; i < COMPUTER_COUNT; ++i) {
+        printf("%02d[%c]%s", i + 1, view->symbols[i], (i + 1) % LAB_COLUMNS == 0 ? "\n" : " ");
+    }
+    printf("座位符号数量：空闲 %d，已预约 %d，故障 %d。\n", view->free_count, view->booked_count, view->fault_count);
+}
+
+/* 功能：打印一条已验证记录。参数：record。返回：无。 */
+static void print_reservation(const Reservation *record)
+{
+    char period[16]; /* 时段起止时间。 */
+    utils_format_slot(record->slot_index, period, sizeof period);
+    printf("预约 %d | 日期 %08d | %s | 电脑 %02d | %s\n", record->id, record->date, period,
+           record->computer_no, record->status == BOOKING_ACTIVE ? "有效" : "已取消");
+}
+
+/* 功能：打印本人结果。参数：list 成功查询集合。返回：无。 */
+static void print_reservations(const ReservationList *list)
+{
+    size_t i; /* 结果下标。 */
+    if (list->count == 0) { puts("暂无符合条件的预约。"); }
+    for (i = 0; i < list->count; ++i) { print_reservation(&list->items[i]); }
+}
+
+/* 功能：学生查看视图或确认后预约。参数：context/session；create 非零为预约。
+ * 返回：InputResult；业务失败回菜单，EOF/ERROR 传播。
+ */
+static InputResult seat_booking_flow(const BookingContext *context, const AuthSession *session, int create)
+{
+    int date, slot, no, confirm; /* 完整读取后才使用的目标与确认。 */
+    BookingSeats view; /* 成功后才显示的真实座位。 */
+    Reservation created; /* 保存成功后才发布的预约详情。 */
+    BookingResult result; /* 业务结果。 */
+    InputResult input = read_booking_target(&date, &slot); /* 有界输入状态。 */
+    if (input != INPUT_OK) { return input; }
+    result = create ? booking_check_time(context, date, slot, 1) : BOOKING_OK;
+    if (result == BOOKING_OK) { result = booking_get_seats(date, slot, &view); }
+    if (result != BOOKING_OK) { printf("操作失败：%s。\n", booking_result_message(result)); return INPUT_OK; }
+    print_booking_seats(date, slot, &view);
+    if (!create) { return INPUT_OK; }
+    input = utils_read_int_range("电脑编号（1～40）：", 1, COMPUTER_COUNT, &no);
+    if (input != INPUT_OK) { return input; }
+    result = booking_check_create(context, session, date, slot, no);
+    if (result != BOOKING_OK) { printf("预约失败：%s。\n", booking_result_message(result)); return INPUT_OK; }
+    printf("确认预约：学号 %s，日期 %08d，时段 %02d:00-%02d:00，电脑 %02d。\n",
+           session->user_id, date, OPEN_HOUR + slot, OPEN_HOUR + slot + 1, no);
+    puts("1. 确认预约\n0. 放弃");
+    input = read_menu(1, &confirm);
+    if (input != INPUT_OK) { return input; }
+    if (!confirm) { puts("已放弃预约，未创建记录。"); return INPUT_OK; }
+    result = booking_create(context, session, date, slot, no, &created);
+    if (result == BOOKING_OK) { puts("预约成功。"); print_reservation(&created); }
+    else { printf("预约失败：%s。\n", booking_result_message(result)); }
+    return INPUT_OK;
+}
+
+/* 功能：默认有效预约，可选择全部历史。参数：context/session。返回：InputResult。 */
+static InputResult query_booking_flow(const BookingContext *context, const AuthSession *session)
+{
+    ReservationList list = {0}; /* 堆上个人结果。 */
+    BookingResult result = booking_query(context, session, BOOKING_QUERY_ACTIVE, &list);
+    InputResult input = INPUT_OK; /* 查询失败不假装暂无记录。 */
+    int choice; /* 0 返回，1 全部历史。 */
+    if (result != BOOKING_OK) { printf("查询失败：%s。\n", booking_result_message(result)); goto done; }
+    puts("我的有效预约（含过去未取消记录）："); print_reservations(&list);
+    puts("1. 查看全部历史与已取消记录\n0. 返回学生菜单");
+    input = read_menu(1, &choice);
+    if (input != INPUT_OK || choice == 0) { goto done; }
+    result = booking_query(context, session, BOOKING_QUERY_ALL, &list);
+    if (result == BOOKING_OK) { puts("我的全部预约："); print_reservations(&list); }
+    else { printf("查询失败：%s。\n", booking_result_message(result)); }
+done:
+    storage_free_reservations(&list);
+    return input;
+}
+
+/* 功能：展示可取消记录，校验详情并确认后取消。参数：context/session。返回：InputResult。 */
+static InputResult cancel_booking_flow(const BookingContext *context, const AuthSession *session)
+{
+    ReservationList list = {0}; /* 可取消结果。 */
+    Reservation candidate; /* 通过预检的详情。 */
+    BookingResult result = booking_query(context, session, BOOKING_QUERY_CANCELLABLE, &list);
+    InputResult input = INPUT_OK; /* EOF/错误释放集合后传播。 */
+    int id, confirm; /* 待取消编号与确认。 */
+    if (result != BOOKING_OK) { printf("取消查询失败：%s。\n", booking_result_message(result)); goto done; }
+    puts("本人尚未开始的可取消预约："); print_reservations(&list);
+    if (list.count == 0) { goto done; }
+    input = utils_read_int_range("预约编号：", 1, INT_MAX, &id);
+    if (input != INPUT_OK) { goto done; }
+    result = booking_check_cancel(context, session, id, &candidate);
+    if (result != BOOKING_OK) { printf("取消失败：%s。\n", booking_result_message(result)); goto done; }
+    print_reservation(&candidate);
+    puts("1. 确认取消\n0. 保留预约");
+    input = read_menu(1, &confirm);
+    if (input != INPUT_OK) { goto done; }
+    if (!confirm) { puts("已放弃取消，原预约不变。"); goto done; }
+    result = booking_cancel(context, session, id);
+    if (result == BOOKING_OK) { puts("取消成功，该时段座位已经释放。"); }
+    else { printf("取消失败：%s。\n", booking_result_message(result)); }
+done:
+    storage_free_reservations(&list);
+    return input;
+}
+
 /* 功能：显示已认证角色菜单，进入及每轮均检查同一角色权限。
- * 参数：role 预期角色；session 当前会话；computers 座位。返回：InputResult。
+ * 参数：role 预期角色；session 当前会话；computers 座位；context 时钟。返回：InputResult。
  */
 static InputResult user_menu(UserRole role, AuthSession *session,
-                             const Lab computers[COMPUTER_COUNT])
+                             const Lab computers[COMPUTER_COUNT], const BookingContext *context)
 {
     for (;;) {
         int choice; /* 当前角色菜单选项。 */
@@ -147,7 +278,13 @@ static InputResult user_menu(UserRole role, AuthSession *session,
             puts("已退出登录，登录状态已清除。");
             return INPUT_OK;
         }
-        if (choice == 1) {
+        if (role == ROLE_STUDENT && choice >= 1 && choice <= 4) {
+            if (choice == 1 || choice == 2) { input = seat_booking_flow(context, session, choice == 2); }
+            else if (choice == 3) { input = query_booking_flow(context, session); }
+            else { input = cancel_booking_flow(context, session); }
+            if (input == INPUT_EOF || input == INPUT_ERROR) { auth_logout(session); return input; }
+            if (input == INPUT_INVALID) { puts("输入无效，本次预约操作已取消。"); }
+        } else if (choice == 1) {
             ui_print_seat_map(computers);
         } else {
             puts("该功能尚未开放");
@@ -156,10 +293,10 @@ static InputResult user_menu(UserRole role, AuthSession *session,
 }
 
 /* 功能：收集角色凭据并在成功后进入角色菜单。
- * 参数：role 角色；session 输出；computers 座位。返回：InputResult。
+ * 参数：role 角色；session 输出；computers 座位；context 预约时钟。返回：InputResult。
  */
 static InputResult login_user(UserRole role, AuthSession *session,
-                              const Lab computers[COMPUTER_COUNT])
+                              const Lab computers[COMPUTER_COUNT], const BookingContext *context)
 {
     char id[ID_LEN] = {0}; /* 本次登录标识。 */
     char password[PASSWORD_LEN] = {0}; /* 本次登录密码，不传给会话。 */
@@ -184,7 +321,7 @@ static InputResult login_user(UserRole role, AuthSession *session,
     utils_clear_secret(password, sizeof password);
     if (result == AUTH_OK) {
         puts("登录成功。");
-        input = user_menu(role, session, computers);
+        input = user_menu(role, session, computers, context);
     } else {
         printf("登录失败：%s。可重新选择登录或返回。\n", auth_result_message(result));
     }
@@ -198,10 +335,10 @@ done:
 }
 
 /* 功能：角色入口只允许注册、登录和返回，不直接访问已登录菜单。
- * 参数：role 固定角色；session 调用方持有的会话；computers 座位。返回：InputResult。
+ * 参数：role 固定角色；session 调用方会话；computers 座位；context 时钟。返回：InputResult。
  */
 static InputResult role_entry(UserRole role, AuthSession *session,
-                              const Lab computers[COMPUTER_COUNT])
+                              const Lab computers[COMPUTER_COUNT], const BookingContext *context)
 {
     auth_logout(session);
     for (;;) {
@@ -218,7 +355,7 @@ static InputResult role_entry(UserRole role, AuthSession *session,
             auth_logout(session);
             return INPUT_OK;
         }
-        input = choice == 1 ? register_user(role) : login_user(role, session, computers);
+        input = choice == 1 ? register_user(role) : login_user(role, session, computers, context);
         if (input == INPUT_EOF || input == INPUT_ERROR) {
             auth_logout(session);
             return input;
@@ -228,6 +365,12 @@ static InputResult role_entry(UserRole role, AuthSession *session,
 
 /* 功能：主菜单持有显式会话，所有退出路径统一清理；参数、返回值见 ui.h。 */
 int ui_run(const Lab computers[COMPUTER_COUNT])
+{
+    return ui_run_with_context(computers, NULL);
+}
+
+/* 功能：持有会话并传递可注入时钟；参数、返回值见 ui.h。 */
+int ui_run_with_context(const Lab computers[COMPUTER_COUNT], const BookingContext *context)
 {
     AuthSession session = {0}; /* 无全局会话，不能靠切菜单继承权限。 */
     InputResult input = INPUT_OK; /* 用于统一 EOF/错误退出。 */
@@ -252,7 +395,7 @@ int ui_run(const Lab computers[COMPUTER_COUNT])
         if (choice == 3) {
             ui_print_seat_map(computers);
         } else {
-            input = role_entry(choice == 1 ? ROLE_ADMIN : ROLE_STUDENT, &session, computers);
+            input = role_entry(choice == 1 ? ROLE_ADMIN : ROLE_STUDENT, &session, computers, context);
         }
         if (input == INPUT_EOF || input == INPUT_ERROR) {
             break;

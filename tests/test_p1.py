@@ -108,7 +108,8 @@ def main():
                 assert fields[3] == "0"
             content = account_file(directory, role).read_bytes()
             timestamp = account_file(directory, role).stat().st_mtime_ns
-            options = [1, *range(2, 6 if role == 1 else 7)]
+            # P2 已开放学生 1～4；固定历史日期用于只读视图与必定过期的预约输入。
+            options = [1, 2, 3, 4, 5] if role == 1 else [1, 20000101, 0, 2, 20000101, 0, 3, 0, 4, 5, 6]
             result = run(directory, login(role, menu=options))
             assert result.returncode == 0 and not result.stderr
             assert "登录成功".encode() in result.stdout
@@ -116,7 +117,10 @@ def main():
             other = "------ 学生菜单 ------" if role == 1 else "------ 管理员菜单 ------"
             assert expected.encode() in result.stdout and other.encode() not in result.stdout
             assert b"01[*]" in result.stdout and b"40[*]" in result.stdout
-            assert result.stdout.count("该功能尚未开放".encode()) == (4 if role == 1 else 5)
+            assert result.stdout.count("该功能尚未开放".encode()) == (4 if role == 1 else 2)
+            if role == 2:
+                assert "时段已经开始或日期已过去".encode() in result.stdout
+                assert "我的有效预约".encode() in result.stdout and "可取消预约".encode() in result.stdout
             assert "登录状态已清除".encode() in result.stdout
             assert content == account_file(directory, role).read_bytes()
             assert timestamp == account_file(directory, role).stat().st_mtime_ns

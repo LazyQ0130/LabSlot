@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdint.h>
 #include <string.h>
 #include <sys/stat.h>
 #include "lab.h"
@@ -473,7 +474,7 @@ int storage_initialize(Lab computers[COMPUTER_COUNT])
 {
     static const char *const paths[] = {
         ADMINS_PATH, STUDENTS_PATH, RESERVATIONS_PATH, REPORTS_PATH, COUNTS_PATH
-    }; /* 只需要创建和读取、不在 P0 解析的文件。 */
+    }; /* 引导创建与可读性检查；账户和预约由各加载器按需严格解析。 */
     size_t i; /* 固定文件路径表下标。 */
     int exists; /* 电脑文件是否存在且类型正确。 */
     int loaded; /* 电脑文件读取结果。 */
@@ -503,4 +504,213 @@ int storage_initialize(Lab computers[COMPUTER_COUNT])
     }
     memcpy(computers, defaults, sizeof defaults);
     return 1;
+}
+
+/* 功能：验证集合内存形状。参数：list。返回：有效 1，否则 0，不访问数组内容。 */
+static int reservation_shape(const ReservationList *list)
+{
+    return list != NULL && list->count <= list->capacity && list->capacity <= MAX_RESERVATIONS &&
+        ((list->capacity == 0 && list->items == NULL) || (list->capacity > 0 && list->items != NULL));
+}
+
+/* 功能：有界动态扩容；参数、返回值见 storage.h。 */
+StorageResult storage_reserve_reservations(ReservationList *list, size_t needed)
+{
+    size_t capacity; /* 候选容量，失败时不发布。 */
+    Reservation *grown; /* realloc 临时返回值，不能直接覆盖原指针。 */
+    if (needed > MAX_RESERVATIONS) { return STORAGE_CAPACITY; }
+    if (!reservation_shape(list)) { return STORAGE_ERROR; }
+    if (needed <= list->capacity) { return STORAGE_OK; }
+    capacity = list->capacity == 0 ? 64 : list->capacity;
+    while (capacity < needed) {
+        capacity = capacity > MAX_RESERVATIONS / 2 ? MAX_RESERVATIONS : capacity * 2;
+    }
+    if (capacity > SIZE_MAX / sizeof *grown) { return STORAGE_CAPACITY; }
+    grown = realloc(list->items, capacity * sizeof *grown);
+    if (grown == NULL) { return STORAGE_NO_MEMORY; }
+    list->items = grown;
+    list->capacity = capacity;
+    return STORAGE_OK;
+}
+
+/* 功能：释放并清空预约集合；参数、返回值见 storage.h。 */
+void storage_free_reservations(ReservationList *list)
+{
+    if (list != NULL) {
+        free(list->items);
+        memset(list, 0, sizeof *list);
+    }
+}
+
+/* 功能：按正整数编号比较索引。参数：left/right 指向记录指针。返回：排序顺序。 */
+static int reservation_id_order(const void *left, const void *right)
+{
+    const Reservation *a = *(const Reservation *const *)left; /* 左记录。 */
+    const Reservation *b = *(const Reservation *const *)right; /* 右记录。 */
+    return (a->id > b->id) - (a->id < b->id); /* 禁止减法溢出。 */
+}
+
+/* 功能：按日期、时段、电脑比较索引。参数：left/right 指向记录指针。返回：排序顺序。 */
+static int reservation_seat_order(const void *left, const void *right)
+{
+    const Reservation *a = *(const Reservation *const *)left; /* 左记录。 */
+    const Reservation *b = *(const Reservation *const *)right; /* 右记录。 */
+    if (a->date != b->date) { return (a->date > b->date) - (a->date < b->date); }
+    if (a->slot_index != b->slot_index) { return (a->slot_index > b->slot_index) - (a->slot_index < b->slot_index); }
+    return (a->computer_no > b->computer_no) - (a->computer_no < b->computer_no);
+}
+
+/* 功能：按学生、日期、时段比较索引。参数：left/right 指向记录指针。返回：排序顺序。 */
+static int reservation_student_order(const void *left, const void *right)
+{
+    const Reservation *a = *(const Reservation *const *)left; /* 左记录。 */
+    const Reservation *b = *(const Reservation *const *)right; /* 右记录。 */
+    int order = strcmp(a->student_id, b->student_id); /* 字段已先验证终止与格式。 */
+    if (order != 0) { return order; }
+    if (a->date != b->date) { return (a->date > b->date) - (a->date < b->date); }
+    return (a->slot_index > b->slot_index) - (a->slot_index < b->slot_index);
+}
+
+/* 功能：完整快照校验，只排序指针索引，不改原记录顺序；契约见 storage.h。 */
+StorageResult storage_validate_reservations(const ReservationList *list)
+{
+    const Reservation **index; /* 堆上索引，避免 n² 查重与大栈数组。 */
+    size_t i; /* 当前记录。 */
+    size_t active = 0; /* 有效记录数，已取消不参与冲突。 */
+    StorageResult result = STORAGE_ERROR; /* 校验完所有约束才成功。 */
+    if (list != NULL && list->count > MAX_RESERVATIONS) { return STORAGE_CAPACITY; }
+    if (!reservation_shape(list)) { return STORAGE_ERROR; }
+    if (list->count == 0) { return STORAGE_OK; }
+    for (i = 0; i < list->count; ++i) {
+        const Reservation *r = &list->items[i]; /* 先检查字段再用于比较器。 */
+        if (r->id <= 0 || !utils_valid_id(r->student_id) || r->computer_no < 1 ||
+            r->computer_no > COMPUTER_COUNT || !utils_valid_date(r->date) ||
+            r->slot_index < 0 || r->slot_index >= SLOT_COUNT ||
+            (r->status != BOOKING_ACTIVE && r->status != BOOKING_CANCELLED)) {
+            return STORAGE_ERROR;
+        }
+    }
+    if (list->count > SIZE_MAX / sizeof *index) { return STORAGE_CAPACITY; }
+    index = malloc(list->count * sizeof *index);
+    if (index == NULL) { return STORAGE_NO_MEMORY; }
+    for (i = 0; i < list->count; ++i) { index[i] = &list->items[i]; }
+    qsort(index, list->count, sizeof *index, reservation_id_order);
+    for (i = 1; i < list->count; ++i) {
+        if (index[i - 1]->id == index[i]->id) { goto done; }
+    }
+    for (i = 0; i < list->count; ++i) {
+        if (list->items[i].status == BOOKING_ACTIVE) { index[active++] = &list->items[i]; }
+    }
+    qsort(index, active, sizeof *index, reservation_seat_order);
+    for (i = 1; i < active; ++i) {
+        if (reservation_seat_order(&index[i - 1], &index[i]) == 0) { goto done; }
+    }
+    qsort(index, active, sizeof *index, reservation_student_order);
+    for (i = 1; i < active; ++i) {
+        if (reservation_student_order(&index[i - 1], &index[i]) == 0) { goto done; }
+    }
+    result = STORAGE_OK;
+done:
+    free(index);
+    return result;
+}
+
+/* 功能：严格数字字段，不允许符号/空白。参数：text/minimum/maximum；value 输出。返回：有效 1，否则 0。 */
+static int reservation_number(const char *text, int minimum, int maximum, int *value)
+{
+    size_t i; /* 字节位置。 */
+    for (i = 0; text[i] != '\0'; ++i) {
+        if (text[i] < '0' || text[i] > '9') { return 0; }
+    }
+    return utils_parse_int(text, minimum, maximum, value);
+}
+
+/* 功能：解析恰好六字段预约。参数：line 可改行；record 输出。返回：有效 1，否则 0。 */
+static int parse_reservation(char *line, Reservation *record)
+{
+    char *fields[6]; /* 编号、学号、电脑、日期、时段、状态。 */
+    size_t i; /* 字段下标。 */
+    size_t length = strlen(line); /* 已经拒绝 NUL 的行。 */
+    int status; /* 经过范围检查的状态。 */
+    if (length > 0 && line[length - 1] == '\r') { line[length - 1] = '\0'; }
+    fields[0] = line;
+    for (i = 1; i < 6; ++i) {
+        char *separator = strchr(fields[i - 1], '|'); /* 下一个分隔符。 */
+        if (separator == NULL) { return 0; }
+        *separator = '\0'; fields[i] = separator + 1;
+    }
+    if (strchr(fields[5], '|') != NULL || !utils_valid_id(fields[1]) ||
+        !reservation_number(fields[0], 1, INT_MAX, &record->id) ||
+        !reservation_number(fields[2], 1, COMPUTER_COUNT, &record->computer_no) ||
+        strlen(fields[3]) != 8 || !reservation_number(fields[3], 10000101, 99991231, &record->date) ||
+        !utils_valid_date(record->date) ||
+        !reservation_number(fields[4], 0, SLOT_COUNT - 1, &record->slot_index) ||
+        !reservation_number(fields[5], BOOKING_CANCELLED, BOOKING_ACTIVE, &status)) {
+        return 0;
+    }
+    strcpy(record->student_id, fields[1]);
+    record->status = (BookingStatus)status;
+    return 1;
+}
+
+/* 功能：严格加载，部分失败不发布，也不覆盖源文件；契约见 storage.h。 */
+StorageResult storage_load_reservations(ReservationList *list)
+{
+    ReservationList loaded = {0}; /* 本次读取的独立快照。 */
+    StorageResult result = STORAGE_OK; /* 汇总解析、分配、全量验证与关闭。 */
+    FILE *file; /* 预约输入流。 */
+    char line[INPUT_LINE_CAPACITY]; /* 有界记录行。 */
+    if (!reservation_shape(list) || check_path(RESERVATIONS_PATH, 0) != 1) {
+        fputs("预约文件缺失、类型错误或输出集合无效。\n", stderr);
+        return STORAGE_ERROR;
+    }
+    file = fopen(RESERVATIONS_PATH, "rb");
+    if (file == NULL) { report_file_error("打开预约文件", RESERVATIONS_PATH); return STORAGE_ERROR; }
+    for (;;) {
+        Reservation record = {0}; /* 当前记录。 */
+        LineResult line_result = utils_read_line(file, line, sizeof line); /* 读行结果。 */
+        if (line_result == LINE_EOF) { break; }
+        if (line_result == LINE_ERROR) {
+            report_file_error("读取预约文件", RESERVATIONS_PATH); result = STORAGE_ERROR; break;
+        }
+        if (line_result != LINE_OK || !parse_reservation(line, &record)) {
+            fprintf(stderr, "预约文件 '%s' 第 %zu 行损坏。\n", RESERVATIONS_PATH, loaded.count + 1);
+            result = STORAGE_ERROR; break;
+        }
+        result = storage_reserve_reservations(&loaded, loaded.count + 1);
+        if (result != STORAGE_OK) { break; }
+        loaded.items[loaded.count++] = record;
+    }
+    if (!close_input(file, RESERVATIONS_PATH)) { result = STORAGE_ERROR; }
+    if (result == STORAGE_OK) { result = storage_validate_reservations(&loaded); }
+    if (result == STORAGE_OK) {
+        storage_free_reservations(list);
+        *list = loaded; /* 完整成功后转交数组所有权。 */
+    } else {
+        fputs("预约加载失败：请检查文件完整性、容量或内存；原文件未改动。\n", stderr);
+        storage_free_reservations(&loaded);
+    }
+    return result;
+}
+
+/* 功能：验证并安全保存预约；契约见 storage.h。 */
+StorageResult storage_save_reservations(const ReservationList *list)
+{
+    StorageResult result = storage_validate_reservations(list); /* 保存前重新全量校验。 */
+    FILE *file; /* 独占临时流。 */
+    size_t i; /* 写入下标。 */
+    int success = 1; /* 每一条及最终关闭均需成功。 */
+    if (result != STORAGE_OK) {
+        fputs("预约快照校验失败，未保存。\n", stderr); return result;
+    }
+    file = open_snapshot(RESERVATIONS_TEMP_PATH);
+    if (file == NULL) { return STORAGE_ERROR; }
+    for (i = 0; i < list->count; ++i) {
+        const Reservation *r = &list->items[i]; /* 已验证记录。 */
+        if (fprintf(file, "%d|%s|%d|%d|%d|%d\n", r->id, r->student_id, r->computer_no,
+                    r->date, r->slot_index, (int)r->status) < 0) {
+            report_file_error("写入预约临时文件", RESERVATIONS_TEMP_PATH); success = 0; break;
+        }
+    }
+    return finish_snapshot(file, RESERVATIONS_PATH, RESERVATIONS_TEMP_PATH, success) ? STORAGE_OK : STORAGE_ERROR;
 }

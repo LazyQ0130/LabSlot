@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "model.h"
 
 #ifdef _WIN32
@@ -238,4 +239,91 @@ void utils_clear_secret(void *buffer, size_t size)
     while (size-- > 0) {
         *cursor++ = 0;
     }
+}
+
+/* 功能：计算某月天数。参数：year 年；month 合法月份。返回：天数。 */
+static int days_in_month(int year, int month)
+{
+    static const int days[] = {31,28,31,30,31,30,31,31,30,31,30,31}; /* 公历平年。 */
+    return days[month - 1] + (month == 2 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+}
+
+/* 功能：真实公历验证；参数和返回值见 utils.h。 */
+int utils_valid_date(int date)
+{
+    int year = date / 10000; /* 四位年。 */
+    int month = date / 100 % 100; /* 月。 */
+    int day = date % 100; /* 日。 */
+    return year >= 1000 && year <= 9999 && month >= 1 && month <= 12 &&
+        day >= 1 && day <= days_in_month(year, month);
+}
+
+/* 功能：公历日序号；参数和返回值见 utils.h。 */
+int utils_date_serial(int date)
+{
+    int year = date / 10000; /* 当前年。 */
+    int month; /* 累加此前月份。 */
+    int serial; /* 连续天数，最大不到四百万，不会 int 溢出。 */
+    if (!utils_valid_date(date)) {
+        return -1;
+    }
+    serial = 365 * (year - 1) + (year - 1) / 4 - (year - 1) / 100 + (year - 1) / 400;
+    for (month = 1; month < date / 100 % 100; ++month) {
+        serial += days_in_month(year, month);
+    }
+    return serial + date % 100;
+}
+
+/* 功能：按自然日推进，不用 YYYYMMDD 直接加一；参数和返回值见 utils.h。 */
+int utils_date_add(int date, int days)
+{
+    int year = date / 10000, month = date / 100 % 100, day = date % 100; /* 日期分量。 */
+    if (!utils_valid_date(date) || days < -36600 || days > 36600) {
+        return 0;
+    }
+    while (days > 0) {
+        if (++day > days_in_month(year, month)) {
+            day = 1;
+            if (++month > 12) { month = 1; ++year; }
+        }
+        --days;
+    }
+    while (days < 0) {
+        if (--day == 0) {
+            if (--month == 0) { month = 12; --year; }
+            day = days_in_month(year, month);
+        }
+        ++days;
+    }
+    return year >= 1000 && year <= 9999 ? year * 10000 + month * 100 + day : 0;
+}
+
+/* 功能：本地系统墙钟读取；参数和返回值见 utils.h。 */
+int utils_local_time(void *context, LabTime *now)
+{
+    time_t timestamp = time(NULL); /* 系统当前时间。 */
+    struct tm *local; /* 标准库本地时间，单进程立即复制所需字段。 */
+    (void)context;
+    if (now == NULL || timestamp == (time_t)-1 || (local = localtime(&timestamp)) == NULL) {
+        return 0;
+    }
+    if (local->tm_year < 1000 - 1900 || local->tm_year > 9999 - 1900) {
+        return 0; /* 先限制年份再乘 10000，避免异常系统日期产生有符号溢出。 */
+    }
+    now->date = (local->tm_year + 1900) * 10000 + (local->tm_mon + 1) * 100 + local->tm_mday;
+    now->hour = local->tm_hour;
+    now->minute = local->tm_min;
+    now->second = local->tm_sec;
+    return 1;
+}
+
+/* 功能：格式化九个时段；参数和返回值见 utils.h。 */
+int utils_format_slot(int slot, char *buffer, size_t capacity)
+{
+    int written; /* snprintf 需要的字节数。 */
+    if (slot < 0 || slot >= SLOT_COUNT || buffer == NULL || capacity == 0) {
+        return 0;
+    }
+    written = snprintf(buffer, capacity, "%02d:00-%02d:00", OPEN_HOUR + slot, OPEN_HOUR + slot + 1);
+    return written >= 0 && (size_t)written < capacity;
 }

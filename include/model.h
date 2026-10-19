@@ -1,6 +1,8 @@
 #ifndef SMART_LAB_MODEL_H
 #define SMART_LAB_MODEL_H
 
+#include <stddef.h>
+
 /* 固定规模和开放时间：08:00～17:00，每个时段为一小时。 */
 #define LAB_ROWS 5
 #define LAB_COLUMNS 8
@@ -17,6 +19,7 @@
 #define MAX_ADMINS 30
 #define MAX_STUDENTS 1000
 #define MAX_RESERVATIONS 100000
+#define BOOKING_WINDOW_DAYS 7 /* 今天起共七个自然日，即今天至第六天。 */
 #define MAX_REPORTS 10000
 
 /* 电脑的持久状态；预约占用独立存储，不属于电脑固定属性。 */
@@ -73,13 +76,22 @@ typedef struct {
 
 /* 一条预约独立表达 日期 + 时段 + 电脑 + 学生 的关系。 */
 typedef struct {
-    int id;                  /* 正整数预约编号，后续模块负责唯一性。 */
+    int id;                  /* 预约模块分配的正整数编号，取消后不复用。 */
     char student_id[ID_LEN];  /* 预约人的学号。 */
     int computer_no;          /* 电脑编号 1～40。 */
     int date;                /* YYYYMMDD，例如 20261020。 */
     int slot_index;          /* 0～8，0 表示 08:00～09:00。 */
     BookingStatus status;    /* 有效或已取消。 */
 } Reservation;
+
+/* 堆上预约集合，使用前零初始化，使用后 storage_free_reservations。
+ * 所有权由持有此结构体的调用方负责，不得浅复制后分别释放。
+ */
+typedef struct {
+    Reservation *items; /* 动态数组，零容量时为 NULL。 */
+    size_t count;       /* 已初始化的记录数量。 */
+    size_t capacity;    /* 实际分配条数，最多 MAX_RESERVATIONS。 */
+} ReservationList;
 
 /* 故障报告；后续保存于题目指定的 error.txt。 */
 typedef struct {

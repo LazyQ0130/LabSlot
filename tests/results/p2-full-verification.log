@@ -1,0 +1,352 @@
+Build OK: smart-lab.exe (C11, warnings treated as errors)
+PASS 首次启动/六文件/40台/5×8布局/正常退出
+PASS 重启/故障恢复/乱序CRLF/已有六文件不覆盖
+PASS 菜单非法输入：letter
+PASS 菜单非法输入：negative
+PASS 菜单非法输入：out-of-range
+PASS 菜单非法输入：large-int
+PASS 菜单非法输入：empty
+PASS 菜单非法输入：spaces
+PASS 菜单非法输入：long-line
+PASS 菜单非法输入：trailing-text
+PASS 菜单非法输入：decimal
+PASS 菜单非法输入：nul
+PASS 菜单非法输入：sign
+PASS 菜单非法输入：two-numbers
+PASS EOF：immediate
+PASS EOF：no-newline
+PASS EOF：after-invalid
+PASS EOF：after-long
+PASS EOF：after-seat
+PASS 管理员/学生实际入口及合法空白
+PASS 缺失数据目录后恢复（旧目录保留备份）
+PASS 零字节电脑文件初始化
+PASS 损坏保留原文件：garbage
+PASS 损坏保留原文件：blank-only
+PASS 损坏保留原文件：spaces-only
+PASS 损坏保留原文件：missing-record
+PASS 损坏保留原文件：duplicate
+PASS 损坏保留原文件：bad-number
+PASS 损坏保留原文件：zero-number
+PASS 损坏保留原文件：negative-number
+PASS 损坏保留原文件：bad-status
+PASS 损坏保留原文件：extra-record
+PASS 损坏保留原文件：extra-field
+PASS 损坏保留原文件：suffix
+PASS 损坏保留原文件：overflow
+PASS 损坏保留原文件：nul
+PASS 损坏保留原文件：long-line
+PASS 损坏保留原文件：utf8-bom
+PASS 损坏保留原文件：invalid-utf8
+PASS 损坏保留原文件：trailing-blank
+PASS 电脑文件末行无换行
+PASS 补齐缺失业务文件并保留电脑
+PASS 数据目录被同名文件占用
+PASS 数据文件类型错误：admins.txt
+PASS 数据文件类型错误：students.txt
+PASS 数据文件类型错误：computers.txt
+PASS 数据文件类型错误：reservations.txt
+PASS 数据文件类型错误：error.txt
+PASS 数据文件类型错误：count.txt
+PASS 保存接口/临时替换/故障状态跨进程持久化
+PASS 保存拒绝无效快照：invalid-no
+PASS 保存拒绝无效快照：duplicate
+PASS 保存拒绝无效快照：invalid-status
+PASS 保存拒绝无效快照：null
+PASS 临时文件独占创建/遗留文件不覆盖
+PASS 临时文件创建失败不破坏旧数据
+PASS Windows替换失败保留原文件和临时快照
+
+57/57 passed; report: tests\runs\20261019-094835-4aa246b7
+PASS admin: 注册/重启登录/角色菜单/退出/未开放功能
+PASS admin: 多账户/重复拒绝/旧账户保留
+PASS admin: 错误密码/不存在/重试成功
+PASS admin: 密码确认不一致
+PASS admin: API roundtrip
+PASS admin: API invalid-struct
+PASS admin: API read-missing
+PASS admin: API retry-write
+PASS admin: API save-invalid
+PASS admin: API read-locked
+PASS admin: 输入拒绝 id-empty
+PASS admin: 输入拒绝 id-long
+PASS admin: 输入拒绝 id-separator
+PASS admin: 输入拒绝 id-space
+PASS admin: 输入拒绝 id-unicode
+PASS admin: 输入拒绝 id-leading-dash
+PASS admin: 输入拒绝 name-long
+PASS admin: 输入拒绝 name-utf8-long
+PASS admin: 输入拒绝 name-empty
+PASS admin: 输入拒绝 name-separator
+PASS admin: 输入拒绝 name-bad-utf8
+PASS admin: 输入拒绝 name-partial-utf8
+PASS admin: 输入拒绝 name-nul
+PASS admin: 输入拒绝 password-long
+PASS admin: 输入拒绝 password-empty
+PASS admin: 输入拒绝 password-delimiter
+PASS admin: 输入拒绝 password-huge
+PASS admin: 输入拒绝 confirm-long
+PASS admin: 最大字节容量/中文/CRLF
+PASS admin: EOF 字段 0
+PASS admin: EOF 字段 1
+PASS admin: EOF 字段 2
+PASS admin: EOF 字段 3
+PASS admin: EOF 字段 4
+PASS admin: EOF 字段 5
+PASS admin: EOF 字段 6
+PASS admin: 登录后EOF
+PASS admin: 多级菜单非法输入
+PASS admin: 损坏安全报错 empty-line
+PASS admin: 损坏安全报错 missing-field
+PASS admin: 损坏安全报错 extra-field
+PASS admin: 损坏安全报错 duplicate
+PASS admin: 损坏安全报错 bad-id
+PASS admin: 损坏安全报错 long-id
+PASS admin: 损坏安全报错 long-name
+PASS admin: 损坏安全报错 long-password
+PASS admin: 损坏安全报错 empty-name
+PASS admin: 损坏安全报错 empty-password
+PASS admin: 损坏安全报错 nul
+PASS admin: 损坏安全报错 utf8
+PASS admin: 损坏安全报错 overlong-utf8
+PASS admin: 损坏安全报错 surrogate
+PASS admin: 损坏安全报错 too-high-codepoint
+PASS admin: 损坏安全报错 control
+PASS admin: 损坏安全报错 bom
+PASS admin: 损坏安全报错 huge-line
+PASS admin: 损坏安全报错 trailing-blank
+PASS admin: 容量边界 0
+PASS admin: 容量边界 1
+PASS admin: 原格式/末行无换行/旧时长保留
+PASS admin: 完整UTF8多字节字段往返
+PASS admin: 写入失败不虚报 stale
+PASS admin: 写入失败不虚报 directory
+PASS admin: Windows替换失败保留旧账户
+PASS student: 注册/重启登录/角色菜单/退出/未开放功能
+PASS student: 多账户/重复拒绝/旧账户保留
+PASS student: 错误密码/不存在/重试成功
+PASS student: 密码确认不一致
+PASS student: API roundtrip
+PASS student: API invalid-struct
+PASS student: API read-missing
+PASS student: API retry-write
+PASS student: API save-invalid
+PASS student: API read-locked
+PASS student: 输入拒绝 id-empty
+PASS student: 输入拒绝 id-long
+PASS student: 输入拒绝 id-separator
+PASS student: 输入拒绝 id-space
+PASS student: 输入拒绝 id-unicode
+PASS student: 输入拒绝 id-leading-dash
+PASS student: 输入拒绝 name-long
+PASS student: 输入拒绝 name-utf8-long
+PASS student: 输入拒绝 name-empty
+PASS student: 输入拒绝 name-separator
+PASS student: 输入拒绝 name-bad-utf8
+PASS student: 输入拒绝 name-partial-utf8
+PASS student: 输入拒绝 name-nul
+PASS student: 输入拒绝 password-long
+PASS student: 输入拒绝 password-empty
+PASS student: 输入拒绝 password-delimiter
+PASS student: 输入拒绝 password-huge
+PASS student: 输入拒绝 confirm-long
+PASS student: 最大字节容量/中文/CRLF
+PASS student: EOF 字段 0
+PASS student: EOF 字段 1
+PASS student: EOF 字段 2
+PASS student: EOF 字段 3
+PASS student: EOF 字段 4
+PASS student: EOF 字段 5
+PASS student: EOF 字段 6
+PASS student: 登录后EOF
+PASS student: 多级菜单非法输入
+PASS student: 损坏安全报错 empty-line
+PASS student: 损坏安全报错 missing-field
+PASS student: 损坏安全报错 extra-field
+PASS student: 损坏安全报错 duplicate
+PASS student: 损坏安全报错 bad-id
+PASS student: 损坏安全报错 long-id
+PASS student: 损坏安全报错 long-name
+PASS student: 损坏安全报错 long-password
+PASS student: 损坏安全报错 empty-name
+PASS student: 损坏安全报错 empty-password
+PASS student: 损坏安全报错 nul
+PASS student: 损坏安全报错 utf8
+PASS student: 损坏安全报错 overlong-utf8
+PASS student: 损坏安全报错 surrogate
+PASS student: 损坏安全报错 too-high-codepoint
+PASS student: 损坏安全报错 control
+PASS student: 损坏安全报错 bom
+PASS student: 损坏安全报错 huge-line
+PASS student: 损坏安全报错 trailing-blank
+PASS student: 损坏安全报错 negative-time
+PASS student: 损坏安全报错 overflow-time
+PASS student: 损坏安全报错 text-time
+PASS student: 容量边界 0
+PASS student: 容量边界 1
+PASS student: 原格式/末行无换行/旧时长保留
+PASS student: 完整UTF8多字节字段往返
+PASS student: 写入失败不虚报 stale
+PASS student: 写入失败不虚报 directory
+PASS student: Windows替换失败保留旧账户
+PASS 双角色隔离/同名不同凭据/退出后跨角色须重新认证
+PASS 登录只读取对应角色文件
+PASS 真实开发数据保持不变
+
+134/134 passed; report: tests\runs\p1-20261019-094836-bf079f30
+PASS 正常创建/不同日期时段/唯一编号/两类冲突/重启
+PASS 本人取消/他人和重复拒绝/取消保留/座位释放/重新预约
+PASS 取消开始/过去拒绝 20261018-8
+PASS 取消开始/过去拒绝 20261019-2
+PASS 取消开始/过去拒绝 20261019-0
+PASS 尚未开始的远期旧记录可取消
+PASS 固定时间日期规则 0
+PASS 固定时间日期规则 1
+PASS 固定时间日期规则 2
+PASS 固定时间日期规则 3
+PASS 固定时间日期规则 4
+PASS 固定时间日期规则 5
+PASS 固定时间日期规则 6
+PASS 固定时间日期规则 7
+PASS 固定时间日期规则 8
+PASS 固定时间日期规则 9
+PASS 固定时间日期规则 10
+PASS 固定时间日期规则 11
+PASS 固定时间日期规则 12
+PASS 固定时间日期规则 13
+PASS 固定时间日期规则 14
+PASS 固定时间日期规则 15
+PASS 固定时间日期规则 16
+PASS 固定时间日期规则 17
+PASS 固定时间日期规则 18
+PASS 固定时间日期规则 19
+PASS 固定时间日期规则 20
+PASS 固定时间日期规则 21
+PASS 固定时间日期规则 22
+PASS 固定时间日期规则 23
+PASS 固定时间日期规则 24
+PASS 公历推进/时段格式 0
+PASS 公历推进/时段格式 1
+PASS 公历推进/时段格式 2
+PASS 公历推进/时段格式 3
+PASS 公历推进/时段格式 4
+PASS 公历推进/时段格式 5
+PASS 公历推进/时段格式 6
+PASS 公历推进/时段格式 7
+PASS 业务权限 create-none
+PASS 业务权限 create-admin
+PASS 业务权限 create-ghost
+PASS 业务权限 cancel-none
+PASS 业务权限 cancel-admin
+PASS 业务权限 cancel-ghost
+PASS 业务权限 query-none
+PASS 业务权限 query-admin
+PASS 业务权限 query-ghost
+PASS 学生文件损坏与账户不存在分离
+PASS 异常时间源安全失败/历史查询不依赖时钟
+PASS 业务输入参数边界
+PASS 确认后重新加载冲突与归属
+PASS 业务读文件缺失/空电脑表不初始化
+PASS 故障拒绝与座位符号优先级
+PASS 个人过滤/有效与全部历史/排序/查询不写入
+PASS 损坏预约保护 garbage
+PASS 损坏预约保护 blank
+PASS 损坏预约保护 empty-id
+PASS 损坏预约保护 duplicate-id
+PASS 损坏预约保护 duplicate-cancelled-id
+PASS 损坏预约保护 seat-conflict
+PASS 损坏预约保护 student-conflict
+PASS 损坏预约保护 no-zero
+PASS 损坏预约保护 no-large
+PASS 损坏预约保护 bad-date
+PASS 损坏预约保护 long-date
+PASS 损坏预约保护 bad-slot
+PASS 损坏预约保护 negative-slot
+PASS 损坏预约保护 bad-status
+PASS 损坏预约保护 suffix
+PASS 损坏预约保护 extra-field
+PASS 损坏预约保护 missing-field
+PASS 损坏预约保护 overflow-id
+PASS 损坏预约保护 zero-id
+PASS 损坏预约保护 negative-id
+PASS 损坏预约保护 invalid-student
+PASS 损坏预约保护 long-student
+PASS 损坏预约保护 nul
+PASS 损坏预约保护 bom
+PASS 损坏预约保护 huge-line
+PASS 损坏预约保护 numeric-space
+PASS 乱序/CRLF/末行无换行/取消编号不复用
+PASS 编号INT_MAX边界安全拒绝
+PASS 保存前完整校验 1
+PASS 保存前完整校验 2
+PASS 保存前完整校验 3
+PASS 保存前完整校验 4
+PASS 保存前完整校验 5
+PASS 保存前完整校验 6
+PASS 保存前完整校验 7
+PASS 保存前完整校验 8
+PASS 保存前完整校验 9
+PASS 保存前完整校验 10
+PASS 真实MAX_RESERVATIONS边界 +0
+PASS 真实MAX_RESERVATIONS边界 +1
+PASS 分配故障 create-1
+PASS 分配故障 create-2
+PASS 分配故障 create-3
+PASS 分配故障 create-4
+PASS 分配故障 create-5
+PASS 分配故障 create-6
+PASS 内存故障同进程恢复 create
+PASS 分配故障 cancel-1
+PASS 分配故障 cancel-2
+PASS 分配故障 cancel-3
+PASS 分配故障 cancel-4
+PASS 分配故障 cancel-5
+PASS 内存故障同进程恢复 cancel
+PASS 分配故障 query-1
+PASS 分配故障 query-2
+PASS 分配故障 query-3
+PASS 分配故障 query-4
+PASS 分配故障 query-5
+PASS 内存故障同进程恢复 query
+PASS 分配故障 seats-1
+PASS 分配故障 seats-2
+PASS 内存故障同进程恢复 seats
+PASS 部分读取/扩容失败输出保持 1
+PASS 部分读取/扩容失败输出保持 2
+PASS 部分读取/扩容失败输出保持 3
+PASS realloc失败保留原指针并可恢复
+PASS 写失败回滚 create-stale
+PASS 写失败回滚 create-directory
+PASS 写失败回滚 create-write
+PASS 写失败回滚 create-flush
+PASS 写失败回滚 create-close
+PASS 写失败回滚 cancel-stale
+PASS 写失败回滚 cancel-directory
+PASS 写失败回滚 cancel-write
+PASS 写失败回滚 cancel-flush
+PASS 写失败回滚 cancel-close
+PASS 真实Windows锁失败 create
+PASS 真实Windows锁失败 cancel
+PASS 真实Windows锁失败 query
+PASS 写入时间边界重查 create
+PASS 写入时间边界重查 cancel
+PASS 固定时间UI完整预约/查询/取消/释放
+PASS UI预约与取消放弃确认不写入
+PASS UI业务EOF清理 0
+PASS UI业务EOF清理 1
+PASS UI业务EOF清理 2
+PASS UI业务EOF清理 3
+PASS UI业务EOF清理 4
+PASS UI业务EOF清理 5
+PASS UI业务EOF清理 6
+PASS UI业务EOF清理 7
+PASS UI业务EOF清理 8
+PASS UI预约非法输入 0
+PASS UI预约非法输入 1
+PASS UI预约非法输入 2
+PASS UI预约非法输入 3
+PASS UI预约非法输入 4
+PASS UI损坏文件不能显示暂无记录
+PASS 真实开发数据及学生累计时间不变
+
+154/154 passed; report: tests\runs\p2-20261019-094841-030ad26e

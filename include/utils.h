@@ -59,4 +59,27 @@ InputResult utils_read_field(const char *prompt, char *buffer, size_t capacity, 
 /* 功能：volatile 写清除敏感缓冲区。参数：buffer 地址；size 字节数。返回：无。 */
 void utils_clear_secret(void *buffer, size_t size);
 
+/* 本地墙钟快照；不使用 UTC 日期替代用户机器的本地日期。 */
+typedef struct {
+    int date;   /* YYYYMMDD。 */
+    int hour;   /* 0～23。 */
+    int minute; /* 0～59。 */
+    int second; /* 0～59。 */
+} LabTime;
+
+/* 功能：读取本地系统时间。参数：context 未使用；now 输出。返回：成功 1，失败 0。 */
+int utils_local_time(void *context, LabTime *now);
+
+/* 功能：公历日期验证，支持 1000～9999 年及闰年。参数：date YYYYMMDD。返回：有效 1，否则 0。 */
+int utils_valid_date(int date);
+
+/* 功能：转换为连续公历日序号，供窗口差值计算。参数：date。返回：序号，非法为 -1。 */
+int utils_date_serial(int date);
+
+/* 功能：日历加减，支持跨月/年。参数：date；days 范围 ±36600。返回：日期，越界/非法为 0。 */
+int utils_date_add(int date, int days);
+
+/* 功能：格式化时段。参数：slot 0～8；buffer 输出；capacity 字节数。返回：成功 1，否则 0。 */
+int utils_format_slot(int slot, char *buffer, size_t capacity);
+
 #endif
