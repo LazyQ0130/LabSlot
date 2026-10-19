@@ -1,0 +1,130 @@
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS empty exact top three / full normalized scores
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS same data deterministic byte-identical output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure rejects / sentinel preserved
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure rejects / sentinel preserved
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS exact candidate factor scores / total / stable order 0
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS exact candidate factor scores / total / stable order 1
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS exact candidate factor scores / total / stable order 2
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS preference changes actual ordering
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 40 exact nine-bit masks / actual loads
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS own conflict excludes whole request
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS own conflict clears every computer bit
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (8, 1)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (7, 2)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (6, 3)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (8, 2)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (7, 3)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (-1, 1)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (0, 0)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (0, 4)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS business role/account gate admin
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS business role/account gate none
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS business role/account gate ghost
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS date/window validation 20261018
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS date/window validation 20261026
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS date/window validation 20260230
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS start equality rejected
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS today future slots available
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS clock error is explicit
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS cross year uses calendar window
+PASS probe exits successfully
+PASS stale recommendation final create rejects occupied seat
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS 100000 records exact output preserved
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS no candidates is legal empty result
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS corrupt input rejects full analysis
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS P3 recovery distinguished
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS P6 isolated initialization
+PASS P6 native window
+PASS P6 session via actual auth
+PASS P6 local clock
+PASS recommendation entry in booking page
+PASS three real ranked results
+PASS native preference invokes business
+PASS candidate navigates and highlights actual seat
+PASS native boundary rejects crossing 17
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation GDI stable
+PASS recommendation USER stable
+PASS admin authenticated
+PASS forged admin recommendation entry rejected
+PASS recommendation destroys resources
+PASS real development data hashes / mtimes unchanged
+128 passed, 0 failed
+Report: tests\runs\p6-1-20261019-145336-08b18239\TEST_RESULTS.md

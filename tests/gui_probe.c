@@ -214,7 +214,7 @@ int main(int argc,char **argv)
     CHECK("student login creates correct session",app.page==GUI_DASHBOARD && auth_session_has_role(&app.session,ROLE_STUDENT));
     CHECK("real dashboard statistics",app.stats_result==STATS_OK && app.student_stats.active_count==0);
     click(&app,GUI_QUICK); date_slot(&app,tomorrow,0);
-    CHECK("40 real seat controls / counts",app.child_count==50 && app.seats_valid && app.seats.free_count==40);
+    CHECK("40 real seat controls / counts",app.child_count==51 && GetDlgItem(app.window,GUI_SMART_OPEN)!=NULL && app.seats_valid && app.seats.free_count==40);
     CHECK("date and slot selections consumed",app.date==tomorrow && app.slot==0);
     click(&app,GUI_SEAT_FIRST+2);
     CHECK("free seat selectable",app.selected==3 && IsWindowEnabled(GetDlgItem(window,GUI_RESERVE)));

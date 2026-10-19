@@ -63,3 +63,8 @@ mingw32-make test
 ## 尚未验证
 
 Linux/macOS 分支、不同 Windows C 运行库、磁盘实际耗尽/掉电和多进程并发写入未验证。P0 不承诺断电耐久或并发事务。自动测试检查 UTF-8 输出字节与 ASCII 座位布局；具体终端字体的视觉效果仍取决于本机终端设置。
+
+## P6 阶段验收索引
+
+- [P6整体设计与基线](../docs/P6_INNOVATION_DESIGN.md)
+- [P6.1智能推荐](P6_1_RECOMMENDATION_TEST_CASES.md)：精确评分、可用掩码、过时结果及原生GUI。

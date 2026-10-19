@@ -13,6 +13,7 @@
 #include "stats.h"
 #include "fault.h"
 #include "admin.h"
+#include "recommend.h"
 
 /* 控件编号稳定，供消息分发及独立 Windows 集成测试使用。 */
 enum {
@@ -34,12 +35,15 @@ enum {
     GUI_ADMIN_STUDENT_MODE, GUI_ADMIN_QUERY, GUI_ADMIN_STATS_MODE,
     GUI_ADMIN_STATS_DATE, GUI_ADMIN_EXPORT, GUI_ADMIN_YES, GUI_ADMIN_NO,
     GUI_ADMIN_PREVIEW_TABLE,
-    GUI_ADMIN_SEAT_FIRST = 500
+    GUI_ADMIN_SEAT_FIRST = 500,
+    GUI_SMART_OPEN = 600, GUI_SMART_DATE, GUI_SMART_SLOT, GUI_SMART_DURATION,
+    GUI_SMART_PREF, GUI_SMART_REFRESH, GUI_SMART_FIRST = 610
 };
 typedef enum {
     GUI_LOGIN, GUI_REGISTER, GUI_DASHBOARD, GUI_SEATS,
     GUI_RESERVATIONS, GUI_FAULT, GUI_STUDENT_STATS,
-    GUI_ADMIN_LAB, GUI_ADMIN_REPORTS, GUI_ADMIN_USAGE, GUI_ADMIN_STUDENTS, GUI_ADMIN_STATS
+    GUI_ADMIN_LAB, GUI_ADMIN_REPORTS, GUI_ADMIN_USAGE, GUI_ADMIN_STUDENTS, GUI_ADMIN_STATS,
+    GUI_RECOMMEND
 } GuiPage;
 
 /* 单窗口持有会话和展示投影；不持有账户表，不直接读写业务 TXT。 */
@@ -81,6 +85,8 @@ typedef struct {
     int stats_mode;
     size_t pending_reports;
     HWND action;
+    Recommendation recommendations;
+    int recommendation_valid, recommend_date, recommend_slot, recommend_duration;
 } GuiApp;
 
 int gui_scale(const GuiApp *app, int value);

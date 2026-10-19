@@ -11,7 +11,7 @@ typedef enum {
     BOOKING_STUDENT_CONFLICT, BOOKING_NOT_FOUND, BOOKING_NOT_OWNER,
     BOOKING_ALREADY_CANCELLED, BOOKING_TIME_EXPIRED, BOOKING_WINDOW_EXCEEDED,
     BOOKING_STORAGE_ERROR, BOOKING_CAPACITY, BOOKING_NO_MEMORY,
-    BOOKING_ID_EXHAUSTED, BOOKING_CLOCK_ERROR
+    BOOKING_ID_EXHAUSTED, BOOKING_CLOCK_ERROR, BOOKING_RECOVERY_REQUIRED
 } BookingResult;
 
 /* 时间依赖由调用方显式传入；NULL 上下文/函数使用本地系统时间，生产无硬编码时间。 */
@@ -84,5 +84,17 @@ BookingResult booking_get_seats(int date, int slot, BookingSeats *seats);
 
 /* 功能：结果提示。参数：result。返回：无密码的静态说明文本。 */
 const char *booking_result_message(BookingResult result);
+
+/* 只读当日可用性。低九位含设备、座位、本人冲突、窗口及开始时刻限制。
+ * 成功才写out；一次完整加载，不暴露其他学生身份。 */
+typedef struct {
+    unsigned int masks[COMPUTER_COUNT];
+    int loads[COMPUTER_COUNT];
+    unsigned int own_conflicts;
+    LabTime as_of;
+} BookingAvailability;
+unsigned int booking_range_mask(int start, int duration);
+BookingResult booking_availability(const BookingContext *context, const AuthSession *session,
+                                   int date, BookingAvailability *out);
 
 #endif

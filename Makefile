@@ -25,7 +25,10 @@ $(GUI_TARGET): $(GUI_SOURCES) $(HEADERS) $(GUI_RESOURCE)
 $(TARGET): $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(SOURCES) -o $@
 
-test: test-p0 test-p1 test-p2 test-p3 test-p4
+test: test-p0 test-p1 test-p2 test-p3 test-p4 test-p6-1
+
+test-p6-1: $(TARGET) $(GUI_TARGET)
+	$(PYTHON) tests/test_p6_1.py --cc "$(CC)"
 
 test-p0: $(TARGET)
 	$(PYTHON) tests/test_p0.py --executable $(TARGET) --cc "$(CC)"

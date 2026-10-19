@@ -304,6 +304,59 @@ const char *booking_result_message(BookingResult result)
     case BOOKING_NO_MEMORY: return "内存分配失败，请重试";
     case BOOKING_ID_EXHAUSTED: return "预约编号已达整数上限，不能再创建";
     case BOOKING_CLOCK_ERROR: return "无法读取有效的本地时间";
+    case BOOKING_RECOVERY_REQUIRED: return "维护未完成，请先重启恢复";
     }
     return "未知预约错误";
+}
+
+unsigned int booking_range_mask(int start, int duration)
+{
+    if (start < 0 || start >= SLOT_COUNT || duration < 1 || duration > 3 || duration > SLOT_COUNT-start) { return 0; }
+    return ((1u << duration)-1u) << start;
+}
+
+/* 只处理已经严格验证的快照；供推荐及连续创建共同使用。 */
+static BookingResult availability_at(const ReservationList *list, const Lab computers[COMPUTER_COUNT],
+                                      const char *student, const LabTime *now, int date, BookingAvailability *out)
+{
+    BookingAvailability view = {0};
+    unsigned int time_mask = 0;
+    int no, slot, difference = utils_date_serial(date)-utils_date_serial(now->date);
+    size_t i;
+    if (difference < 0) { return BOOKING_TIME_EXPIRED; }
+    if (difference >= BOOKING_WINDOW_DAYS) { return BOOKING_WINDOW_EXCEEDED; }
+    for (slot=0; slot<SLOT_COUNT; ++slot) {
+        if (utils_slot_future(now,date,slot)) { time_mask |= 1u << slot; }
+    }
+    for (no=0; no<COMPUTER_COUNT; ++no) {
+        view.masks[no] = computers[no].status == COMPUTER_FAULT ? 0 : time_mask;
+    }
+    for (i=0; i<list->count; ++i) {
+        const Reservation *r = &list->items[i];
+        if (r->status != BOOKING_ACTIVE || r->date != date) { continue; }
+        view.masks[r->computer_no-1] &= ~(1u << r->slot_index);
+        ++view.loads[r->computer_no-1];
+        if (!strcmp(student,r->student_id)) { view.own_conflicts |= 1u << r->slot_index; }
+    }
+    for (no=0; no<COMPUTER_COUNT; ++no) { view.masks[no] &= ~view.own_conflicts; }
+    view.as_of=*now; *out=view; return BOOKING_OK;
+}
+
+BookingResult booking_availability(const BookingContext *context, const AuthSession *session,
+                                   int date, BookingAvailability *out)
+{
+    Lab computers[COMPUTER_COUNT];
+    LabTime now;
+    ReservationList list = {0};
+    BookingResult result;
+    if (!auth_session_has_role(session,ROLE_STUDENT)) { return BOOKING_UNAUTHORIZED; }
+    if (!storage_writes_allowed()) { return BOOKING_RECOVERY_REQUIRED; }
+    result=require_student(session);
+    if (result!=BOOKING_OK) { return result; }
+    if (!out || !utils_valid_date(date)) { return BOOKING_INVALID_INPUT; }
+    if (!read_now(context,&now)) { return BOOKING_CLOCK_ERROR; }
+    if (storage_load_computers(computers)!=1) { return BOOKING_STORAGE_ERROR; }
+    result=from_storage(storage_load_reservations(&list));
+    if (result==BOOKING_OK) { result=availability_at(&list,computers,session->user_id,&now,date,out); }
+    storage_free_reservations(&list); return result;
 }
