@@ -68,3 +68,5 @@ Linux/macOS 分支、不同 Windows C 运行库、磁盘实际耗尽/掉电和�
 
 - [P6整体设计与基线](../docs/P6_INNOVATION_DESIGN.md)
 - [P6.1智能推荐](P6_1_RECOMMENDATION_TEST_CASES.md)：精确评分、可用掩码、过时结果及原生GUI。
+
+- [P6.2预约热力图](P6_2_HEATMAP_TEST_CASES.md)：全部63格、P4口径、跨年周、颜色、双角色GUI。

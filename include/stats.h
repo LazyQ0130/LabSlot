@@ -43,6 +43,8 @@ StatsResult stats_compute_daily(const BookingContext *context, const AuthSession
  * 参数：时钟/管理员会话/日期/成功输出。返回：StatsResult；跨支持日期边界拒绝，不输出残周。
  */
 StatsResult stats_compute_week(const BookingContext *context, const AuthSession *session, int date, WeeklyStats *out);
+/* 学生/管理员共享的周聚合投影，不含身份明细；与日报/周报同一聚合实现。 */
+StatsResult stats_compute_heatmap(const BookingContext *context, const AuthSession *session, int date, WeeklyStats *out);
 /* 功能：仅当前学生累计已结束的有效预约；无指定他人学号参数，不写账户文件。
  * 参数：时钟/学生会话/成功输出。返回：StatsResult；失败保持输出不变。
  */

@@ -1,0 +1,117 @@
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS entire empty week exact zeros
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS heatmap role/account none
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS heatmap role/account ghost
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS complete week lower boundary rejected
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS invalid date rejected
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS corrupt source refuses matrix
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS maintenance gate
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS clock failure
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS heatmap initialization
+PASS heatmap native window
+PASS heatmap real student session
+PASS heatmap actual clock
+PASS student booking heatmap entry / exact 40 peak
+PASS actual grid selection precise 40/40 / percent
+PASS grid keyboard selects adjacent slot / 80 percent
+PASS future valid cell navigates existing seat query
+PASS historical cell cannot navigate
+PASS forged expired navigation rechecked
+PASS heatmap real administrator session
+PASS admin statistics heatmap entry / no student action
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap GDI stable
+PASS heatmap USER stable
+PASS heatmap resources released
+PASS real development data hashes / mtimes unchanged
+115 passed, 0 failed
+Report: tests\runs\p6-2-20261019-150245-085dcbb0\TEST_RESULTS.md

@@ -78,6 +78,8 @@ int utils_date_serial(int date);
 
 /* 功能：日历加减，支持跨月/年。参数：date；days 范围 ±36600。返回：日期，越界/非法为 0。 */
 int utils_date_add(int date, int days);
+/* 任意日期所在完整周的周一；非法或整周超出日期支持范围返回0。 */
+int utils_week_start(int date);
 
 /* 功能：格式化时段。参数：slot 0～8；buffer 输出；capacity 字节数。返回：成功 1，否则 0。 */
 int utils_format_slot(int slot, char *buffer, size_t capacity);

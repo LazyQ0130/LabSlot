@@ -68,7 +68,7 @@ static int student_date_order(const void *a, const void *b)
  * 参数：时钟/管理员会话/start/长度1或7/成功输出。返回：StatsResult，不写任何文件。
  */
 static StatsResult compute_range(const BookingContext *context, const AuthSession *session,
-                                  int start, int days, WeeklyStats *out)
+                                  int start, int days, UserRole role, WeeklyStats *out)
 {
     WeeklyStats result = {0};
     ReservationList reservations = {0};
@@ -78,7 +78,7 @@ static StatsResult compute_range(const BookingContext *context, const AuthSessio
     size_t i, used = 0, capacity;
     int day, start_serial = utils_date_serial(start);
     if ((days != 1 && days != 7) || out == NULL || start_serial < 0 || utils_date_add(start, days-1) == 0) { return STATS_INVALID_INPUT; }
-    status = require_role(session, ROLE_ADMIN, NULL);
+    status = require_role(session, role, NULL);
     if (status != STATS_OK) { return status; }
     status = read_time(context, &now);
     if (status != STATS_OK) { return status; }
@@ -133,7 +133,7 @@ StatsResult stats_compute_daily(const BookingContext *context, const AuthSession
     WeeklyStats result;
     StatsResult status;
     if (!utils_valid_date(date) || out == NULL) { return STATS_INVALID_INPUT; }
-    status = compute_range(context, session, date, 1, &result);
+    status = compute_range(context, session, date, 1, ROLE_ADMIN, &result);
     if (status == STATS_OK) { *out = result.days[0]; }
     return status;
 }
@@ -144,9 +144,19 @@ StatsResult stats_compute_week(const BookingContext *context, const AuthSession 
     int start;
     if (!utils_valid_date(date) || out == NULL) { return STATS_INVALID_INPUT; }
     /* 日序1为公历0001-01-01周一；只使用公历工具，不对YYYYMMDD直接加减。 */
-    start = utils_date_add(date, -((utils_date_serial(date)-1) % 7));
+    start = utils_week_start(date);
     if (start == 0 || utils_date_add(start, 6) == 0) { return STATS_DATE_RANGE; }
-    return compute_range(context, session, start, 7, out);
+    return compute_range(context, session, start, 7, ROLE_ADMIN, out);
+}
+
+StatsResult stats_compute_heatmap(const BookingContext *context, const AuthSession *session, int date, WeeklyStats *out)
+{
+    int start;
+    if (!session || (session->role!=ROLE_STUDENT && session->role!=ROLE_ADMIN)) { return STATS_UNAUTHORIZED; }
+    if (!out || !utils_valid_date(date)) { return STATS_INVALID_INPUT; }
+    start=utils_week_start(date);
+    if (!start) { return STATS_DATE_RANGE; }
+    return compute_range(context,session,start,7,session->role,out);
 }
 
 /* 功能、参数及返回值见stats.h的个人累计契约。 */

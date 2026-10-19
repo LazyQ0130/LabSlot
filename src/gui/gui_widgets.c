@@ -112,6 +112,7 @@ void gui_clear_controls(GuiApp *app)
     admin_free_student(&app->admin_student);
     app->reservations_valid=app->reports_valid=0;
     app->computers_valid=app->usage_valid=app->admin_student_valid=app->admin_stats_valid=0;
+    app->heatmap_valid=0; app->heat_day=app->heat_slot=-1;
     app->recommendation_valid=0; app->recommendations.count=0;
 }
 /* 功能：建立只读虚拟 ListView；参数应用/编号/列名/列数；失败返回 NULL。 */

@@ -298,6 +298,14 @@ int utils_date_add(int date, int days)
     return year >= 1000 && year <= 9999 ? year * 10000 + month * 100 + day : 0;
 }
 
+int utils_week_start(int date)
+{
+    int start;
+    if (!utils_valid_date(date)) { return 0; }
+    start=utils_date_add(date,-((utils_date_serial(date)-1)%7));
+    return start!=0 && utils_date_add(start,6)!=0 ? start : 0;
+}
+
 /* 功能：本地系统墙钟读取；参数和返回值见 utils.h。 */
 int utils_local_time(void *context, LabTime *now)
 {

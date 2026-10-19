@@ -27,7 +27,7 @@ void gui_booking_create(GuiApp *app)
     SendMessageW(app->slot_picker,CB_SETCURSEL,(WPARAM)app->slot,0);
     gui_button(app,L"刷新座位",GUI_REFRESH);
     for (i=0;i<COMPUTER_COUNT;++i) { gui_button(app,L"",GUI_SEAT_FIRST+i); }
-    if (app->session.role==ROLE_STUDENT) { gui_button(app,L"确认预约",GUI_RESERVE); gui_button(app,L"智能推荐",GUI_SMART_OPEN); }
+    if (app->session.role==ROLE_STUDENT) { gui_button(app,L"确认预约",GUI_RESERVE); gui_button(app,L"智能推荐",GUI_SMART_OPEN); gui_button(app,L"本周预约热度",GUI_HEAT_OPEN); }
     gui_booking_refresh(app);
 }
 /* 功能：按 5×8 和可用空间布局座位；参数应用；无返回。 */
@@ -41,7 +41,8 @@ void gui_booking_layout(GuiApp *app)
     for (i=0;i<COMPUTER_COUNT;++i) {
         gui_move(app,GUI_SEAT_FIRST+i,280+(i%8)*(cell+gap),292+(i/8)*(row+row_gap),cell,row);
     }
-    gui_move(app,GUI_SMART_OPEN,app->width-184,106,152,38);
+    gui_move(app,GUI_HEAT_OPEN,app->width-184,106,152,38);
+    gui_move(app,GUI_SMART_OPEN,app->width-352,106,152,38);
     gui_move(app,GUI_RESERVE,app->width-204,app->height-132,148,42);
 }
 /* 功能：同步座位文本、可用性及预约按钮；参数应用；无返回。 */

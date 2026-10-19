@@ -9,6 +9,7 @@
 #include "gui_student_stats.h"
 #include "gui_admin.h"
 #include "gui_recommend.h"
+#include "gui_heatmap.h"
 #include "utils.h"
 #include "storage.h"
 #include <limits.h>
@@ -68,6 +69,7 @@ void gui_layout(GuiApp *app)
         gui_shell_layout(app);
         if (app->page==GUI_SEATS) { gui_booking_layout(app); }
         else if (app->page==GUI_RECOMMEND) { gui_recommend_layout(app); }
+        else if (app->page==GUI_HEATMAP) { gui_heatmap_layout(app); }
         else if (app->page==GUI_RESERVATIONS) { gui_reservations_layout(app); }
         else if (app->page==GUI_FAULT) { gui_fault_layout(app); }
         else if (app->page==GUI_STUDENT_STATS) { gui_student_stats_layout(app); }
@@ -83,7 +85,7 @@ void gui_layout(GuiApp *app)
 /* 功能：销毁旧控件、检查会话并建立目标页面；参数应用/页面；无返回。 */
 void gui_show_page(GuiApp *app, GuiPage page)
 {
-    if (page<GUI_LOGIN || page>GUI_RECOMMEND) { return; }
+    if (page<GUI_LOGIN || page>GUI_HEATMAP) { return; }
     if (page>GUI_REGISTER && !auth_session_has_role(&app->session,app->session.role)) { page=GUI_LOGIN; }
     if (page>=GUI_RESERVATIONS && page<=GUI_STUDENT_STATS && !auth_session_has_role(&app->session,ROLE_STUDENT)) {
         gui_notice(app,L"需要学生登录权限，管理员不能进入学生业务页面。",1); return;
@@ -101,6 +103,7 @@ void gui_show_page(GuiApp *app, GuiPage page)
         gui_shell_create(app);
         if (page==GUI_SEATS) { gui_booking_create(app); }
         else if (page==GUI_RECOMMEND) { gui_recommend_create(app); }
+        else if (page==GUI_HEATMAP) { gui_heatmap_create(app); }
         else if (page==GUI_RESERVATIONS) { gui_reservations_create(app); }
         else if (page==GUI_FAULT) { gui_fault_create(app); }
         else if (page==GUI_STUDENT_STATS) { gui_student_stats_create(app); }
@@ -118,6 +121,7 @@ void gui_show_page(GuiApp *app, GuiPage page)
             page==GUI_RESERVATIONS ? GUI_NAV_RESERVATIONS : page==GUI_FAULT ? GUI_NAV_FAULT :
             page==GUI_STUDENT_STATS ? GUI_NAV_STATS : page>=GUI_ADMIN_LAB ?
             GUI_NAV_ADMIN_LAB+(int)page-GUI_ADMIN_LAB : GUI_HOME;
+        if (page==GUI_HEATMAP) { focus=GUI_HEAT_DATE; }
         if (page==GUI_RECOMMEND) { focus=GUI_SMART_DATE; }
         if (page==GUI_ADMIN_STUDENTS) { focus=GUI_ADMIN_STUDENT_ID; }
         SetFocus(GetDlgItem(app->window,focus));
@@ -200,6 +204,8 @@ static void command(GuiApp *app, int id, int code)
     }
     if (app->busy) { return; }
     if (!auth_session_has_role(&app->session,app->session.role)) { gui_show_page(app,GUI_LOGIN); return; }
+    if (id==GUI_HEAT_OPEN && code==BN_CLICKED) { gui_show_page(app,GUI_HEATMAP); return; }
+    if (app->page==GUI_HEATMAP) { gui_heatmap_command(app,id,code); }
     if (id==GUI_SMART_OPEN && code==BN_CLICKED) { gui_show_page(app,GUI_RECOMMEND); return; }
     if (app->page==GUI_RECOMMEND) { gui_recommend_command(app,id,code); }
     if (code==BN_CLICKED && id>=GUI_NAV_ADMIN_LAB && id<=GUI_NAV_ADMIN_STATS) {
@@ -272,6 +278,7 @@ static LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wp, LPARAM
     case WM_COMMAND: command(app,LOWORD(wp),HIWORD(wp)); return 0;
     case WM_NOTIFY:
         if (app->changing_page) { return 0; }
+        if (app->page==GUI_HEATMAP && ((NMHDR *)lp)->idFrom==GUI_HEAT_DATE && ((NMHDR *)lp)->code==DTN_DATETIMECHANGE && !app->busy) { gui_heatmap_refresh(app); return 0; }
         if (app->page==GUI_RECOMMEND && ((NMHDR *)lp)->idFrom==GUI_SMART_DATE && ((NMHDR *)lp)->code==DTN_DATETIMECHANGE && !app->busy) { gui_recommend_refresh(app); return 0; }
         if (app->page==GUI_RESERVATIONS) { return gui_reservations_notify(app,(NMHDR *)lp); }
         if (app->page==GUI_FAULT) { return gui_fault_notify(app,(NMHDR *)lp); }

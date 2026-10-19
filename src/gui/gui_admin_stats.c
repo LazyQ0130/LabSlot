@@ -32,11 +32,13 @@ void gui_admin_stats_create(GuiApp *app)
     SendMessageW(app->filter,CB_SETCURSEL,0,0);
     app->date_picker=gui_date_control(app,GUI_ADMIN_STATS_DATE);
     gui_button(app,L"刷新统计",GUI_ADMIN_REFRESH);
+    gui_button(app,L"预约热力图",GUI_HEAT_OPEN);
     gui_button(app,L"导出每日统计",GUI_ADMIN_EXPORT);
     gui_admin_stats_refresh(app);
 }
 void gui_admin_stats_layout(GuiApp *app)
 {
+    gui_move(app,GUI_HEAT_OPEN,app->width-352,106,152,40);
     gui_move(app,GUI_ADMIN_REFRESH,app->width-184,106,152,40);
     gui_move(app,GUI_ADMIN_STATS_MODE,256,198,160,220);
     gui_move(app,GUI_ADMIN_STATS_DATE,432,198,176,36);
