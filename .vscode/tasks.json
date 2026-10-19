@@ -5,7 +5,7 @@
       "label": "LabSlot: Verify P0-P4 and all GUI workflows",
       "type": "process",
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Test", "-GuiTest"],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Analyze", "-Test", "-GuiTest"],
       "options": {"cwd": "${workspaceFolder}"},
       "group": "test",
       "problemMatcher": ["$gcc"]

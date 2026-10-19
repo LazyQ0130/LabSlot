@@ -3,6 +3,7 @@
 param(
     [switch]$Test,
     [switch]$GuiTest,
+    [switch]$Analyze,
     [string]$Compiler = 'gcc'
 )
 
@@ -38,6 +39,10 @@ try {
     & $Compiler '-std=c11' '-Wall' '-Wextra' '-Wpedantic' '-Werror' '-Iinclude' @sharedSources @guiSources 'src/gui/gui_resource.o' '-mwindows' '-lcomctl32' '-lgdi32' '-luser32' '-o' 'LabSlot-GUI.exe'
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     Write-Host 'Build OK: LabSlot-GUI.exe (Win32 C11, PerMonitorV2)'
+    if ($Analyze) {
+        & python 'scripts/analyze.py' '--cc' $Compiler
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
     if ($Test) {
         # Python is a development dependency; the C executable does not need it.
         $env:PYTHONIOENCODING = 'utf-8'
@@ -55,6 +60,8 @@ try {
         & python 'tests/test_gui_student.py' '--cc' $Compiler
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         & python 'tests/test_gui_admin.py' '--cc' $Compiler
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        & python 'tests/test_gui_final.py' '--cc' $Compiler
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 } finally {

@@ -1,0 +1,66 @@
+# P5.4 real Windows GUI validation
+
+```text
+PASS real local clock available
+PASS password edit masks input
+PASS Chinese name registration through GUI
+PASS GUI login authenticates expected role
+PASS Chinese mixed name survives UTF16 / UTF8 round trip
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS own booking visible
+PASS same student / slot conflict rejected
+PASS owned confirmation answered / defaults No
+PASS declined cancellation keeps booking
+PASS owned confirmation answered / defaults No
+PASS confirmed cancellation refreshes
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS owned confirmation answered / defaults No
+PASS Chinese mixed report saved from current session
+PASS future bookings never fake completed hours
+PASS student logout clears session
+PASS password edit masks input
+PASS Chinese name registration through GUI
+PASS GUI login authenticates expected role
+PASS admin dashboard real pending count
+PASS usage returns actual reservation student
+PASS exact student history includes cancelled booking
+PASS owned confirmation answered / defaults No
+PASS affected future preview before confirmation
+PASS owned confirmation answered / defaults No
+PASS report confirmation sets fault and closes report
+PASS business reload confirms processed report
+PASS fault cancels future bookings visible in student history
+PASS owned confirmation answered / defaults No
+PASS restoration updates device
+PASS GUI login authenticates expected role
+PASS restoration never resurrects cancellation
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS GUI login authenticates expected role
+PASS daily stats follow actual GUI booking
+PASS weekly stats follow actual GUI booking
+PASS owned confirmation answered / defaults No
+PASS declined export leaves snapshot empty
+PASS owned confirmation answered / defaults No
+PASS daily export persisted actual snapshot
+PASS admin logout clears session
+PASS layout sessions use actual account APIs
+ACTUAL_SYSTEM_DPI 96; no injected WM_DPICHANGED; monitors 1
+PASS actual DPI minimum: all 15 views / headers / controls
+PASS actual DPI normal: all 15 views / headers / controls
+PASS actual DPI maximized: all 15 views / headers / controls
+PASS navigation focus stays on current page
+PASS student search starts in exact-ID input
+PASS new seat font and all page resources released
+54/54 passed
+PASS unconfirmed demo preparation creates nothing
+PASS confirmed new demo copies exact production binaries / no accounts or data
+PASS existing demonstration directory never overwritten
+PASS development data cannot be initialized as a demonstration
+PASS relative demo target rejected
+PASS real development data hashes and modification times unchanged
+```

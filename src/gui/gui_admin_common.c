@@ -100,11 +100,11 @@ void gui_admin_grid(GuiApp *app, HDC dc, int x, int y, int width, int height)
     int i, cell=(width-7*6)/8, row=(height-4*8)/5;
     for (i=0;i<COMPUTER_COUNT;++i) {
         char symbol=app->usage_valid ? app->usage.seats.symbols[i] : '?';
-        wchar_t text[20];
+        RECT rect={gui_scale(app,x+i%8*(cell+6)),gui_scale(app,y+i/8*(row+8)),
+            gui_scale(app,x+i%8*(cell+6)+cell),gui_scale(app,y+i/8*(row+8)+row)};
         COLORREF color=symbol=='!' ? RGB(254,226,226) : symbol=='*' ? RGB(220,252,231) : RGB(226,232,240);
-        swprintf(text,20,L"%02d\n%ls",i+1,symbol=='!' ? L"故障" : symbol=='*' ? L"空闲" : symbol=='#' ? L"预约" : L"未知");
         gui_card(app,dc,x+i%8*(cell+6),y+i/8*(row+8),cell,row,color);
-        gui_text(app,dc,text,x+i%8*(cell+6),y+i/8*(row+8)+4,cell,row-4,app->small,symbol=='!' ? GUI_RED : GUI_INK,DT_CENTER);
+        gui_seat_label(app,dc,rect,i+1,symbol=='!' ? L"故障" : symbol=='*' ? L"空闲" : symbol=='#' ? L"预约" : L"未知",symbol=='!' ? GUI_RED : GUI_INK);
     }
 }
 

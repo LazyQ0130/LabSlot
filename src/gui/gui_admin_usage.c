@@ -28,8 +28,8 @@ void gui_admin_usage_create(GuiApp *app)
 }
 void gui_admin_usage_layout(GuiApp *app)
 {
-    int split=256+(app->width-288)*54/100;
-    const int weights[]={32,28,16,24};
+    int split=256+(app->width-288)/2;
+    const int weights[]={24,36,14,26};
     gui_move(app,GUI_ADMIN_DATE,272,202,176,36);
     gui_move(app,GUI_ADMIN_SLOT,464,202,164,240);
     gui_move(app,GUI_ADMIN_REFRESH,app->width-184,106,152,40);
@@ -39,7 +39,7 @@ void gui_admin_usage_layout(GuiApp *app)
 void gui_admin_usage_paint(GuiApp *app, HDC dc)
 {
     wchar_t text[160];
-    int width=app->width-288, split=256+width*54/100;
+    int width=app->width-288, split=256+width/2;
     gui_admin_title(app,dc,L"实验室使用情况",L"本页面显示有效预约信息，不代表实际签到人数。只读查询，不修改学生预约。");
     gui_card(app,dc,256,190,width,app->height-270,RGB(255,255,255));
     if (app->usage_valid) {
@@ -47,7 +47,7 @@ void gui_admin_usage_paint(GuiApp *app, HDC dc)
             app->date,OPEN_HOUR+app->slot,OPEN_HOUR+app->slot+1,app->usage.count,app->usage.seats.free_count,app->usage.seats.fault_count);
     } else { wcscpy(text,L"数据不可用：加载失败时不保留旧预约信息。"); }
     gui_text(app,dc,text,272,250,width-32,32,app->small,app->usage_valid ? GUI_INK : GUI_RED,0);
-    gui_text(app,dc,L"空闲  /  已预约  /  故障（优先显示）",272,280,split-288,24,app->small,GUI_MUTED,0);
+    gui_text(app,dc,L"前方 / 讲台 · 空闲 / 预约 / 故障",272,280,split-288,24,app->small,GUI_MUTED,0);
     gui_admin_grid(app,dc,272,312,split-288,app->height-416);
     gui_text(app,dc,app->usage_valid && !app->usage.count ? L"该时段暂无有效预约" : L"预约学生明细",split+16,280,app->width-split-64,24,app->small,GUI_MUTED,0);
 }

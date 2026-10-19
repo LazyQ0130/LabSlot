@@ -1,6 +1,8 @@
-# 智能实验室预约系统 · P5.3
+# 智能实验室预约系统 · P5.4
 
 大学 C 语言课程设计项目。使用纯 C11 和标准 C 文本文件读写，无数据库或网络服务依赖。保留完整控制台版本 `smart-lab.exe` 与原生 Win32 桌面版本 `LabSlot-GUI.exe`。P0–P4 业务已完成；P5.1/P5.2 完成认证、座位预约和学生业务；P5.3 完成管理员维护、报告处理、使用情况、学生查询、日/周统计和每日快照导出。GUI 只依赖 Windows 系统库，共用原有业务层和数据格式。
+
+P5.4 完成座位编号/状态分层、讲台方向、表头最小宽度和长文本提示、导航键盘焦点及图表留白打磨；保留全部业务规则。真实系统缩放、中文输入和端到端验证的范围与限制见 [最终 GUI 验收](tests/P5_4_FINAL_GUI_TEST_CASES.md)。答辩演示按 [DEMO_GUIDE](docs/DEMO_GUIDE.md) 创建明确确认的全新隔离目录，不在项目真实 data 上初始化或重置。
 
 ## Win32 桌面程序
 
@@ -10,6 +12,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 .\LabSlot-GUI.exe
 # 完整回归与原生 GUI 控件集成测试
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test -GuiTest
+# 加上 GCC 对所有正式 C 文件的静态分析
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Analyze -Test -GuiTest
 ```
 
 GUI 的数据根目录固定为 **EXE 所在目录**；将两个 EXE 保持在项目根目录，从项目根目录运行控制台即可共用同一份 `data/`。GUI 启动先运行现有维护恢复及初始化；错误时停止启动，不重置已有文件。请勿同时运行控制台和 GUI 写入同一份数据；现有存储仍按单进程设计，GUI 仅阻止重复 GUI 实例。
@@ -22,7 +26,7 @@ GUI 的数据根目录固定为 **EXE 所在目录**；将两个 EXE 保持在�
 
 所有长列表使用虚拟 ListView，查询仅发生在进入页面、刷新、筛选和业务完成后；绘制/滚动不加载业务文件，页面切换/注销/关闭释放所属集合。
 
-GUI 源码在 `src/gui/`，不会进入原控制台的 `src/*.c` 构建。MinGW 链接 `-mwindows -lcomctl32 -lgdi32 -luser32`，用 `windres` 嵌入原生主题与 PerMonitorV2 清单。Make 支持 `make gui`、`make test-gui`（三套 GUI 测试）、`make test-gui-student` 和 `make test-gui-admin`；VS Code 提供 GUI 运行、GUI 测试及完整验证任务。`build.ps1 -Test -GuiTest` 运行 P0–P4 与全部三套 GUI 测试。详见 [P5.3 验收](tests/P5_3_GUI_TEST_CASES.md)、[P5.2 历史验收](tests/P5_2_GUI_TEST_CASES.md) 与 [P5.1 历史验收](tests/P5_GUI_TEST_CASES.md)。
+GUI 源码在 `src/gui/`，不会进入原控制台的 `src/*.c` 构建。MinGW 链接 `-mwindows -lcomctl32 -lgdi32 -luser32`，用 `windres` 嵌入原生主题与 PerMonitorV2 清单。Make 支持 `make gui`、`make test-gui`（四套 GUI 测试）、`make test-gui-student`、`make test-gui-admin`、`make test-gui-final` 和 `make analyze`；VS Code 完整验证任务包含静态分析。`build.ps1 -Test -GuiTest` 运行 P0–P4 与四套 GUI 测试；P5.4 新驱动使用实际时钟和实际窗口 DPI，另外检查安全演示目录准备。详见 [P5.4 验收](tests/P5_4_FINAL_GUI_TEST_CASES.md)、[P5.3 历史验收](tests/P5_3_GUI_TEST_CASES.md)、[P5.2 历史验收](tests/P5_2_GUI_TEST_CASES.md) 与 [P5.1 历史验收](tests/P5_GUI_TEST_CASES.md)。
 
 已阅读项目根目录的《智能实验室预约系统.pdf》（3 页）和《智能实验室预约系统_C语言架构设计.md》。按原题保留 40 台电脑、08:00～17:00 共 9 个一小时时段，以及 `error.txt`、`count.txt` 文件名。按本次任务的模型要求，将跨日期/时段的预约拆为独立 `Reservation`，不以电脑上的一个学生姓名表示所有预约。
 
@@ -289,5 +293,5 @@ python tests/test_p4.py --executable smart-lab.exe --cc gcc
 
 ## 下一阶段
 
-- P0～P5.3 已完成。本阶段不编写正式课程设计报告，不扩展新业务。
-- 最终人工验收建议补查系统 125%/150% 缩放、多显示器拖动、中文输入法、真实设备及备份恢复操作，详见 [P5.3 验收文档](tests/P5_3_GUI_TEST_CASES.md)。
+- P0～P5.4 已完成，本阶段不编写正式 Word 课程设计报告，不扩展新业务。
+- 答辩前按 [演示指南](docs/DEMO_GUIDE.md) 重新准备新目录和有效日期，完整回归后再现场演示；对 [最终验收](tests/P5_4_FINAL_GUI_TEST_CASES.md) 中未验证的多显示器、认证输入法组合等场景补做人工检查，不把自动化结果当成人工验收。

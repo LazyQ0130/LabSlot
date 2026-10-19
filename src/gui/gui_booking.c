@@ -33,13 +33,13 @@ void gui_booking_create(GuiApp *app)
 /* 功能：按 5×8 和可用空间布局座位；参数应用；无返回。 */
 void gui_booking_layout(GuiApp *app)
 {
-    int i, width=app->width-336, gap=10, cell=(width-7*gap)/8;
-    int grid_height=app->height-464, row=(grid_height-4*gap)/5;
+    int i, width=app->width-336, gap=8, cell=(width-7*gap)/8;
+    int row_gap=6, row=(app->height-436-4*row_gap)/5;
     gui_move(app,GUI_DATE,280,193,190,38);
     gui_move(app,GUI_SLOT,490,193,180,300);
     gui_move(app,GUI_REFRESH,690,193,130,38);
     for (i=0;i<COMPUTER_COUNT;++i) {
-        gui_move(app,GUI_SEAT_FIRST+i,280+(i%8)*(cell+gap),304+(i/8)*(row+gap),cell,row);
+        gui_move(app,GUI_SEAT_FIRST+i,280+(i%8)*(cell+gap),292+(i/8)*(row+row_gap),cell,row);
     }
     gui_move(app,GUI_RESERVE,app->width-204,app->height-132,148,42);
 }
@@ -90,8 +90,9 @@ void gui_booking_paint(GuiApp *app, HDC dc)
         swprintf(text,160,L"共 40 台   ·   空闲 %d   ·   已预约 %d   ·   故障 %d",
                  app->seats.free_count,app->seats.booked_count,app->seats.fault_count);
     } else { wcscpy(text,L"座位状态不可用：未展示旧数据，请检查错误提示并刷新。"); }
-    gui_text(app,dc,text,280,250,width-48,26,app->body,app->seats_valid ? GUI_INK : GUI_RED,0);
-    gui_text(app,dc,L"实验室前方  /  5 排 × 8 列",280,280,width-48,22,app->small,GUI_MUTED,DT_CENTER);
+    gui_text(app,dc,text,280,241,width-48,24,app->body,app->seats_valid ? GUI_INK : GUI_RED,0);
+    gui_card(app,dc,280,268,width-48,20,RGB(239,246,255));
+    gui_text(app,dc,L"讲台 / 实验室前方 · 5 排 × 8 列",280,270,width-48,16,app->small,GUI_BLUE,DT_CENTER);
     if (app->selected) { swprintf(text,160,L"已选择 %02d 号电脑  ·  蓝色高亮",app->selected); }
     else { wcscpy(text,app->session.role==ROLE_STUDENT ? L"绿色 空闲   /   灰色 已预约   /   红色 故障" : L"只读视图 · 管理员不可预约"); }
     gui_text(app,dc,text,280,app->height-132,width-224,40,app->body,GUI_MUTED,DT_WORDBREAK);

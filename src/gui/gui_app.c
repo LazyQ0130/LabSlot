@@ -109,7 +109,14 @@ void gui_show_page(GuiApp *app, GuiPage page)
     }
     app->changing_page=0;
     gui_layout(app);
-    SetFocus(GetDlgItem(app->window,page<=GUI_REGISTER ? GUI_ID : page==GUI_SEATS ? GUI_DATE : GUI_HOME));
+    {
+        int focus=page<=GUI_REGISTER ? GUI_ID : page==GUI_SEATS ? GUI_DATE :
+            page==GUI_RESERVATIONS ? GUI_NAV_RESERVATIONS : page==GUI_FAULT ? GUI_NAV_FAULT :
+            page==GUI_STUDENT_STATS ? GUI_NAV_STATS : page>=GUI_ADMIN_LAB ?
+            GUI_NAV_ADMIN_LAB+(int)page-GUI_ADMIN_LAB : GUI_HOME;
+        if (page==GUI_ADMIN_STUDENTS) { focus=GUI_ADMIN_STUDENT_ID; }
+        SetFocus(GetDlgItem(app->window,focus));
+    }
 }
 /* 用动态符号支持旧系统回退，避免把新 DPI API 作为必要导入。 */
 /* 功能：启用 PerMonitorV2，旧系统回退系统 DPI 感知；无参数/返回。 */

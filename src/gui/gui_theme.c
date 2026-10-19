@@ -23,18 +23,21 @@ int gui_theme_create(GuiApp *app)
     app->heading = make_font(app, 26, FW_BOLD);
     app->hero = make_font(app, 38, FW_BOLD);
     app->number = make_font(app, 30, FW_BOLD);
+    app->seat_number = make_font(app, 18, FW_BOLD);
     app->background = CreateSolidBrush(GUI_BG);
     app->white = CreateSolidBrush(RGB(255,255,255));
     return app->body && app->small && app->heading && app->hero && app->number &&
-           app->background && app->white;
+           app->seat_number && app->background && app->white;
 }
 /* 功能：逐个释放主题 GDI 对象并清空句柄；参数应用；无返回。 */
 void gui_theme_destroy(GuiApp *app)
 {
     DeleteObject(app->body); DeleteObject(app->small); DeleteObject(app->heading);
     DeleteObject(app->hero); DeleteObject(app->number);
+    DeleteObject(app->seat_number);
     DeleteObject(app->background); DeleteObject(app->white);
     app->body = app->small = app->heading = app->hero = app->number = NULL;
+    app->seat_number = NULL;
     app->background = app->white = NULL;
 }
 /* 功能：用临时画刷填充矩形后释放；参数 DC/物理矩形/颜色；无返回。 */

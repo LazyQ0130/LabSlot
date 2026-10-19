@@ -7,6 +7,8 @@ HWND gui_button(GuiApp *app, const wchar_t *text, int id);
 HWND gui_edit(GuiApp *app, int id, int secret, int max_chars);
 int gui_read_edit(HWND control, char *text, size_t capacity);
 void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item);
+/* 统一座位的双行编号/状态，矩形为物理像素，不依赖颜色传达状态。 */
+void gui_seat_label(GuiApp *app, HDC dc, RECT rect, int no, const wchar_t *status, COLORREF color);
 void gui_clear_controls(GuiApp *app);
 /* 虚拟表格只保留列和原生选择状态，行内容由页面拥有的集合提供。 */
 HWND gui_table(GuiApp *app, int id, const wchar_t *const *columns, int count);

@@ -50,14 +50,17 @@ int gui_admin_chart_value(const GuiApp *app, int index)
 }
 static void chart(GuiApp *app, HDC dc)
 {
-    int i, width=app->width-288, left=312, top=410, bottom=app->height-132;
+    int i, width=app->width-288, left=312, top=432, bottom=app->height-132;
     int count=app->stats_mode==0 ? SLOT_COUNT : 7, maximum=app->stats_mode==0 ? COMPUTER_COUNT : DAILY_CAPACITY;
     int span=(app->width-360)/count;
     HPEN pen=CreatePen(PS_SOLID,1,GUI_LINE);
     HGDIOBJ old=SelectObject(dc,pen);
     wchar_t text[64];
     gui_card(app,dc,256,360,width,app->height-444,RGB(255,255,255));
-    gui_text(app,dc,app->stats_mode==0 ? L"各时段有效预约数 / 每时段容量 40" : L"每日预约小时 / 每日容量 360",280,376,width-48,24,app->body,GUI_INK,0);
+    gui_text(app,dc,app->stats_mode==0 ?
+        (app->daily.counts.reservation_count ? L"各时段有效预约数 / 每时段容量 40" : L"当日暂无有效预约 / 每时段容量 40") :
+        (app->weekly.reservation_count ? L"每日预约小时 / 每日容量 360" : L"本周暂无有效预约 / 每日容量 360"),
+        280,376,width-48,24,app->body,GUI_INK,0);
     for (i=0;i<=4;++i) {
         int y=bottom-(bottom-top)*i/4;
         MoveToEx(dc,gui_scale(app,left),gui_scale(app,y),NULL);

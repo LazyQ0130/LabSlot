@@ -48,7 +48,7 @@ typedef struct {
     HINSTANCE instance;
     UINT dpi;                       /* 当前窗口 DPI，所有布局以 96 DPI 为基准。 */
     int width, height;              /* 逻辑客户区尺寸。 */
-    HFONT body, small, heading, hero, number;
+    HFONT body, small, heading, hero, number, seat_number;
     HBRUSH background, white;
     GuiPage page;
     UserRole role;                  /* 认证页选择的角色，不等同于会话权限。 */

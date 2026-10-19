@@ -121,7 +121,7 @@ HWND gui_table(GuiApp *app, int id, const wchar_t *const *columns, int count)
     int i; /* 列序号。 */
     if (!table) { return NULL; }
     SendMessageW(table,LVM_SETUNICODEFORMAT,TRUE,0);
-    ListView_SetExtendedListViewStyle(table,LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES);
+    ListView_SetExtendedListViewStyle(table,LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES | LVS_EX_LABELTIP);
     ListView_SetBkColor(table,RGB(255,255,255)); ListView_SetTextBkColor(table,RGB(255,255,255));
     ListView_SetTextColor(table,GUI_INK);
     for (i=0;i<count;++i) {
@@ -135,10 +135,28 @@ HWND gui_table(GuiApp *app, int id, const wchar_t *const *columns, int count)
 void gui_table_layout(GuiApp *app, const int *weights, int count)
 {
     RECT rect; /* 表格物理客户区，不按顶层宽度猜测。 */
-    int i, width;
-    if (!app->table) { return; }
+    int i, width, minimum[8], total=0;
+    HDC dc;
+    HGDIOBJ old_font=NULL;
+    if (!app->table || count<1 || count>8) { return; }
     GetClientRect(app->table,&rect); width=rect.right-gui_scale(app,24);
-    for (i=0;i<count;++i) { ListView_SetColumnWidth(app->table,i,MulDiv(width,weights[i],100)); }
+    dc=GetDC(app->table);
+    if (dc) { old_font=SelectObject(dc,app->body); }
+    for (i=0;i<count;++i) {
+        wchar_t title[64]={0};
+        LVCOLUMNW column={0};
+        SIZE extent={0};
+        column.mask=LVCF_TEXT; column.pszText=title; column.cchTextMax=64;
+        SendMessageW(app->table,LVM_GETCOLUMNW,(WPARAM)i,(LPARAM)&column);
+        if (dc) { GetTextExtentPoint32W(dc,title,(int)wcslen(title),&extent); }
+        else { extent.cx=gui_scale(app,(int)wcslen(title)*14); }
+        minimum[i]=extent.cx+gui_scale(app,20); total+=minimum[i];
+    }
+    if (dc) { SelectObject(dc,old_font); ReleaseDC(app->table,dc); }
+    for (i=0;i<count;++i) {
+        int column=width>=total ? minimum[i]+MulDiv(width-total,weights[i],100) : MulDiv(width,weights[i],100);
+        ListView_SetColumnWidth(app->table,i,column);
+    }
     SendMessageW(ListView_GetHeader(app->table),WM_SETFONT,(WPARAM)app->body,TRUE);
 }
 /* 功能：有界写入 ListView 请求的文本缓冲；参数通知/完整宽文本；无返回。 */
@@ -148,6 +166,23 @@ void gui_table_text(NMLVDISPINFOW *info, const wchar_t *text)
         wcsncpy(info->item.pszText,text,(size_t)info->item.cchTextMax-1);
         info->item.pszText[info->item.cchTextMax-1]=L'\0';
     }
+}
+/* 紧凑窗口也能分别显示醒目编号与完整状态；大座位沿用统计数字字体。 */
+void gui_seat_label(GuiApp *app, HDC dc, RECT rect, int no, const wchar_t *status, COLORREF color)
+{
+    int large=rect.bottom-rect.top>=gui_scale(app,56);
+    int number_height=gui_scale(app,large ? 34 : 20), status_height=gui_scale(app,14);
+    int top=rect.top+(rect.bottom-rect.top-number_height-status_height)/2;
+    RECT number_rect={rect.left,top,rect.right,top+number_height};
+    RECT status_rect={rect.left,top+number_height,rect.right,top+number_height+status_height};
+    wchar_t text[16];
+    HGDIOBJ old_font=SelectObject(dc,large ? app->number : app->seat_number);
+    swprintf(text,16,L"%02d",no);
+    SetBkMode(dc,TRANSPARENT); SetTextColor(dc,color);
+    DrawTextW(dc,text,-1,&number_rect,DT_CENTER | DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX);
+    SelectObject(dc,app->small);
+    DrawTextW(dc,status,-1,&status_rect,DT_CENTER | DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX);
+    SelectObject(dc,old_font);
 }
 /* 功能：按业务投影绘制按钮/座位状态；参数应用/绘制通知；无返回。 */
 void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
@@ -191,10 +226,18 @@ void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
     SelectObject(item->hDC,old_brush); SelectObject(item->hDC,old_pen);
     DeleteObject(brush); DeleteObject(pen);
     GetWindowTextW(item->hwndItem,label,128);
-    old_font=SelectObject(item->hDC,app->body);
-    SetBkMode(item->hDC,TRANSPARENT); SetTextColor(item->hDC,fg);
-    DrawTextW(item->hDC,label,-1,&rect,DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-    SelectObject(item->hDC,old_font);
+    if (seat>=0 && seat<COMPUTER_COUNT) {
+        char symbol=id>=GUI_ADMIN_SEAT_FIRST ? (app->computers_valid ? (app->computers[seat].status==COMPUTER_FAULT ? '!' : '*') : '?') :
+            app->seats_valid ? app->seats.symbols[seat] : '?';
+        const wchar_t *status=symbol=='!' ? L"故障" : symbol=='#' ? L"已预约" : symbol=='*' ?
+            (id>=GUI_ADMIN_SEAT_FIRST ? L"正常" : L"空闲") : L"未知";
+        gui_seat_label(app,item->hDC,rect,seat+1,status,fg);
+    } else {
+        old_font=SelectObject(item->hDC,app->body);
+        SetBkMode(item->hDC,TRANSPARENT); SetTextColor(item->hDC,fg);
+        DrawTextW(item->hDC,label,-1,&rect,DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+        SelectObject(item->hDC,old_font);
+    }
     if (item->itemState & ODS_FOCUS) {
         InflateRect(&rect,-gui_scale(app,4),-gui_scale(app,4)); DrawFocusRect(item->hDC,&rect);
     }

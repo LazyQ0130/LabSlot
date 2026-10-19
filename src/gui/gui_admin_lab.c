@@ -39,10 +39,10 @@ void gui_admin_lab_create(GuiApp *app)
 void gui_admin_lab_layout(GuiApp *app)
 {
     int i, width=app->width-288, grid=width-260, cell=(grid-7*8)/8;
-    int row=(app->height-355-4*10)/5;
+    int row=(app->height-365-4*10)/5;
     gui_move(app,GUI_ADMIN_REFRESH,app->width-184,106,152,40);
     for (i=0;i<COMPUTER_COUNT;++i) {
-        gui_move(app,GUI_ADMIN_SEAT_FIRST+i,272+i%8*(cell+8),268+i/8*(row+10),cell,row);
+        gui_move(app,GUI_ADMIN_SEAT_FIRST+i,272+i%8*(cell+8),278+i/8*(row+10),cell,row);
     }
     gui_move(app,GUI_ADMIN_MARK,app->width-248,432,200,40);
     gui_move(app,GUI_ADMIN_RESTORE,app->width-248,484,200,40);
@@ -57,6 +57,7 @@ void gui_admin_lab_paint(GuiApp *app, HDC dc)
     else { wcscpy(text,L"电脑数据不可用，请检查错误后刷新。"); }
     gui_text(app,dc,text,256,206,width,28,app->body,GUI_INK,0);
     gui_card(app,dc,256,248,width-244,app->height-328,RGB(255,255,255));
+    gui_text(app,dc,L"讲台 / 实验室前方",272,253,width-276,18,app->small,GUI_BLUE,DT_CENTER);
     gui_card(app,dc,app->width-264,248,232,app->height-328,RGB(255,255,255));
     if (!app->selected || !app->computers_valid) { wcscpy(text,L"选择左侧电脑\n\n查看状态与可执行操作"); }
     else {
