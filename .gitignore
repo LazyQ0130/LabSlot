@@ -1,0 +1,7 @@
+*.exe
+*.o
+__pycache__/
+data/*.tmp
+data/*.txt
+tests/runs/
+tests/reference-preview/
