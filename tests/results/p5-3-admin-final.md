@@ -1,0 +1,407 @@
+# P5.3 native GUI integration
+
+```text
+
+normal
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS daily stats from real business snapshot
+PASS daily utilization capacity 360
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS full Monday through Sunday range
+PASS week distinct students / hours / average
+PASS week utilization capacity 2520
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly mode disables daily export
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS declined export leaves count empty
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS export success says snapshot can go stale
+PASS saved daily snapshot
+PASS usage selected current slot / real count
+PASS usage student ID
+PASS usage student name
+PASS usage four public fields only
+PASS usage slot selection refreshes true count
+PASS exact student projection active and history counts
+PASS student history includes cancellation
+PASS student table public five columns
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS nonexact query fails and releases previous student
+PASS selected normal computer enables mark only
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS scrollable affected preview contains exact future bookings
+PASS declined maintenance does not write
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS confirmed fault refreshes computer state
+PASS fault cancels future / keeps started
+PASS repeated fault returns business error
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS restore normal refreshes computer
+PASS restore never resurrects cancelled bookings
+PASS all reports across students virtual table
+PASS pending filter
+PASS specified computer filter
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS confirm fault processed / refreshed pending list
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS repair report restores computer and closes
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS dismiss only closes / leaves normal computer
+PASS processed reports correct status
+PASS processed status rendered
+PASS repeat report action denied by business
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS same date export updates without duplicate
+PASS dashboard refresh reflects maintenance and reports
+PASS admin DPI 96 size 0 page 2 no overlap / table fits
+PASS admin DPI 96 size 0 page 3 no overlap / table fits
+PASS admin DPI 96 size 0 page 7 no overlap / table fits
+PASS admin DPI 96 size 0 page 8 no overlap / table fits
+PASS admin DPI 96 size 0 page 9 no overlap / table fits
+PASS admin DPI 96 size 0 page 10 no overlap / table fits
+PASS admin DPI 96 size 0 page 11 no overlap / table fits
+PASS admin DPI 96 size 1 page 2 no overlap / table fits
+PASS admin DPI 96 size 1 page 3 no overlap / table fits
+PASS admin DPI 96 size 1 page 7 no overlap / table fits
+PASS admin DPI 96 size 1 page 8 no overlap / table fits
+PASS admin DPI 96 size 1 page 9 no overlap / table fits
+PASS admin DPI 96 size 1 page 10 no overlap / table fits
+PASS admin DPI 96 size 1 page 11 no overlap / table fits
+PASS admin DPI 120 size 0 page 2 no overlap / table fits
+PASS admin DPI 120 size 0 page 3 no overlap / table fits
+PASS admin DPI 120 size 0 page 7 no overlap / table fits
+PASS admin DPI 120 size 0 page 8 no overlap / table fits
+PASS admin DPI 120 size 0 page 9 no overlap / table fits
+PASS admin DPI 120 size 0 page 10 no overlap / table fits
+PASS admin DPI 120 size 0 page 11 no overlap / table fits
+PASS admin DPI 120 size 1 page 2 no overlap / table fits
+PASS admin DPI 120 size 1 page 3 no overlap / table fits
+PASS admin DPI 120 size 1 page 7 no overlap / table fits
+PASS admin DPI 120 size 1 page 8 no overlap / table fits
+PASS admin DPI 120 size 1 page 9 no overlap / table fits
+PASS admin DPI 120 size 1 page 10 no overlap / table fits
+PASS admin DPI 120 size 1 page 11 no overlap / table fits
+PASS admin DPI 144 size 0 page 2 no overlap / table fits
+PASS admin DPI 144 size 0 page 3 no overlap / table fits
+PASS admin DPI 144 size 0 page 7 no overlap / table fits
+PASS admin DPI 144 size 0 page 8 no overlap / table fits
+PASS admin DPI 144 size 0 page 9 no overlap / table fits
+PASS admin DPI 144 size 0 page 10 no overlap / table fits
+PASS admin DPI 144 size 0 page 11 no overlap / table fits
+PASS admin DPI 144 size 1 page 2 no overlap / table fits
+PASS admin DPI 144 size 1 page 3 no overlap / table fits
+PASS admin DPI 144 size 1 page 7 no overlap / table fits
+PASS admin DPI 144 size 1 page 8 no overlap / table fits
+PASS admin DPI 144 size 1 page 9 no overlap / table fits
+PASS admin DPI 144 size 1 page 10 no overlap / table fits
+PASS admin DPI 144 size 1 page 11 no overlap / table fits
+RESOURCE baseline GDI 35 USER 29
+RESOURCE cycle 20 GDI 35 USER 29
+RESOURCE cycle 40 GDI 35 USER 29
+RESOURCE cycle 60 GDI 35 USER 29
+RESOURCE cycle 80 GDI 35 USER 29
+PASS 80 page cycles release owned lists
+PASS 80 cycles no continuing GDI growth
+PASS 80 cycles no continuing USER growth
+PASS test fixture can be corrupted
+PASS refresh corruption clears valid stats and export
+PASS logout clears session / owned lists
+PASS logged out cannot access admin page
+PASS destroy releases page / theme / session
+180/180 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+student
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS student keeps six real navigation items
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS student cannot invoke admin business entry
+PASS destroy releases page / theme / session
+11/11 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+empty
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS empty dashboard real zeros
+PASS report empty state differs from failure
+PASS usage empty state
+PASS empty stats valid / zero bars
+PASS destroy releases page / theme / session
+9/9 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+corrupt
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS corrupt dashboard never fake zero usage
+PASS corrupt usage clears list
+PASS corrupt statistics unavailable / export disabled
+PASS corrupt student query has no stale ownership
+PASS destroy releases page / theme / session
+9/9 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+corrupt-reports
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS corrupt reports dashboard error / unavailable
+PASS corrupt reports not empty success
+PASS destroy releases page / theme / session
+7/7 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+save-failure
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS export save failure never claims success
+PASS destroy releases page / theme / session
+14/14 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+changed
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS maintenance rechecks changed preview
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS report processing rechecks competing update
+PASS destroy releases page / theme / session
+19/19 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+refresh-failure
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS daily stats from real business snapshot
+PASS daily utilization capacity 360
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS full Monday through Sunday range
+PASS week distinct students / hours / average
+PASS week utilization capacity 2520
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly mode disables daily export
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS committed operation / refresh failure distinguished
+PASS destroy releases page / theme / session
+36/36 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+recovery
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS test holds completion archive to interrupt maintenance
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS interrupted GUI maintenance reports recovery gate
+PASS recovery gate disables maintenance writes
+PASS recovery gate blocks reports
+PASS recovery gate blocks export
+PASS intent persists for normal restart recovery
+PASS destroy releases page / theme / session
+19/19 passed
+
+recover-restart
+PASS normal GUI startup replays pending maintenance
+PASS startup recovery reopens writes
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS restarted GUI shows recovered computer
+PASS recovery cancels future / preserves started
+PASS replayed intent archived through storage API
+PASS destroy releases page / theme / session
+9/9 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+large
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS 100000 history rows in virtual ListView
+PASS last history virtual row
+PASS 10000 reports in virtual ListView
+PASS last report virtual row
+PASS destroy releases page / theme / session
+9/9 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+preview-many
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS long affected preview has all 41 virtual rows
+PASS long preview declined without writes
+PASS destroy releases page / theme / session
+11/11 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+
+account-gone
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS test account set allocated
+PASS test removes current admin through storage API
+PASS expired actual admin cannot compute or export
+PASS expired actual admin cannot maintain computers
+PASS destroy releases page / theme / session
+13/13 passed
+PASS fixture hashes and modification times unchanged except authorized mutations
+PASS real development data hashes and modification times unchanged
+```

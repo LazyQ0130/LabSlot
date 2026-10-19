@@ -106,9 +106,12 @@ void gui_clear_controls(GuiApp *app)
     app->id=app->name=app->password=app->confirmation=NULL;
     app->date_picker=app->slot_picker=NULL;
     app->table=app->filter=app->fault_computer=app->fault_detail=NULL;
+    app->action=NULL;
     storage_free_reservations(&app->reservations);
     storage_free_reports(&app->reports);
+    admin_free_student(&app->admin_student);
     app->reservations_valid=app->reports_valid=0;
+    app->computers_valid=app->usage_valid=app->admin_student_valid=app->admin_stats_valid=0;
 }
 /* 功能：建立只读虚拟 ListView；参数应用/编号/列名/列数；失败返回 NULL。 */
 HWND gui_table(GuiApp *app, int id, const wchar_t *const *columns, int count)
@@ -157,7 +160,8 @@ void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
         (id==GUI_BOOKING && app->page==GUI_SEATS) ||
         (id==GUI_NAV_RESERVATIONS && app->page==GUI_RESERVATIONS) ||
         (id==GUI_NAV_FAULT && app->page==GUI_FAULT) ||
-        (id==GUI_NAV_STATS && app->page==GUI_STUDENT_STATS);
+        (id==GUI_NAV_STATS && app->page==GUI_STUDENT_STATS) ||
+        (id>=GUI_NAV_ADMIN_LAB && id<=GUI_NAV_ADMIN_STATS && (int)app->page==GUI_ADMIN_LAB+id-GUI_NAV_ADMIN_LAB);
     int primary = id==GUI_SUBMIT || id==GUI_QUICK || id==GUI_RESERVE || id==GUI_FAULT_SUBMIT;
     int hover = GetPropW(item->hwndItem,L"hover") != NULL;
     COLORREF bg=RGB(255,255,255), fg=GUI_INK, border=GUI_LINE;
@@ -168,9 +172,11 @@ void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
     HGDIOBJ old_brush, old_pen, old_font;
     if (primary) { bg=hover ? RGB(29,78,216) : GUI_BLUE; fg=RGB(255,255,255); border=bg; }
     else if (active || hover) { bg=RGB(239,246,255); fg=GUI_BLUE; border=RGB(191,219,254); }
-    if (id==GUI_RES_CANCEL) { bg=hover ? RGB(254,226,226) : RGB(254,242,242); fg=GUI_RED; border=RGB(254,202,202); }
+    if (id==GUI_RES_CANCEL || id==GUI_ADMIN_MARK || id==GUI_ADMIN_PROCESS || id==GUI_ADMIN_YES) { bg=hover ? RGB(254,226,226) : RGB(254,242,242); fg=GUI_RED; border=RGB(254,202,202); }
+    if (id>=GUI_ADMIN_SEAT_FIRST && id<GUI_ADMIN_SEAT_FIRST+COMPUTER_COUNT) { seat=id-GUI_ADMIN_SEAT_FIRST; }
     if (seat>=0 && seat<COMPUTER_COUNT) {
-        char symbol=app->seats_valid ? app->seats.symbols[seat] : '?';
+        char symbol=id>=GUI_ADMIN_SEAT_FIRST ? (app->computers_valid ? (app->computers[seat].status==COMPUTER_FAULT ? '!' : '*') : '?') :
+            app->seats_valid ? app->seats.symbols[seat] : '?';
         bg=RGB(240,253,244); fg=RGB(21,128,61); border=RGB(187,247,208);
         if (symbol=='#' || symbol=='?') { bg=RGB(241,245,249); fg=GUI_MUTED; border=GUI_LINE; }
         if (symbol=='!') { bg=RGB(254,242,242); fg=GUI_RED; border=RGB(254,202,202); }

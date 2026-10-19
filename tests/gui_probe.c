@@ -259,7 +259,7 @@ int main(int argc,char **argv)
     credentials(&app,L"P5Admin",test_password); click(&app,GUI_SUBMIT);
     CHECK("admin login correct role",app.page==GUI_DASHBOARD && auth_session_has_role(&app.session,ROLE_ADMIN));
     click(&app,GUI_BOOKING);
-    CHECK("role navigation names / admin has no reserve control",GetDlgItem(window,GUI_RESERVE)==NULL && app.child_count==46);
+    CHECK("role navigation names / admin has no reserve control",GetDlgItem(window,GUI_RESERVE)==NULL && app.child_count==51);
     click(&app,GUI_SEAT_FIRST+5); click(&app,GUI_RESERVE);
     CHECK("forged admin booking messages denied",app.selected==0);
     dpi_layout(&app);

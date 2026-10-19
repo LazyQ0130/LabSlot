@@ -54,6 +54,8 @@ try {
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         & python 'tests/test_gui_student.py' '--cc' $Compiler
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        & python 'tests/test_gui_admin.py' '--cc' $Compiler
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 } finally {
     Pop-Location

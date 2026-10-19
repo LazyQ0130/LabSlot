@@ -5,6 +5,7 @@
 #include "gui_reservations.h"
 #include "gui_fault.h"
 #include "gui_student_stats.h"
+#include "gui_admin.h"
 
 /* 字体每次 DPI 变化重建；绘制时选回原对象，窗口销毁时统一释放。 */
 /* 功能：创建指定逻辑字号和字重的系统字体；参数应用/字号/字重；失败返回 NULL。 */
@@ -88,6 +89,11 @@ void gui_paint(GuiApp *app, HDC target)
         else if (app->page == GUI_RESERVATIONS) { gui_reservations_paint(app,dc); }
         else if (app->page == GUI_FAULT) { gui_fault_paint(app,dc); }
         else if (app->page == GUI_STUDENT_STATS) { gui_student_stats_paint(app,dc); }
+        else if (app->page == GUI_ADMIN_LAB) { gui_admin_lab_paint(app,dc); }
+        else if (app->page == GUI_ADMIN_REPORTS) { gui_admin_reports_paint(app,dc); }
+        else if (app->page == GUI_ADMIN_USAGE) { gui_admin_usage_paint(app,dc); }
+        else if (app->page == GUI_ADMIN_STUDENTS) { gui_admin_students_paint(app,dc); }
+        else if (app->page == GUI_ADMIN_STATS) { gui_admin_stats_paint(app,dc); }
         else { gui_dashboard_paint(app,dc); }
     }
     if (app->page > GUI_REGISTER && app->notice[0]) {

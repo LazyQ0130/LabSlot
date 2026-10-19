@@ -7,6 +7,7 @@
 #include "gui_reservations.h"
 #include "gui_fault.h"
 #include "gui_student_stats.h"
+#include "gui_admin.h"
 #include "utils.h"
 #include "storage.h"
 #include <limits.h>
@@ -68,6 +69,11 @@ void gui_layout(GuiApp *app)
         else if (app->page==GUI_RESERVATIONS) { gui_reservations_layout(app); }
         else if (app->page==GUI_FAULT) { gui_fault_layout(app); }
         else if (app->page==GUI_STUDENT_STATS) { gui_student_stats_layout(app); }
+        else if (app->page==GUI_ADMIN_LAB) { gui_admin_lab_layout(app); }
+        else if (app->page==GUI_ADMIN_REPORTS) { gui_admin_reports_layout(app); }
+        else if (app->page==GUI_ADMIN_USAGE) { gui_admin_usage_layout(app); }
+        else if (app->page==GUI_ADMIN_STUDENTS) { gui_admin_students_layout(app); }
+        else if (app->page==GUI_ADMIN_STATS) { gui_admin_stats_layout(app); }
         else { gui_dashboard_layout(app); }
     }
     InvalidateRect(app->window,NULL,FALSE);
@@ -75,10 +81,13 @@ void gui_layout(GuiApp *app)
 /* 功能：销毁旧控件、检查会话并建立目标页面；参数应用/页面；无返回。 */
 void gui_show_page(GuiApp *app, GuiPage page)
 {
-    if (page<GUI_LOGIN || page>GUI_STUDENT_STATS) { return; }
+    if (page<GUI_LOGIN || page>GUI_ADMIN_STATS) { return; }
     if (page>GUI_REGISTER && !auth_session_has_role(&app->session,app->session.role)) { page=GUI_LOGIN; }
-    if (page>=GUI_RESERVATIONS && !auth_session_has_role(&app->session,ROLE_STUDENT)) {
+    if (page>=GUI_RESERVATIONS && page<=GUI_STUDENT_STATS && !auth_session_has_role(&app->session,ROLE_STUDENT)) {
         gui_notice(app,L"需要学生登录权限，管理员不能进入学生业务页面。",1); return;
+    }
+    if (page>=GUI_ADMIN_LAB && !auth_session_has_role(&app->session,ROLE_ADMIN)) {
+        gui_notice(app,L"需要管理员登录权限。",1); return;
     }
     if (page<=GUI_REGISTER) { auth_logout(&app->session); }
     app->changing_page=1;
@@ -91,6 +100,11 @@ void gui_show_page(GuiApp *app, GuiPage page)
         else if (page==GUI_RESERVATIONS) { gui_reservations_create(app); }
         else if (page==GUI_FAULT) { gui_fault_create(app); }
         else if (page==GUI_STUDENT_STATS) { gui_student_stats_create(app); }
+        else if (page==GUI_ADMIN_LAB) { gui_admin_lab_create(app); }
+        else if (page==GUI_ADMIN_REPORTS) { gui_admin_reports_create(app); }
+        else if (page==GUI_ADMIN_USAGE) { gui_admin_usage_create(app); }
+        else if (page==GUI_ADMIN_STUDENTS) { gui_admin_students_create(app); }
+        else if (page==GUI_ADMIN_STATS) { gui_admin_stats_create(app); }
         else { gui_dashboard_create(app); }
     }
     app->changing_page=0;
@@ -154,6 +168,10 @@ int gui_initialize_data(wchar_t *error, size_t capacity)
 int gui_translate_message(GuiApp *app, MSG *message)
 {
     if (message->message==WM_KEYDOWN && message->wParam==VK_RETURN &&
+        app->page==GUI_ADMIN_STUDENTS && message->hwnd==app->id) {
+        SendMessageW(app->window,WM_COMMAND,MAKEWPARAM(GUI_ADMIN_QUERY,BN_CLICKED),0); return 1;
+    }
+    if (message->message==WM_KEYDOWN && message->wParam==VK_RETURN &&
         app->page<=GUI_REGISTER && (message->hwnd==app->id || message->hwnd==app->name ||
         message->hwnd==app->password || message->hwnd==app->confirmation)) {
         SendMessageW(app->window,WM_COMMAND,MAKEWPARAM(GUI_SUBMIT,BN_CLICKED),0);
@@ -170,6 +188,26 @@ static void command(GuiApp *app, int id, int code)
     }
     if (app->busy) { return; }
     if (!auth_session_has_role(&app->session,app->session.role)) { gui_show_page(app,GUI_LOGIN); return; }
+    if (code==BN_CLICKED && id>=GUI_NAV_ADMIN_LAB && id<=GUI_NAV_ADMIN_STATS) {
+        gui_show_page(app,(GuiPage)(GUI_ADMIN_LAB+id-GUI_NAV_ADMIN_LAB)); return;
+    }
+    if (code==BN_CLICKED && id>=GUI_ADMIN_QUICK_LAB && id<=GUI_ADMIN_QUICK_STATS) {
+        if (id==GUI_ADMIN_QUICK_LAB) { gui_show_page(app,GUI_ADMIN_LAB); }
+        else if (id==GUI_ADMIN_QUICK_REPORTS) { gui_show_page(app,GUI_ADMIN_REPORTS); }
+        else { gui_show_page(app,GUI_ADMIN_STATS); }
+        return;
+    }
+    if (app->session.role==ROLE_ADMIN) {
+        if (app->page==GUI_ADMIN_REPORTS) { gui_admin_reports_command(app,id,code); }
+        else if (app->page==GUI_ADMIN_LAB && code==BN_CLICKED) { gui_admin_lab_command(app,id); }
+        else if (app->page==GUI_DASHBOARD && id==GUI_ADMIN_REFRESH && code==BN_CLICKED) { gui_admin_dashboard_refresh(app); }
+        else if (app->page==GUI_ADMIN_USAGE && ((id==GUI_ADMIN_SLOT && code==CBN_SELCHANGE) || (id==GUI_ADMIN_REFRESH && code==BN_CLICKED))) { gui_admin_usage_refresh(app); }
+        else if (app->page==GUI_ADMIN_STUDENTS && ((id==GUI_ADMIN_STUDENT_MODE && code==CBN_SELCHANGE) || (id==GUI_ADMIN_QUERY && code==BN_CLICKED))) { gui_admin_students_query(app); }
+        else if (app->page==GUI_ADMIN_STATS) {
+            if ((id==GUI_ADMIN_STATS_MODE && code==CBN_SELCHANGE) || (id==GUI_ADMIN_REFRESH && code==BN_CLICKED)) { gui_admin_stats_refresh(app); }
+            else if (id==GUI_ADMIN_EXPORT && code==BN_CLICKED) { gui_admin_stats_export(app); }
+        }
+    }
     if (id==GUI_SLOT && code==CBN_SELCHANGE && app->page==GUI_SEATS) { gui_booking_refresh(app); }
     else if (code==BN_CLICKED) {
         if (id==GUI_LOGOUT) {
@@ -222,6 +260,11 @@ static LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wp, LPARAM
         if (app->changing_page) { return 0; }
         if (app->page==GUI_RESERVATIONS) { return gui_reservations_notify(app,(NMHDR *)lp); }
         if (app->page==GUI_FAULT) { return gui_fault_notify(app,(NMHDR *)lp); }
+        if (app->page==GUI_ADMIN_REPORTS) { return gui_admin_reports_notify(app,(NMHDR *)lp); }
+        if (app->page==GUI_ADMIN_USAGE) { return gui_admin_usage_notify(app,(NMHDR *)lp); }
+        if (app->page==GUI_ADMIN_STUDENTS) { return gui_admin_students_notify(app,(NMHDR *)lp); }
+        if (app->page==GUI_ADMIN_STATS && ((NMHDR *)lp)->idFrom==GUI_ADMIN_STATS_DATE &&
+            ((NMHDR *)lp)->code==DTN_DATETIMECHANGE && !app->busy) { gui_admin_stats_refresh(app); return 0; }
         if (((NMHDR *)lp)->idFrom==GUI_DATE && ((NMHDR *)lp)->code==DTN_DATETIMECHANGE &&
             app->page==GUI_SEATS && !app->busy) { gui_booking_refresh(app); }
         return 0;

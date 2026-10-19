@@ -12,6 +12,7 @@
 #include "booking.h"
 #include "stats.h"
 #include "fault.h"
+#include "admin.h"
 
 /* 控件编号稳定，供消息分发及独立 Windows 集成测试使用。 */
 enum {
@@ -23,11 +24,22 @@ enum {
     GUI_RES_FILTER, GUI_RES_TABLE, GUI_RES_REFRESH, GUI_RES_DETAILS, GUI_RES_CANCEL,
     GUI_FAULT_COMPUTER, GUI_FAULT_DETAIL, GUI_FAULT_SUBMIT, GUI_FAULT_REFRESH,
     GUI_REPORT_FILTER, GUI_REPORT_TABLE, GUI_REPORT_DETAILS, GUI_STATS_REFRESH,
-    GUI_HOME_REFRESH, GUI_QUICK_RESERVATIONS, GUI_QUICK_FAULT
+    GUI_HOME_REFRESH, GUI_QUICK_RESERVATIONS, GUI_QUICK_FAULT,
+    GUI_NAV_ADMIN_LAB = 400, GUI_NAV_ADMIN_REPORTS, GUI_NAV_ADMIN_USAGE,
+    GUI_NAV_ADMIN_STUDENTS, GUI_NAV_ADMIN_STATS, GUI_ADMIN_REFRESH,
+    GUI_ADMIN_QUICK_LAB, GUI_ADMIN_QUICK_REPORTS, GUI_ADMIN_QUICK_STATS,
+    GUI_ADMIN_REPORT_STATUS, GUI_ADMIN_REPORT_PC, GUI_ADMIN_REPORT_ACTION,
+    GUI_ADMIN_DETAILS, GUI_ADMIN_PROCESS, GUI_ADMIN_MARK, GUI_ADMIN_RESTORE,
+    GUI_ADMIN_DATE, GUI_ADMIN_SLOT, GUI_ADMIN_TABLE, GUI_ADMIN_STUDENT_ID,
+    GUI_ADMIN_STUDENT_MODE, GUI_ADMIN_QUERY, GUI_ADMIN_STATS_MODE,
+    GUI_ADMIN_STATS_DATE, GUI_ADMIN_EXPORT, GUI_ADMIN_YES, GUI_ADMIN_NO,
+    GUI_ADMIN_PREVIEW_TABLE,
+    GUI_ADMIN_SEAT_FIRST = 500
 };
 typedef enum {
     GUI_LOGIN, GUI_REGISTER, GUI_DASHBOARD, GUI_SEATS,
-    GUI_RESERVATIONS, GUI_FAULT, GUI_STUDENT_STATS
+    GUI_RESERVATIONS, GUI_FAULT, GUI_STUDENT_STATS,
+    GUI_ADMIN_LAB, GUI_ADMIN_REPORTS, GUI_ADMIN_USAGE, GUI_ADMIN_STUDENTS, GUI_ADMIN_STATS
 } GuiPage;
 
 /* 单窗口持有会话和展示投影；不持有账户表，不直接读写业务 TXT。 */
@@ -58,6 +70,17 @@ typedef struct {
     FaultResult reports_result, computers_result;
     int reservations_valid, reports_valid;
     LabTime reservations_as_of;     /* 仅用于显示可取消提示，最终由业务层复查。 */
+    Lab computers[COMPUTER_COUNT];
+    int computers_valid, normal_count, fault_count, current_open;
+    AdminUsage usage;
+    FaultResult usage_result, admin_student_result;
+    int usage_valid, admin_student_valid, admin_stats_valid;
+    AdminStudentInfo admin_student; /* 唯一所有者，离页及查询失败 admin_free_student。 */
+    DailyStats daily;
+    WeeklyStats weekly;
+    int stats_mode;
+    size_t pending_reports;
+    HWND action;
 } GuiApp;
 
 int gui_scale(const GuiApp *app, int value);

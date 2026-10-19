@@ -2,17 +2,24 @@
 #include "gui_widgets.h"
 #include "gui_theme.h"
 #include "gui_student_stats.h"
+#include "gui_admin.h"
 #include <wchar.h>
 
 /* 功能：建立当前角色导航；参数应用；无返回。 */
 void gui_shell_create(GuiApp *app)
 {
     gui_button(app,L"▦  工作台",GUI_HOME);
-    gui_button(app,app->session.role==ROLE_STUDENT ? L"▤  座位预约" : L"▤  座位概览",GUI_BOOKING);
+    gui_button(app,app->session.role==ROLE_STUDENT ? L"▤  座位预约" : L"▤  实验室座位",GUI_BOOKING);
     if (app->session.role==ROLE_STUDENT) {
         gui_button(app,L"▤  我的预约",GUI_NAV_RESERVATIONS);
         gui_button(app,L"◇  故障报告",GUI_NAV_FAULT);
         gui_button(app,L"▥  个人统计",GUI_NAV_STATS);
+    } else {
+        gui_button(app,L"◇  电脑维护",GUI_NAV_ADMIN_LAB);
+        gui_button(app,L"◇  故障报告",GUI_NAV_ADMIN_REPORTS);
+        gui_button(app,L"▤  使用情况",GUI_NAV_ADMIN_USAGE);
+        gui_button(app,L"▤  学生查询",GUI_NAV_ADMIN_STUDENTS);
+        gui_button(app,L"▥  数据统计",GUI_NAV_ADMIN_STATS);
     }
     gui_button(app,L"退出登录",GUI_LOGOUT);
 }
@@ -25,6 +32,10 @@ void gui_shell_layout(GuiApp *app)
     gui_move(app,GUI_NAV_RESERVATIONS,16,218,192,44);
     gui_move(app,GUI_NAV_FAULT,16,272,192,44);
     gui_move(app,GUI_NAV_STATS,16,326,192,44);
+    {
+        int i;
+        for (i=0;i<5;++i) { gui_move(app,GUI_NAV_ADMIN_LAB+i,16,218+i*50,192,44); }
+    }
 }
 /* 功能：绘制产品头部、身份与角色功能说明；参数应用/DC；无返回。 */
 void gui_shell_paint(GuiApp *app, HDC dc)
@@ -39,11 +50,7 @@ void gui_shell_paint(GuiApp *app, HDC dc)
     swprintf(identity,96,L"%ls  ·  %ls",app->session.role==ROLE_STUDENT ? L"学生" : L"管理员",user);
     gui_text(app,dc,identity,app->width-360,29,328,28,app->body,GUI_INK,DT_RIGHT);
     if (app->session.role==ROLE_ADMIN) {
-        gui_text(app,dc,L"后续图形功能",24,250,176,24,app->small,GUI_MUTED,0);
-        gui_text(app,dc,
-        L"设备维护 · 未开放\n\n学生查询 · 未开放\n\n故障处理 · 未开放\n\n预约统计 · 未开放",
-        24,290,176,240,app->body,GUI_MUTED,DT_WORDBREAK);
-        gui_text(app,dc,L"以上功能可在控制台使用",24,app->height-112,180,32,app->small,GUI_MUTED,DT_WORDBREAK);
+        gui_text(app,dc,L"管理服务\n维护前预览，确认后提交",24,app->height-128,180,50,app->small,GUI_MUTED,DT_WORDBREAK);
     } else {
         gui_text(app,dc,L"学生服务\n数据按操作实时查询",24,app->height-128,180,50,app->small,GUI_MUTED,DT_WORDBREAK);
     }
@@ -51,6 +58,7 @@ void gui_shell_paint(GuiApp *app, HDC dc)
 /* 功能：获取真实本人统计并建立快捷入口；参数应用；无返回。 */
 void gui_dashboard_create(GuiApp *app)
 {
+    if (app->session.role==ROLE_ADMIN) { gui_admin_dashboard_create(app); return; }
     app->stats_result=app->session.role==ROLE_STUDENT ?
         stats_query_student(NULL,&app->session,&app->student_stats) : STATS_UNAUTHORIZED;
     gui_button(app,app->session.role==ROLE_STUDENT ? L"选择座位  →" : L"查看座位  →",GUI_QUICK);
@@ -63,6 +71,7 @@ void gui_dashboard_create(GuiApp *app)
 /* 功能：定位工作台快捷操作；参数应用；无返回。 */
 void gui_dashboard_layout(GuiApp *app)
 {
+    if (app->session.role==ROLE_ADMIN) { gui_admin_dashboard_layout(app); return; }
     gui_move(app,GUI_QUICK,284,465,200,46);
     gui_move(app,GUI_QUICK_RESERVATIONS,500,465,160,46);
     gui_move(app,GUI_QUICK_FAULT,676,465,160,46);
@@ -76,6 +85,7 @@ void gui_dashboard_paint(GuiApp *app, HDC dc)
     int x=256, width=app->width-288, gap=16, card=(width-2*gap)/3, i;
     const wchar_t *labels[]={L"实验室电脑",L"每日开放时段",L"预约时间单位"};
     const wchar_t *values[]={L"40 台",L"9 个",L"1 小时"};
+    if (app->session.role==ROLE_ADMIN) { gui_admin_dashboard_paint(app,dc); return; }
     GetLocalTime(&now);
     gui_text(app,dc,L"欢迎使用实验室预约系统",x,110,width-180,46,app->heading,GUI_INK,0);
     swprintf(text,160,L"%04u 年 %02u 月 %02u 日  ·  开放时间 08:00–17:00",
