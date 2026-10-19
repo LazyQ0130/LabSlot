@@ -295,3 +295,7 @@ python tests/test_p4.py --executable smart-lab.exe --cc gcc
 
 - P0～P5.4 已完成，本阶段不编写正式 Word 课程设计报告，不扩展新业务。
 - 答辩前按 [演示指南](docs/DEMO_GUIDE.md) 重新准备新目录和有效日期，完整回归后再现场演示；对 [最终验收](tests/P5_4_FINAL_GUI_TEST_CASES.md) 中未验证的多显示器、认证输入法组合等场景补做人工检查，不把自动化结果当成人工验收。
+
+## P6 创新扩展进度
+
+P6.0 整体设计与基线验证已完成，见 [设计说明](docs/P6_INNOVATION_DESIGN.md) 和 [基线记录](tests/results/p6-0-validation.md)。本次重新执行的九套测试合计1352项全部取得通过结果；首次学生GUI出现16项失败，未改源码及断言的独立复跑263/263，原因未确定，原始失败证据保留。后续按P6.1至P6.4独立验收推进，不能把设计视作功能完成。
