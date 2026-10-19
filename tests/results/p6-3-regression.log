@@ -1,0 +1,1977 @@
+Build OK: smart-lab.exe (C11, warnings treated as errors)
+Build OK: LabSlot-GUI.exe (Win32 C11, PerMonitorV2)
+Analyze src/admin.c
+Analyze src/auth.c
+Analyze src/booking.c
+Analyze src/fault.c
+Analyze src/heatmap.c
+Analyze src/lab.c
+Analyze src/main.c
+Analyze src/recommend.c
+Analyze src/stats.c
+Analyze src/storage.c
+Analyze src/ui.c
+Analyze src/utils.c
+Analyze src/gui/gui_admin_common.c
+Analyze src/gui/gui_admin_dashboard.c
+Analyze src/gui/gui_admin_lab.c
+Analyze src/gui/gui_admin_reports.c
+Analyze src/gui/gui_admin_stats.c
+Analyze src/gui/gui_admin_students.c
+Analyze src/gui/gui_admin_usage.c
+Analyze src/gui/gui_app.c
+Analyze src/gui/gui_booking.c
+Analyze src/gui/gui_dashboard.c
+Analyze src/gui/gui_fault.c
+Analyze src/gui/gui_heatmap.c
+Analyze src/gui/gui_login.c
+Analyze src/gui/gui_main.c
+Analyze src/gui/gui_recommend.c
+Analyze src/gui/gui_reservations.c
+Analyze src/gui/gui_student_stats.c
+Analyze src/gui/gui_theme.c
+Analyze src/gui/gui_widgets.c
+PASS GCC static analysis: 31 production C files; warnings treated as errors.
+PASS 首次启动/六文件/40台/5×8布局/正常退出
+PASS 重启/故障恢复/乱序CRLF/已有六文件不覆盖
+PASS 菜单非法输入：letter
+PASS 菜单非法输入：negative
+PASS 菜单非法输入：out-of-range
+PASS 菜单非法输入：large-int
+PASS 菜单非法输入：empty
+PASS 菜单非法输入：spaces
+PASS 菜单非法输入：long-line
+PASS 菜单非法输入：trailing-text
+PASS 菜单非法输入：decimal
+PASS 菜单非法输入：nul
+PASS 菜单非法输入：sign
+PASS 菜单非法输入：two-numbers
+PASS EOF：immediate
+PASS EOF：no-newline
+PASS EOF：after-invalid
+PASS EOF：after-long
+PASS EOF：after-seat
+PASS 管理员/学生实际入口及合法空白
+PASS 缺失数据目录后恢复（旧目录保留备份）
+PASS 零字节电脑文件初始化
+PASS 损坏保留原文件：garbage
+PASS 损坏保留原文件：blank-only
+PASS 损坏保留原文件：spaces-only
+PASS 损坏保留原文件：missing-record
+PASS 损坏保留原文件：duplicate
+PASS 损坏保留原文件：bad-number
+PASS 损坏保留原文件：zero-number
+PASS 损坏保留原文件：negative-number
+PASS 损坏保留原文件：bad-status
+PASS 损坏保留原文件：extra-record
+PASS 损坏保留原文件：extra-field
+PASS 损坏保留原文件：suffix
+PASS 损坏保留原文件：overflow
+PASS 损坏保留原文件：nul
+PASS 损坏保留原文件：long-line
+PASS 损坏保留原文件：utf8-bom
+PASS 损坏保留原文件：invalid-utf8
+PASS 损坏保留原文件：trailing-blank
+PASS 电脑文件末行无换行
+PASS 补齐缺失业务文件并保留电脑
+PASS 数据目录被同名文件占用
+PASS 数据文件类型错误：admins.txt
+PASS 数据文件类型错误：students.txt
+PASS 数据文件类型错误：computers.txt
+PASS 数据文件类型错误：reservations.txt
+PASS 数据文件类型错误：error.txt
+PASS 数据文件类型错误：count.txt
+PASS 保存接口/临时替换/故障状态跨进程持久化
+PASS 保存拒绝无效快照：invalid-no
+PASS 保存拒绝无效快照：duplicate
+PASS 保存拒绝无效快照：invalid-status
+PASS 保存拒绝无效快照：null
+PASS 临时文件独占创建/遗留文件不覆盖
+PASS 临时文件创建失败不破坏旧数据
+PASS Windows替换失败保留原文件和临时快照
+
+57/57 passed; report: tests\runs\20261019-151601-136a17ad
+PASS admin: 注册/重启登录/角色菜单/退出/统计入口
+PASS admin: 多账户/重复拒绝/旧账户保留
+PASS admin: 错误密码/不存在/重试成功
+PASS admin: 密码确认不一致
+PASS admin: API roundtrip
+PASS admin: API invalid-struct
+PASS admin: API read-missing
+PASS admin: API retry-write
+PASS admin: API save-invalid
+PASS admin: API read-locked
+PASS admin: 输入拒绝 id-empty
+PASS admin: 输入拒绝 id-long
+PASS admin: 输入拒绝 id-separator
+PASS admin: 输入拒绝 id-space
+PASS admin: 输入拒绝 id-unicode
+PASS admin: 输入拒绝 id-leading-dash
+PASS admin: 输入拒绝 name-long
+PASS admin: 输入拒绝 name-utf8-long
+PASS admin: 输入拒绝 name-empty
+PASS admin: 输入拒绝 name-separator
+PASS admin: 输入拒绝 name-bad-utf8
+PASS admin: 输入拒绝 name-partial-utf8
+PASS admin: 输入拒绝 name-nul
+PASS admin: 输入拒绝 password-long
+PASS admin: 输入拒绝 password-empty
+PASS admin: 输入拒绝 password-delimiter
+PASS admin: 输入拒绝 password-huge
+PASS admin: 输入拒绝 confirm-long
+PASS admin: 最大字节容量/中文/CRLF
+PASS admin: EOF 字段 0
+PASS admin: EOF 字段 1
+PASS admin: EOF 字段 2
+PASS admin: EOF 字段 3
+PASS admin: EOF 字段 4
+PASS admin: EOF 字段 5
+PASS admin: EOF 字段 6
+PASS admin: 登录后EOF
+PASS admin: 多级菜单非法输入
+PASS admin: 损坏安全报错 empty-line
+PASS admin: 损坏安全报错 missing-field
+PASS admin: 损坏安全报错 extra-field
+PASS admin: 损坏安全报错 duplicate
+PASS admin: 损坏安全报错 bad-id
+PASS admin: 损坏安全报错 long-id
+PASS admin: 损坏安全报错 long-name
+PASS admin: 损坏安全报错 long-password
+PASS admin: 损坏安全报错 empty-name
+PASS admin: 损坏安全报错 empty-password
+PASS admin: 损坏安全报错 nul
+PASS admin: 损坏安全报错 utf8
+PASS admin: 损坏安全报错 overlong-utf8
+PASS admin: 损坏安全报错 surrogate
+PASS admin: 损坏安全报错 too-high-codepoint
+PASS admin: 损坏安全报错 control
+PASS admin: 损坏安全报错 bom
+PASS admin: 损坏安全报错 huge-line
+PASS admin: 损坏安全报错 trailing-blank
+PASS admin: 容量边界 0
+PASS admin: 容量边界 1
+PASS admin: 原格式/末行无换行/旧时长保留
+PASS admin: 完整UTF8多字节字段往返
+PASS admin: 写入失败不虚报 stale
+PASS admin: 写入失败不虚报 directory
+PASS admin: Windows替换失败保留旧账户
+PASS student: 注册/重启登录/角色菜单/退出/统计入口
+PASS student: 多账户/重复拒绝/旧账户保留
+PASS student: 错误密码/不存在/重试成功
+PASS student: 密码确认不一致
+PASS student: API roundtrip
+PASS student: API invalid-struct
+PASS student: API read-missing
+PASS student: API retry-write
+PASS student: API save-invalid
+PASS student: API read-locked
+PASS student: 输入拒绝 id-empty
+PASS student: 输入拒绝 id-long
+PASS student: 输入拒绝 id-separator
+PASS student: 输入拒绝 id-space
+PASS student: 输入拒绝 id-unicode
+PASS student: 输入拒绝 id-leading-dash
+PASS student: 输入拒绝 name-long
+PASS student: 输入拒绝 name-utf8-long
+PASS student: 输入拒绝 name-empty
+PASS student: 输入拒绝 name-separator
+PASS student: 输入拒绝 name-bad-utf8
+PASS student: 输入拒绝 name-partial-utf8
+PASS student: 输入拒绝 name-nul
+PASS student: 输入拒绝 password-long
+PASS student: 输入拒绝 password-empty
+PASS student: 输入拒绝 password-delimiter
+PASS student: 输入拒绝 password-huge
+PASS student: 输入拒绝 confirm-long
+PASS student: 最大字节容量/中文/CRLF
+PASS student: EOF 字段 0
+PASS student: EOF 字段 1
+PASS student: EOF 字段 2
+PASS student: EOF 字段 3
+PASS student: EOF 字段 4
+PASS student: EOF 字段 5
+PASS student: EOF 字段 6
+PASS student: 登录后EOF
+PASS student: 多级菜单非法输入
+PASS student: 损坏安全报错 empty-line
+PASS student: 损坏安全报错 missing-field
+PASS student: 损坏安全报错 extra-field
+PASS student: 损坏安全报错 duplicate
+PASS student: 损坏安全报错 bad-id
+PASS student: 损坏安全报错 long-id
+PASS student: 损坏安全报错 long-name
+PASS student: 损坏安全报错 long-password
+PASS student: 损坏安全报错 empty-name
+PASS student: 损坏安全报错 empty-password
+PASS student: 损坏安全报错 nul
+PASS student: 损坏安全报错 utf8
+PASS student: 损坏安全报错 overlong-utf8
+PASS student: 损坏安全报错 surrogate
+PASS student: 损坏安全报错 too-high-codepoint
+PASS student: 损坏安全报错 control
+PASS student: 损坏安全报错 bom
+PASS student: 损坏安全报错 huge-line
+PASS student: 损坏安全报错 trailing-blank
+PASS student: 损坏安全报错 negative-time
+PASS student: 损坏安全报错 overflow-time
+PASS student: 损坏安全报错 text-time
+PASS student: 容量边界 0
+PASS student: 容量边界 1
+PASS student: 原格式/末行无换行/旧时长保留
+PASS student: 完整UTF8多字节字段往返
+PASS student: 写入失败不虚报 stale
+PASS student: 写入失败不虚报 directory
+PASS student: Windows替换失败保留旧账户
+PASS 双角色隔离/同名不同凭据/退出后跨角色须重新认证
+PASS 登录只读取对应角色文件
+PASS 真实开发数据保持不变
+
+134/134 passed; report: tests\runs\p1-20261019-151603-9f14281e
+PASS 正常创建/不同日期时段/唯一编号/两类冲突/重启
+PASS 本人取消/他人和重复拒绝/取消保留/座位释放/重新预约
+PASS 取消开始/过去拒绝 20261018-8
+PASS 取消开始/过去拒绝 20261019-2
+PASS 取消开始/过去拒绝 20261019-0
+PASS 尚未开始的远期旧记录可取消
+PASS 时间规则 20261018/slot=8/now=20261019,10,15,0
+PASS 时间规则 20261019/slot=2/now=20261019,10,15,0
+PASS 时间规则 20261019/slot=3/now=20261019,10,15,0
+PASS 时间规则 20261020/slot=0/now=20261019,10,15,0
+PASS 时间规则 20261025/slot=8/now=20261019,10,15,0
+PASS 时间规则 20261026/slot=0/now=20261019,10,15,0
+PASS 时间规则 20261301/slot=0/now=20261019,10,15,0
+PASS 时间规则 20260431/slot=0/now=20261019,10,15,0
+PASS 时间规则 20260229/slot=0/now=20261019,10,15,0
+PASS 时间规则 20261020/slot=-1/now=20261019,10,15,0
+PASS 时间规则 20261020/slot=9/now=20261019,10,15,0
+PASS 时间规则 20261019/slot=3/now=20261019,11,0,0
+PASS 时间规则 20261019/slot=3/now=20261019,10,59,59
+PASS 时间规则 20240229/slot=0/now=20240228,10,15,0
+PASS 时间规则 19000229/slot=0/now=19000228,10,15,0
+PASS 时间规则 20000229/slot=0/now=20000228,10,15,0
+PASS 时间规则 21000229/slot=0/now=21000228,10,15,0
+PASS 时间规则 20270106/slot=0/now=20261231,16,30,0
+PASS 时间规则 20270107/slot=0/now=20261231,16,30,0
+PASS 时间规则 20240305/slot=0/now=20240228,16,30,0
+PASS 时间规则 20240306/slot=0/now=20240228,16,30,0
+PASS 时间规则 99991231/slot=8/now=99991230,10,15,0
+PASS 时间规则 20261019/slot=0/now=20261019,7,59,59
+PASS 时间规则 20261019/slot=0/now=20261019,8,0,0
+PASS 时间规则 20261019/slot=8/now=20261019,16,0,0
+PASS 公历推进/时段格式 0
+PASS 公历推进/时段格式 1
+PASS 公历推进/时段格式 2
+PASS 公历推进/时段格式 3
+PASS 公历推进/时段格式 4
+PASS 公历推进/时段格式 5
+PASS 公历推进/时段格式 6
+PASS 公历推进/时段格式 7
+PASS 业务权限 create-none
+PASS 业务权限 create-admin
+PASS 业务权限 create-ghost
+PASS 业务权限 cancel-none
+PASS 业务权限 cancel-admin
+PASS 业务权限 cancel-ghost
+PASS 业务权限 query-none
+PASS 业务权限 query-admin
+PASS 业务权限 query-ghost
+PASS 学生文件损坏与账户不存在分离
+PASS 异常时间源安全失败/历史查询不依赖时钟
+PASS 业务输入参数边界
+PASS 确认后重新加载冲突与归属
+PASS 业务读文件缺失/空电脑表不初始化
+PASS 故障拒绝与座位符号优先级
+PASS 个人过滤/有效与全部历史/排序/查询不写入
+PASS 损坏预约保护 garbage
+PASS 损坏预约保护 blank
+PASS 损坏预约保护 empty-id
+PASS 损坏预约保护 duplicate-id
+PASS 损坏预约保护 duplicate-cancelled-id
+PASS 损坏预约保护 seat-conflict
+PASS 损坏预约保护 student-conflict
+PASS 损坏预约保护 no-zero
+PASS 损坏预约保护 no-large
+PASS 损坏预约保护 bad-date
+PASS 损坏预约保护 long-date
+PASS 损坏预约保护 bad-slot
+PASS 损坏预约保护 negative-slot
+PASS 损坏预约保护 bad-status
+PASS 损坏预约保护 suffix
+PASS 损坏预约保护 extra-field
+PASS 损坏预约保护 missing-field
+PASS 损坏预约保护 overflow-id
+PASS 损坏预约保护 zero-id
+PASS 损坏预约保护 negative-id
+PASS 损坏预约保护 invalid-student
+PASS 损坏预约保护 long-student
+PASS 损坏预约保护 nul
+PASS 损坏预约保护 bom
+PASS 损坏预约保护 huge-line
+PASS 损坏预约保护 numeric-space
+PASS 乱序/CRLF/末行无换行/取消编号不复用
+PASS 编号INT_MAX边界安全拒绝
+PASS 保存前完整校验 1
+PASS 保存前完整校验 2
+PASS 保存前完整校验 3
+PASS 保存前完整校验 4
+PASS 保存前完整校验 5
+PASS 保存前完整校验 6
+PASS 保存前完整校验 7
+PASS 保存前完整校验 8
+PASS 保存前完整校验 9
+PASS 保存前完整校验 10
+PASS 真实MAX_RESERVATIONS边界 +0
+PASS 真实MAX_RESERVATIONS边界 +1
+PASS 分配故障 create-1
+PASS 分配故障 create-2
+PASS 分配故障 create-3
+PASS 分配故障 create-4
+PASS 分配故障 create-5
+PASS 分配故障 create-6
+PASS 内存故障同进程恢复 create
+PASS 分配故障 cancel-1
+PASS 分配故障 cancel-2
+PASS 分配故障 cancel-3
+PASS 分配故障 cancel-4
+PASS 分配故障 cancel-5
+PASS 内存故障同进程恢复 cancel
+PASS 分配故障 query-1
+PASS 分配故障 query-2
+PASS 分配故障 query-3
+PASS 分配故障 query-4
+PASS 分配故障 query-5
+PASS 内存故障同进程恢复 query
+PASS 分配故障 seats-1
+PASS 分配故障 seats-2
+PASS 内存故障同进程恢复 seats
+PASS 部分读取/扩容失败输出保持 1
+PASS 部分读取/扩容失败输出保持 2
+PASS 部分读取/扩容失败输出保持 3
+PASS realloc失败保留原指针并可恢复
+PASS 写失败回滚 create-stale
+PASS 写失败回滚 create-directory
+PASS 写失败回滚 create-write
+PASS 写失败回滚 create-flush
+PASS 写失败回滚 create-close
+PASS 写失败回滚 cancel-stale
+PASS 写失败回滚 cancel-directory
+PASS 写失败回滚 cancel-write
+PASS 写失败回滚 cancel-flush
+PASS 写失败回滚 cancel-close
+PASS 真实Windows锁失败 create
+PASS 真实Windows锁失败 cancel
+PASS 真实Windows锁失败 query
+PASS 写入时间边界重查 create
+PASS 写入时间边界重查 cancel
+PASS 固定时间UI完整预约/查询/取消/释放
+PASS UI预约与取消放弃确认不写入
+PASS UI业务EOF清理 0
+PASS UI业务EOF清理 1
+PASS UI业务EOF清理 2
+PASS UI业务EOF清理 3
+PASS UI业务EOF清理 4
+PASS UI业务EOF清理 5
+PASS UI业务EOF清理 6
+PASS UI业务EOF清理 7
+PASS UI业务EOF清理 8
+PASS UI预约非法输入 0
+PASS UI预约非法输入 1
+PASS UI预约非法输入 2
+PASS UI预约非法输入 3
+PASS UI预约非法输入 4
+PASS UI损坏文件不能显示暂无记录
+PASS 正式程序P2只读查询与日期座位流程
+PASS 真实开发数据及学生累计时间不变
+
+155/155 passed; report: tests\runs\p2-20261019-151607-a6e5cc0c
+PASS 上报/持久化/重启/编号/同机重复/本人过滤/无维护副作用
+PASS 业务角色隔离 submit/none
+PASS 业务角色隔离 submit/admin
+PASS 业务角色隔离 change/U1
+PASS 业务角色隔离 preview/U1
+PASS 业务角色隔离 process/U1
+PASS 业务角色隔离 get/U1
+PASS 业务角色隔离 usage/U1
+PASS 业务角色隔离 student/U1
+PASS 业务角色隔离 reports/none
+PASS 会话账户必须真实存在 ghost
+PASS 会话账户必须真实存在 ghostadmin
+PASS 故障说明字段拒绝 0
+PASS 故障说明字段拒绝 1
+PASS 故障说明字段拒绝 2
+PASS 故障说明字段拒绝 3
+PASS 故障说明字段拒绝 4
+PASS 故障说明字段拒绝 5
+PASS 故障说明字段拒绝 6
+PASS 故障说明字段拒绝 7
+PASS 故障说明字段拒绝 8
+PASS 电脑编号边界 0
+PASS 电脑编号边界 -1
+PASS 电脑编号边界 41
+PASS 电脑编号边界 2147483647
+PASS 255字节UTF-8说明完整往返
+PASS 失败及非法时钟拒绝写入
+PASS 损坏报告拒绝/输出不变/禁止覆盖 0
+PASS 损坏报告拒绝/输出不变/禁止覆盖 1
+PASS 损坏报告拒绝/输出不变/禁止覆盖 2
+PASS 损坏报告拒绝/输出不变/禁止覆盖 3
+PASS 损坏报告拒绝/输出不变/禁止覆盖 4
+PASS 损坏报告拒绝/输出不变/禁止覆盖 5
+PASS 损坏报告拒绝/输出不变/禁止覆盖 6
+PASS 损坏报告拒绝/输出不变/禁止覆盖 7
+PASS 损坏报告拒绝/输出不变/禁止覆盖 8
+PASS 损坏报告拒绝/输出不变/禁止覆盖 9
+PASS 损坏报告拒绝/输出不变/禁止覆盖 10
+PASS 损坏报告拒绝/输出不变/禁止覆盖 11
+PASS 损坏报告拒绝/输出不变/禁止覆盖 12
+PASS 损坏报告拒绝/输出不变/禁止覆盖 13
+PASS 损坏报告拒绝/输出不变/禁止覆盖 14
+PASS 损坏报告拒绝/输出不变/禁止覆盖 15
+PASS 损坏报告拒绝/输出不变/禁止覆盖 16
+PASS 损坏报告拒绝/输出不变/禁止覆盖 17
+PASS 损坏报告拒绝/输出不变/禁止覆盖 18
+PASS 损坏报告拒绝/输出不变/禁止覆盖 19
+PASS 损坏报告拒绝/输出不变/禁止覆盖 20
+PASS 损坏报告拒绝/输出不变/禁止覆盖 21
+PASS CRLF/已处理同机历史允许/新编号不复用
+PASS INT_MAX报告编号耗尽无溢出
+PASS 报告容量边界 10000+0
+PASS 报告容量边界 10000+1
+PASS 故障联动/过去开始记录保留/故障优先/恢复/重新预约编号
+PASS 严格开始时刻边界 20261019,11,0,0
+PASS 严格开始时刻边界 20261019,10,59,59
+PASS 严格开始时刻边界 20261020,11,0,0
+PASS 报告动作 1/状态分离/重复处理
+PASS 报告动作 2/状态分离/重复处理
+PASS 报告动作 3/状态分离/重复处理
+PASS 报告确认已故障电脑仍完成预约联动
+PASS 相关文件预验证失败 change
+PASS 相关文件预验证失败 process
+PASS 相关文件预验证失败 usage
+PASS 相关文件预验证失败 student
+PASS 管理员真实预约/姓名/人数/精确学号/空表/参数边界
+PASS 学生查询有效与全部历史计数/取消保留
+PASS 预约引用缺失账户明确报错
+PASS 真实write失败 第1快照/门禁/冻结时刻恢复/幂等
+PASS 真实flush失败 第1快照/门禁/冻结时刻恢复/幂等
+PASS 真实close失败 第1快照/门禁/冻结时刻恢复/幂等
+PASS 真实write失败 第2快照/门禁/冻结时刻恢复/幂等
+PASS 真实flush失败 第2快照/门禁/冻结时刻恢复/幂等
+PASS 真实close失败 第2快照/门禁/冻结时刻恢复/幂等
+PASS 真实write失败 第3快照/门禁/冻结时刻恢复/幂等
+PASS 真实flush失败 第3快照/门禁/冻结时刻恢复/幂等
+PASS 真实close失败 第3快照/门禁/冻结时刻恢复/幂等
+PASS 真实write失败 第4快照/门禁/冻结时刻恢复/幂等
+PASS 真实flush失败 第4快照/门禁/冻结时刻恢复/幂等
+PASS 真实close失败 第4快照/门禁/冻结时刻恢复/幂等
+PASS 真实进程_Exit 第2快照/正式程序重启恢复
+PASS 真实进程_Exit 第3快照/正式程序重启恢复
+PASS 真实进程_Exit 第4快照/正式程序重启恢复
+PASS 恢复源文件损坏/启动失败/全部保存门禁/保留证据
+PASS 损坏维护日志拒绝恢复 0
+PASS 损坏维护日志拒绝恢复 1
+PASS 损坏维护日志拒绝恢复 2
+PASS 损坏维护日志拒绝恢复 3
+PASS 遗留临时路径不覆盖 error.txt.tmp
+PASS 遗留临时路径不覆盖 computers.txt.tmp
+PASS 遗留临时路径不覆盖 reservations.txt.tmp
+PASS 遗留临时路径不覆盖 maintenance.txt.tmp
+PASS 每次动态分配失败输出/释放/恢复 submit
+PASS 每次动态分配失败输出/释放/恢复 load
+PASS 每次动态分配失败输出/释放/恢复 usage
+PASS 每次动态分配失败输出/释放/恢复 student
+PASS 每次动态分配失败输出/释放/恢复 preview
+PASS 每次动态分配失败输出/释放/恢复 process
+PASS UI学生完整上报/确认/中文说明
+PASS UI维护/报告过滤处理/真实查询/公共座位刷新/P4统计入口
+PASS UI EOF/超长/非数字/放弃 0
+PASS UI EOF/超长/非数字/放弃 1
+PASS UI EOF/超长/非数字/放弃 2
+PASS UI EOF/超长/非数字/放弃 3
+PASS UI EOF/超长/非数字/放弃 4
+PASS UI EOF/超长/非数字/放弃 5
+PASS UI EOF/超长/非数字/放弃 6
+PASS UI读取失败不伪装零预约
+PASS 上报真实I/O失败保留旧报告 write
+PASS 上报真实I/O失败保留旧报告 flush
+PASS 上报真实I/O失败保留旧报告 close
+PASS 真实Windows替换失败/恢复重试 computers.txt
+PASS 真实Windows替换失败/恢复重试 reservations.txt
+PASS 真实Windows替换失败/恢复重试 error.txt
+PASS 真实Windows替换失败/恢复重试 maintenance.done.txt
+PASS 真实Windows报告读取失败不当空表
+PASS 恢复源缺失时禁止启动补建/修复源后继续恢复
+PASS 最终确认时钟重查/日志冻结新边界
+PASS 真实开发数据完全不变/所有用例保护账户及累计时间
+
+119/119 passed; report: tests\runs\p3-20261019-151615-1fa91acf
+PASS 日报有效/取消/分时段/人数去重/理论利用率/已完成/只读
+PASS 整周一次聚合/跨天去重/日与周口径/日均/理论利用率
+PASS 空周/跨月跨年闰年日历 2026-11-01
+PASS 空周/跨月跨年闰年日历 2027-01-01
+PASS 空周/跨月跨年闰年日历 2024-02-29
+PASS 空周/跨月跨年闰年日历 2000-02-29
+PASS 空周/跨月跨年闰年日历 2100-03-01
+PASS 空周/跨月跨年闰年日历 1000-01-07
+PASS 空周/跨月跨年闰年日历 9999-12-26
+PASS 非法日期拒绝 20260230
+PASS 非法日期拒绝 20250229
+PASS 非法日期拒绝 21000229
+PASS 非法日期拒绝 0
+PASS 非法日期拒绝 99991301
+PASS 非法日期拒绝 -1
+PASS 非法日期拒绝 2147483647
+PASS 合法日期整周越界明确拒绝 10000101
+PASS 合法日期整周越界明确拒绝 99991231
+PASS 固定时钟时段结束边界 20261019,8,59,59
+PASS 固定时钟时段结束边界 20261019,9,0,0
+PASS 固定时钟时段结束边界 20261019,10,0,0
+PASS 固定时钟时段结束边界 20261019,10,30,0
+PASS 固定时钟时段结束边界 20261019,11,0,0
+PASS 固定时钟时段结束边界 20261019,17,0,0
+PASS 固定时钟时段结束边界 20261018,23,59,59
+PASS 固定时钟时段结束边界 20261020,0,0,0
+PASS 重启/动态累计/忽略过时INT_MAX缓存/本人隔离/空学生
+PASS 统计业务权限 daily/U1
+PASS 统计业务权限 week/U1
+PASS 统计业务权限 export/U1
+PASS 统计业务权限 student/admin
+PASS 统计业务权限 daily/none
+PASS 统计业务权限 week/none
+PASS 统计业务权限 export/none
+PASS 统计业务权限 student/none
+PASS 真实账户存在性 daily
+PASS 真实账户存在性 week
+PASS 真实账户存在性 export
+PASS 真实账户存在性 student
+PASS 空输出参数安全拒绝
+PASS 统计无效/失败时钟不发布结果 daily
+PASS 统计无效/失败时钟不发布结果 week
+PASS 统计无效/失败时钟不发布结果 student
+PASS 统计无效/失败时钟不发布结果 export
+PASS 首次导出/重复upsert/保留其他日期/有序/取消后快照过时/重新导出
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 0
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 1
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 2
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 3
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 4
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 5
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 6
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 7
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 8
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 9
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 10
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 11
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 12
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 13
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 14
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 15
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 16
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 17
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 18
+PASS 损坏快照拒绝覆盖/加载输出不变/实时不依赖快照 19
+PASS 统计保存接口独立完整验证 0
+PASS 统计保存接口独立完整验证 1
+PASS 统计保存接口独立完整验证 2
+PASS 统计保存接口独立完整验证 3
+PASS 统计保存接口独立完整验证 4
+PASS 统计保存接口独立完整验证 5
+PASS 统计保存接口独立完整验证 6
+PASS 统计保存接口独立完整验证 7
+PASS 统计文件CRLF/末行无换行/规范LF保存
+PASS 损坏来源文件不能解释为零 reservations.txt
+PASS 损坏来源文件不能解释为零 admins.txt
+PASS 损坏来源文件不能解释为零 students.txt
+PASS 导出真实I/O失败或进程中断/旧文件保留/重试 write
+PASS 导出真实I/O失败或进程中断/旧文件保留/重试 flush
+PASS 导出真实I/O失败或进程中断/旧文件保留/重试 close
+PASS 导出真实I/O失败或进程中断/旧文件保留/重试 crash
+PASS 导出遗留临时路径不覆盖 stale
+PASS 导出遗留临时路径不覆盖 directory
+PASS 真实P3中断/四种统计门禁/日志不清理/恢复后重新统计
+PASS 真实Windows读取/替换失败及解除后恢复 count.txt/3
+PASS 真实Windows读取/替换失败及解除后恢复 count.txt/0
+PASS 真实Windows读取/替换失败及解除后恢复 reservations.txt/0
+PASS 逐次动态分配失败/输出哨兵/释放/旧文件保留 daily
+PASS 逐次动态分配失败/输出哨兵/释放/旧文件保留 week
+PASS 逐次动态分配失败/输出哨兵/释放/旧文件保留 student
+PASS 逐次动态分配失败/输出哨兵/释放/旧文件保留 export
+PASS 逐次动态分配失败/输出哨兵/释放/旧文件保留 load-counts
+PASS 真实十万预约/大历史动态内存/整数边界安全
+PASS 理论每日360/每周2520/百分比100/历史不依赖当前故障/已离开账户的预约事实
+PASS 快照集合容量100000+0/安全拒绝越界
+PASS 快照集合容量100000+1/安全拒绝越界
+PASS 管理员UI日报/确认导出/周统计/两位小数/说明
+PASS 学生UI本人姓名/完成小时/待完成/统计说明
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 0
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 1
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 2
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 3
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 4
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 5
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 6
+PASS 统计UI非法日期/超长/非数字/EOF/放弃 7
+PASS UI损坏源只报错不输出虚假零结果
+PASS 整周只取一次时钟/所有日期完成小时使用相同时刻
+PASS 运行中来源缺失拒绝/不补建/恢复来源后重试 count.txt/export
+PASS 运行中来源缺失拒绝/不补建/恢复来源后重试 reservations.txt/daily
+PASS 运行中来源缺失拒绝/不补建/恢复来源后重试 reservations.txt/student
+PASS 全部只读保护原文件和修改时间/真实开发数据不变
+
+112/112 passed; report: tests\runs\p4-20261019-151623-75402809
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS empty exact top three / full normalized scores
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS same data deterministic byte-identical output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure rejects / sentinel preserved
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure rejects / sentinel preserved
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS exact candidate factor scores / total / stable order 0
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS exact candidate factor scores / total / stable order 1
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS exact candidate factor scores / total / stable order 2
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS preference changes actual ordering
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 40 exact nine-bit masks / actual loads
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS own conflict excludes whole request
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS own conflict clears every computer bit
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (8, 1)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (7, 2)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (6, 3)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (8, 2)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (7, 3)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (-1, 1)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (0, 0)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS range boundary (0, 4)
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS business role/account gate admin
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS business role/account gate none
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS business role/account gate ghost
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS date/window validation 20261018
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS date/window validation 20261026
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS date/window validation 20260230
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS start equality rejected
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS today future slots available
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS clock error is explicit
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS cross year uses calendar window
+PASS probe exits successfully
+PASS stale recommendation final create rejects occupied seat
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS 100000 records exact output preserved
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS no candidates is legal empty result
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS corrupt input rejects full analysis
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS P3 recovery distinguished
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS P6 isolated initialization
+PASS P6 native window
+PASS P6 session via actual auth
+PASS P6 local clock
+PASS recommendation entry in booking page
+PASS three real ranked results
+PASS native preference invokes business
+PASS candidate navigates and highlights actual seat
+PASS native boundary rejects crossing 17
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation simulated DPI controls fit / no overlap
+PASS recommendation GDI stable
+PASS recommendation USER stable
+PASS admin authenticated
+PASS forged admin recommendation entry rejected
+PASS recommendation destroys resources
+PASS real development data hashes / mtimes unchanged
+128 passed, 0 failed
+Report: tests\runs\p6-1-20261019-151631-bb5cf96f\TEST_RESULTS.md
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 63 cells exact including calendar / cancelled / current faults admin
+PASS all palette boundaries exact
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS entire empty week exact zeros
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS each allocation failure / output sentinel
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS heatmap role/account none
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS heatmap role/account ghost
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS complete week lower boundary rejected
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS invalid date rejected
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS corrupt source refuses matrix
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS maintenance gate
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS clock failure
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS heatmap initialization
+PASS heatmap native window
+PASS heatmap real student session
+PASS heatmap actual clock
+PASS student booking heatmap entry / exact 40 peak
+PASS actual grid selection precise 40/40 / percent
+PASS grid keyboard selects adjacent slot / 80 percent
+PASS future valid cell navigates existing seat query
+PASS historical cell cannot navigate
+PASS forged expired navigation rechecked
+PASS heatmap real administrator session
+PASS admin statistics heatmap entry / no student action
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap simulated DPI bounds / controls
+PASS heatmap GDI stable
+PASS heatmap USER stable
+PASS heatmap resources released
+PASS real development data hashes / mtimes unchanged
+115 passed, 0 failed
+Report: tests\runs\p6-2-20261019-151648-b56ccdb9\TEST_RESULTS.md
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS read-only precheck 1
+PASS probe exits successfully
+PASS exact complete one-hour group 1
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS restart reads every record
+PASS only reservation target changes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS read-only precheck 2
+PASS probe exits successfully
+PASS exact complete one-hour group 2
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS restart reads every record
+PASS only reservation target changes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS read-only precheck 3
+PASS probe exits successfully
+PASS exact complete one-hour group 3
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS restart reads every record
+PASS only reservation target changes
+PASS probe exits successfully
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS single cancellation preserves other group slots
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS 17:00 boundary (7, 2)
+PASS probe exits successfully
+PASS 17:00 boundary (6, 3)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (8, 2)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (7, 3)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (-1, 2)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (0, 0)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (0, 4)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch session gate none
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch session gate admin
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch session gate ghost
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch date/window gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch date/window gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch date/window gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch invalid computer
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch invalid computer
+PASS probe exits successfully
+PASS historical cancelled maximum not reused
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS fault device refused
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS commit clock recheck rejects start equality
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS clock error explicit
+PASS probe exits successfully
+PASS cross-year valid window
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS P3 maintenance gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS bad reservation input
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS INT_MAX allocation boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS INT_MAX allocation boundary
+PASS probe exits successfully
+PASS INT_MAX allocation boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS exact capacity boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS exact capacity boundary
+PASS probe exits successfully
+PASS exact capacity boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none write
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none flush
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none close
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none exclusive
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS real Windows replacement lock preserves original
+PASS probe exits successfully
+PASS batch GUI initialize
+PASS batch GUI window
+PASS batch GUI auth
+PASS batch GUI actual clock
+PASS continuous range free seats
+PASS owned confirmation answered / defaults No
+PASS declined group saves zero
+PASS owned confirmation answered / defaults No
+PASS two-hour GUI commit exact ids / summary
+PASS owned confirmation answered / defaults No
+PASS commit success / refresh failure distinguished
+PASS refresh retry recovers full saved group
+PASS personal list receives five one-hour records
+PASS stats receives five future hours
+PASS continuous out of bounds disables seats
+PASS recommendation carries complete duration
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch GDI stable
+PASS batch USER stable
+PASS batch all GUI resources released
+PASS GUI persists all five original-format rows
+PASS GUI only reservation file changes
+PASS real development data hashes / mtimes unchanged
+189 passed, 0 failed
+Report: tests\runs\p6-3-20261019-151707-4cd82404\TEST_RESULTS.md
+PASS storage initializes isolated fixture
+
+PASS local clock
+
+PASS real Unicode Win32 window created
+
+PASS login controls created
+
+PASS password uses ES_PASSWORD
+
+PASS Unicode UTF8 roundtrip
+
+PASS invalid surrogate rejected
+
+PASS invalid UTF8 rejected
+
+PASS byte overflow rejected without truncation
+
+PASS Tab advances id to password
+
+PASS confirmation mismatch stays on registration
+
+PASS student registration returns to login
+
+PASS duplicate student rejected
+
+PASS wrong password rejected and session empty
+
+PASS wrong password preserves id and clears password
+
+PASS Enter runs primary authentication action
+
+PASS student login creates correct session
+
+PASS real dashboard statistics
+
+PASS 40 real seat controls / counts
+
+PASS date and slot selections consumed
+
+PASS free seat selectable
+
+PASS hover feedback tracked
+
+PASS slot change clears old selection
+
+PASS date change clears old selection
+
+PASS confirmation worker created
+
+PASS real confirmation dialog answered
+
+PASS confirmation located owned dialog
+
+PASS cancel confirmation preserves selection / no write
+
+PASS confirmation worker created
+
+PASS real confirmation dialog answered
+
+PASS confirmation located owned dialog
+
+PASS real booking success refreshes occupied seat
+
+PASS booking persisted using logged student
+
+PASS occupied seat cannot be selected
+
+PASS fixture fault saved
+
+PASS fault real state / cannot select
+
+PASS second fixture student
+
+PASS competing booking outside stale view
+
+PASS stale conflict rejected / refreshed
+
+PASS confirmation worker created
+
+PASS real confirmation dialog answered
+
+PASS confirmation located owned dialog
+
+PASS conflict introduced during confirmation rejected
+
+PASS expired slot rejected
+
+PASS logout clears all session fields
+
+PASS admin registration succeeds
+
+PASS admin login correct role
+
+PASS role navigation names / admin has no reserve control
+
+PASS forged admin booking messages denied
+
+PASS DPI 96 size 0 page 0 controls inside client / seats aligned
+
+PASS DPI 96 size 0 page 1 controls inside client / seats aligned
+
+PASS DPI 96 size 0 page 2 controls inside client / seats aligned
+
+PASS DPI 96 size 0 page 3 controls inside client / seats aligned
+
+PASS DPI 96 size 1 page 0 controls inside client / seats aligned
+
+PASS DPI 96 size 1 page 1 controls inside client / seats aligned
+
+PASS DPI 96 size 1 page 2 controls inside client / seats aligned
+
+PASS DPI 96 size 1 page 3 controls inside client / seats aligned
+
+PASS DPI 120 size 0 page 0 controls inside client / seats aligned
+
+PASS DPI 120 size 0 page 1 controls inside client / seats aligned
+
+PASS DPI 120 size 0 page 2 controls inside client / seats aligned
+
+PASS DPI 120 size 0 page 3 controls inside client / seats aligned
+
+PASS DPI 120 size 1 page 0 controls inside client / seats aligned
+
+PASS DPI 120 size 1 page 1 controls inside client / seats aligned
+
+PASS DPI 120 size 1 page 2 controls inside client / seats aligned
+
+PASS DPI 120 size 1 page 3 controls inside client / seats aligned
+
+PASS DPI 144 size 0 page 0 controls inside client / seats aligned
+
+PASS DPI 144 size 0 page 1 controls inside client / seats aligned
+
+PASS DPI 144 size 0 page 2 controls inside client / seats aligned
+
+PASS DPI 144 size 0 page 3 controls inside client / seats aligned
+
+PASS DPI 144 size 1 page 0 controls inside client / seats aligned
+
+PASS DPI 144 size 1 page 1 controls inside client / seats aligned
+
+PASS DPI 144 size 1 page 2 controls inside client / seats aligned
+
+PASS DPI 144 size 1 page 3 controls inside client / seats aligned
+
+PASS 80 page cycles / no GDI object growth
+
+PASS 80 page cycles / no USER object growth
+
+PASS destroy releases resources and session
+
+PASS restart storage preserves state
+
+PASS restart login restored
+
+PASS restart real occupied and fault states
+
+
+
+79/79 passed
+
+
+startup-new
+PASS startup uses existing initialization
+
+1/1 passed
+
+PASS fixture source bytes preserved
+
+startup-corrupt
+PASS startup recovery/data error blocks GUI
+
+1/1 passed
+
+PASS fixture source bytes preserved
+
+startup-maintenance
+PASS startup recovery/data error blocks GUI
+
+1/1 passed
+
+PASS fixture source bytes preserved
+
+account-corrupt
+PASS error fixture initializes without reset
+
+PASS account corruption is visible / no session
+
+2/2 passed
+
+PASS fixture source bytes preserved
+
+seats-corrupt
+PASS error fixture initializes without reset
+
+PASS dashboard reports unavailable stats
+
+PASS corrupt seats never displayed as free
+
+PASS corrupt seats cannot reserve
+
+4/4 passed
+
+PASS fixture source bytes preserved
+
+Development data unchanged; report: tests\runs\p5-20261019-151726-a1aa7795\TEST_RESULTS.md
+Running normal
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS only own active bookings
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS date displayed by ListView notification
+PASS all history includes own cancelled / excludes others
+PASS cancelled row status
+PASS cancellable filter
+PASS future selection enables dangerous button
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS declined cancellation retains active rows
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS successful cancel refreshes current filter
+PASS successful cancel refreshes dashboard metrics
+PASS cancelled seat visible free on next seat query
+PASS already started selection disables cancel
+PASS forged started cancel command rejected
+PASS forged other student cancellation rejected
+PASS personal stats ignore old Student.time cache
+PASS stats correct identity
+PASS stats refresh succeeds
+PASS own report query excludes private reports
+PASS 40 computers loaded using real status API
+PASS report belongs to current student
+PASS report belongs to current student
+PASS pending status displayed
+PASS processed status displayed
+PASS pending report filter
+PASS processed report filter
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS empty description rejected
+PASS invalid description rejected
+PASS overlength UTF8 description rejected
+PASS invalid computer selection rejected
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS duplicate pending report rejected
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS already faulted computer rejected
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS report submission declined without write
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS report saved / own list refreshed / input cleared
+PASS report identity from authenticated session
+PASS dashboard reservation shortcut works
+PASS dashboard fault shortcut works
+PASS dashboard refresh shows actual state
+PASS student DPI 96 size 0 page 2 no overlap / table fits
+PASS student DPI 96 size 0 page 3 no overlap / table fits
+PASS student DPI 96 size 0 page 4 no overlap / table fits
+PASS student DPI 96 size 0 page 5 no overlap / table fits
+PASS student DPI 96 size 0 page 6 no overlap / table fits
+PASS student DPI 96 size 1 page 2 no overlap / table fits
+PASS student DPI 96 size 1 page 3 no overlap / table fits
+PASS student DPI 96 size 1 page 4 no overlap / table fits
+PASS student DPI 96 size 1 page 5 no overlap / table fits
+PASS student DPI 96 size 1 page 6 no overlap / table fits
+PASS student DPI 120 size 0 page 2 no overlap / table fits
+PASS student DPI 120 size 0 page 3 no overlap / table fits
+PASS student DPI 120 size 0 page 4 no overlap / table fits
+PASS student DPI 120 size 0 page 5 no overlap / table fits
+PASS student DPI 120 size 0 page 6 no overlap / table fits
+PASS student DPI 120 size 1 page 2 no overlap / table fits
+PASS student DPI 120 size 1 page 3 no overlap / table fits
+PASS student DPI 120 size 1 page 4 no overlap / table fits
+PASS student DPI 120 size 1 page 5 no overlap / table fits
+PASS student DPI 120 size 1 page 6 no overlap / table fits
+PASS student DPI 144 size 0 page 2 no overlap / table fits
+PASS student DPI 144 size 0 page 3 no overlap / table fits
+PASS student DPI 144 size 0 page 4 no overlap / table fits
+PASS student DPI 144 size 0 page 5 no overlap / table fits
+PASS student DPI 144 size 0 page 6 no overlap / table fits
+PASS student DPI 144 size 1 page 2 no overlap / table fits
+PASS student DPI 144 size 1 page 3 no overlap / table fits
+PASS student DPI 144 size 1 page 4 no overlap / table fits
+PASS student DPI 144 size 1 page 5 no overlap / table fits
+PASS student DPI 144 size 1 page 6 no overlap / table fits
+INFO resource cycle 20 GDI 37 USER 48
+INFO resource cycle 40 GDI 37 USER 48
+INFO resource cycle 60 GDI 37 USER 48
+INFO resource cycle 80 GDI 37 USER 48
+INFO resource baseline GDI 37 USER 48
+PASS 80 workflow cycles release both owned lists
+PASS 80 workflow cycles no GDI growth
+PASS 80 workflow cycles no USER growth
+PASS logout destroys list / form and clears session
+PASS logged-out booking navigation denied
+PASS logged-out report navigation denied
+PASS logged-out statistics navigation denied
+PASS admin navigation unchanged
+PASS forged admin student-page command rejected
+PASS destroy releases all page resources
+109/109 passed
+Running empty
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS empty active query distinct from error
+PASS empty history
+PASS empty cancellable filter
+PASS empty personal reports distinct from error
+PASS destroy releases all page resources
+10/10 passed
+Running boundary
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS only own active bookings
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS date displayed by ListView notification
+PASS all history includes own cancelled / excludes others
+PASS cancelled row status
+PASS cancellable filter
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS cancellation rechecked after actual confirmation
+PASS destroy releases all page resources
+19/19 passed
+Running changed
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS only own active bookings
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS date displayed by ListView notification
+PASS all history includes own cancelled / excludes others
+PASS cancelled row status
+PASS cancellable filter
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS competing cancellation saved during confirmation
+PASS cancellation rechecked after actual confirmation
+PASS destroy releases all page resources
+20/20 passed
+Running corrupt-reservations
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS corrupt reservations show error / no stale rows
+PASS corrupt reservations disable cancellation
+PASS corrupt source statistics unavailable
+PASS destroy releases all page resources
+9/9 passed
+Running corrupt-reports
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS only own active bookings
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS date displayed by ListView notification
+PASS all history includes own cancelled / excludes others
+PASS cancelled row status
+PASS cancellable filter
+PASS corrupt report data shows error / no stale rows
+PASS corrupt reports disable submit
+PASS destroy releases all page resources
+17/17 passed
+Running save-failure
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS only own active bookings
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS date displayed by ListView notification
+PASS all history includes own cancelled / excludes others
+PASS cancelled row status
+PASS cancellable filter
+PASS own report query excludes private reports
+PASS 40 computers loaded using real status API
+PASS report belongs to current student
+PASS report belongs to current student
+PASS pending status displayed
+PASS processed status displayed
+PASS pending report filter
+PASS processed report filter
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS report save failure not reported as success
+PASS destroy releases all page resources
+30/30 passed
+Running account-gone
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS only own active bookings
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS row belongs to logged student
+PASS date displayed by ListView notification
+PASS all history includes own cancelled / excludes others
+PASS cancelled row status
+PASS cancellable filter
+PASS own report query excludes private reports
+PASS 40 computers loaded using real status API
+PASS report belongs to current student
+PASS report belongs to current student
+PASS pending status displayed
+PASS processed status displayed
+PASS pending report filter
+PASS processed report filter
+PASS owned modal worker created
+PASS owned modal worker completed
+PASS real dialog located and answered
+PASS fixture account removal using storage API
+PASS deleted session account rejected before submit
+PASS no stale reports after missing account
+PASS missing student booking query rejected
+PASS missing student stats rejected
+PASS destroy releases all page resources
+31/31 passed
+Running large
+PASS isolated data initializes
+PASS native window created
+PASS real login enters student dashboard
+PASS reservation navigation / native virtual table
+PASS reservation table has six columns
+PASS 99999 own history records use one virtual table
+PASS last virtual row accessible
+PASS destroy releases all page resources
+8/8 passed
+263 passed, 0 failed; report: tests\runs\p5-2-20261019-151806-b47692c0\TEST_RESULTS.md
+Running normal
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS daily stats from real business snapshot
+PASS daily utilization capacity 360
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS full Monday through Sunday range
+PASS week distinct students / hours / average
+PASS week utilization capacity 2520
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly mode disables daily export
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS declined export leaves count empty
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS export success says snapshot can go stale
+PASS saved daily snapshot
+PASS usage selected current slot / real count
+PASS usage student ID
+PASS usage student name
+PASS usage four public fields only
+PASS usage slot selection refreshes true count
+PASS exact student projection active and history counts
+PASS student history includes cancellation
+PASS student table public five columns
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS public row never contains credentials or cached time
+PASS nonexact query fails and releases previous student
+PASS selected normal computer enables mark only
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS scrollable affected preview contains exact future bookings
+PASS declined maintenance does not write
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS confirmed fault refreshes computer state
+PASS fault cancels future / keeps started
+PASS repeated fault returns business error
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS restore normal refreshes computer
+PASS restore never resurrects cancelled bookings
+PASS all reports across students virtual table
+PASS pending filter
+PASS specified computer filter
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS confirm fault processed / refreshed pending list
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS repair report restores computer and closes
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS dismiss only closes / leaves normal computer
+PASS processed reports correct status
+PASS processed status rendered
+PASS repeat report action denied by business
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS same date export updates without duplicate
+PASS dashboard refresh reflects maintenance and reports
+PASS admin DPI 96 size 0 page 2 no overlap / table fits
+PASS admin DPI 96 size 0 page 3 no overlap / table fits
+PASS admin DPI 96 size 0 page 7 no overlap / table fits
+PASS admin DPI 96 size 0 page 8 no overlap / table fits
+PASS admin DPI 96 size 0 page 9 no overlap / table fits
+PASS admin DPI 96 size 0 page 10 no overlap / table fits
+PASS admin DPI 96 size 0 page 11 no overlap / table fits
+PASS admin DPI 96 size 1 page 2 no overlap / table fits
+PASS admin DPI 96 size 1 page 3 no overlap / table fits
+PASS admin DPI 96 size 1 page 7 no overlap / table fits
+PASS admin DPI 96 size 1 page 8 no overlap / table fits
+PASS admin DPI 96 size 1 page 9 no overlap / table fits
+PASS admin DPI 96 size 1 page 10 no overlap / table fits
+PASS admin DPI 96 size 1 page 11 no overlap / table fits
+PASS admin DPI 120 size 0 page 2 no overlap / table fits
+PASS admin DPI 120 size 0 page 3 no overlap / table fits
+PASS admin DPI 120 size 0 page 7 no overlap / table fits
+PASS admin DPI 120 size 0 page 8 no overlap / table fits
+PASS admin DPI 120 size 0 page 9 no overlap / table fits
+PASS admin DPI 120 size 0 page 10 no overlap / table fits
+PASS admin DPI 120 size 0 page 11 no overlap / table fits
+PASS admin DPI 120 size 1 page 2 no overlap / table fits
+PASS admin DPI 120 size 1 page 3 no overlap / table fits
+PASS admin DPI 120 size 1 page 7 no overlap / table fits
+PASS admin DPI 120 size 1 page 8 no overlap / table fits
+PASS admin DPI 120 size 1 page 9 no overlap / table fits
+PASS admin DPI 120 size 1 page 10 no overlap / table fits
+PASS admin DPI 120 size 1 page 11 no overlap / table fits
+PASS admin DPI 144 size 0 page 2 no overlap / table fits
+PASS admin DPI 144 size 0 page 3 no overlap / table fits
+PASS admin DPI 144 size 0 page 7 no overlap / table fits
+PASS admin DPI 144 size 0 page 8 no overlap / table fits
+PASS admin DPI 144 size 0 page 9 no overlap / table fits
+PASS admin DPI 144 size 0 page 10 no overlap / table fits
+PASS admin DPI 144 size 0 page 11 no overlap / table fits
+PASS admin DPI 144 size 1 page 2 no overlap / table fits
+PASS admin DPI 144 size 1 page 3 no overlap / table fits
+PASS admin DPI 144 size 1 page 7 no overlap / table fits
+PASS admin DPI 144 size 1 page 8 no overlap / table fits
+PASS admin DPI 144 size 1 page 9 no overlap / table fits
+PASS admin DPI 144 size 1 page 10 no overlap / table fits
+PASS admin DPI 144 size 1 page 11 no overlap / table fits
+RESOURCE baseline GDI 36 USER 50
+RESOURCE cycle 20 GDI 36 USER 50
+RESOURCE cycle 40 GDI 36 USER 51
+RESOURCE cycle 60 GDI 36 USER 51
+RESOURCE cycle 80 GDI 36 USER 51
+PASS 80 page cycles release owned lists
+PASS 80 cycles no continuing GDI growth
+PASS 80 cycles no continuing USER growth
+PASS test fixture can be corrupted
+PASS refresh corruption clears valid stats and export
+PASS logout clears session / owned lists
+PASS logged out cannot access admin page
+PASS destroy releases page / theme / session
+180/180 passed
+Running student
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS student keeps six real navigation items
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS forged admin navigation denied
+PASS student cannot invoke admin business entry
+PASS destroy releases page / theme / session
+11/11 passed
+Running empty
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS empty dashboard real zeros
+PASS report empty state differs from failure
+PASS usage empty state
+PASS empty stats valid / zero bars
+PASS destroy releases page / theme / session
+9/9 passed
+Running corrupt
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS corrupt dashboard never fake zero usage
+PASS corrupt usage clears list
+PASS corrupt statistics unavailable / export disabled
+PASS corrupt student query has no stale ownership
+PASS destroy releases page / theme / session
+9/9 passed
+Running corrupt-reports
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS corrupt reports dashboard error / unavailable
+PASS corrupt reports not empty success
+PASS destroy releases page / theme / session
+7/7 passed
+Running save-failure
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS export save failure never claims success
+PASS destroy releases page / theme / session
+14/14 passed
+Running changed
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS maintenance rechecks changed preview
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS report processing rechecks competing update
+PASS destroy releases page / theme / session
+19/19 passed
+Running refresh-failure
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS daily stats from real business snapshot
+PASS daily utilization capacity 360
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS daily chart reads exact slot projection
+PASS full Monday through Sunday range
+PASS week distinct students / hours / average
+PASS week utilization capacity 2520
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly chart reads exact daily projection
+PASS weekly mode disables daily export
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS committed operation / refresh failure distinguished
+PASS destroy releases page / theme / session
+36/36 passed
+Running recovery
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS test holds completion archive to interrupt maintenance
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS interrupted GUI maintenance reports recovery gate
+PASS recovery gate disables maintenance writes
+PASS recovery gate blocks reports
+PASS recovery gate blocks export
+PASS intent persists for normal restart recovery
+PASS destroy releases page / theme / session
+19/19 passed
+PASS normal GUI startup replays pending maintenance
+PASS startup recovery reopens writes
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS restarted GUI shows recovered computer
+PASS recovery cancels future / preserves started
+PASS replayed intent archived through storage API
+PASS destroy releases page / theme / session
+9/9 passed
+Running large
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS 100000 history rows in virtual ListView
+PASS last history virtual row
+PASS 10000 reports in virtual ListView
+PASS last report virtual row
+PASS destroy releases page / theme / session
+9/9 passed
+Running preview-many
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS modal worker created
+PASS owned native dialog worker completed
+PASS owned native dialog answered
+PASS dangerous dialog defaults to No
+PASS long affected preview has all 41 virtual rows
+PASS long preview declined without writes
+PASS destroy releases page / theme / session
+11/11 passed
+Running account-gone
+PASS isolated storage initializes
+PASS actual Win32 window created
+PASS real login enters dashboard
+PASS admin dashboard has eight navigation items
+PASS dashboard real computer counts
+PASS dashboard pending reports count
+PASS current count includes bookings on fault computer
+PASS outside open hours distinct from zero / error
+PASS test account set allocated
+PASS test removes current admin through storage API
+PASS expired actual admin cannot compute or export
+PASS expired actual admin cannot maintain computers
+PASS destroy releases page / theme / session
+13/13 passed
+359 passed, 0 failed; report: tests\runs\p5-3-20261019-151854-b62ca4b5\TEST_RESULTS.md
+PASS real local clock available
+PASS password edit masks input
+PASS Chinese name registration through GUI
+PASS GUI login authenticates expected role
+PASS Chinese mixed name survives UTF16 / UTF8 round trip
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS own booking visible
+PASS same student / slot conflict rejected
+PASS owned confirmation answered / defaults No
+PASS declined cancellation keeps booking
+PASS owned confirmation answered / defaults No
+PASS confirmed cancellation refreshes
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS owned confirmation answered / defaults No
+PASS Chinese mixed report saved from current session
+PASS future bookings never fake completed hours
+PASS student logout clears session
+PASS password edit masks input
+PASS Chinese name registration through GUI
+PASS GUI login authenticates expected role
+PASS admin dashboard real pending count
+PASS usage returns actual reservation student
+PASS exact student history includes cancelled booking
+PASS owned confirmation answered / defaults No
+PASS affected future preview before confirmation
+PASS owned confirmation answered / defaults No
+PASS report confirmation sets fault and closes report
+PASS business reload confirms processed report
+PASS fault cancels future bookings visible in student history
+PASS owned confirmation answered / defaults No
+PASS restoration updates device
+PASS GUI login authenticates expected role
+PASS restoration never resurrects cancellation
+PASS owned confirmation answered / defaults No
+PASS future booking saved and refreshed
+PASS GUI login authenticates expected role
+PASS daily stats follow actual GUI booking
+PASS weekly stats follow actual GUI booking
+PASS owned confirmation answered / defaults No
+PASS declined export leaves snapshot empty
+PASS owned confirmation answered / defaults No
+PASS daily export persisted actual snapshot
+PASS admin logout clears session
+PASS layout sessions use actual account APIs
+ACTUAL_SYSTEM_DPI 144; no injected WM_DPICHANGED; monitors 1
+PASS actual DPI minimum: all 15 views / headers / controls
+PASS actual DPI normal: all 15 views / headers / controls
+PASS actual DPI maximized: all 15 views / headers / controls
+PASS navigation focus stays on current page
+PASS student search starts in exact-ID input
+PASS new seat font and all page resources released
+54/54 passed
+60 passed, 0 failed; report: tests\runs\p5-4-20261019-152004-5841253d\TEST_RESULTS.md

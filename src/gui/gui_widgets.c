@@ -231,7 +231,7 @@ void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
     if (seat>=0 && seat<COMPUTER_COUNT) {
         char symbol=id>=GUI_ADMIN_SEAT_FIRST ? (app->computers_valid ? (app->computers[seat].status==COMPUTER_FAULT ? '!' : '*') : '?') :
             app->seats_valid ? app->seats.symbols[seat] : '?';
-        const wchar_t *status=symbol=='!' ? L"故障" : symbol=='#' ? L"已预约" : symbol=='*' ?
+        const wchar_t *status=symbol=='!' ? L"故障" : symbol=='#' ? (id<GUI_ADMIN_SEAT_FIRST && app->booking_duration>1 ? L"区间冲突" : L"已预约") : symbol=='*' ?
             (id>=GUI_ADMIN_SEAT_FIRST ? L"正常" : L"空闲") : L"未知";
         gui_seat_label(app,item->hDC,rect,seat+1,status,fg);
     } else {

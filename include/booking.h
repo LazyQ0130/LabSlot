@@ -90,11 +90,19 @@ const char *booking_result_message(BookingResult result);
 typedef struct {
     unsigned int masks[COMPUTER_COUNT];
     int loads[COMPUTER_COUNT];
+    ComputerStatus statuses[COMPUTER_COUNT];
     unsigned int own_conflicts;
     LabTime as_of;
 } BookingAvailability;
 unsigned int booking_range_mask(int start, int duration);
 BookingResult booking_availability(const BookingContext *context, const AuthSession *session,
                                    int date, BookingAvailability *out);
+typedef struct { Reservation records[3]; int count; } BatchBooking;
+/* 同机同日1..3条一小时预约，一次快照保存；失败输出和原文件不变。
+ * 单进程、时钟回调只读；不支持外部并发写入或物理断电事务。 */
+BookingResult booking_check_batch(const BookingContext *context, const AuthSession *session,
+                                  int date, int start, int duration, int no);
+BookingResult booking_create_batch(const BookingContext *context, const AuthSession *session,
+                                   int date, int start, int duration, int no, BatchBooking *out);
 
 #endif

@@ -85,13 +85,14 @@ void gui_recommend_command(GuiApp *app, int id, int code)
         gui_recommend_refresh(app);
     } else if(code==BN_CLICKED && index>=0 && index<3 && app->recommendation_valid && (size_t)index<app->recommendations.count) {
         SYSTEMTIME time={0};
-        int date=app->recommend_date, slot=app->recommend_slot, no=app->recommendations.seats[index].computer_no;
+        int date=app->recommend_date, slot=app->recommend_slot, no=app->recommendations.seats[index].computer_no, duration=app->recommend_duration;
         if(fault_require_role(&app->session,ROLE_STUDENT)!=FAULT_OK) { gui_notice(app,L"学生会话或维护状态无效，请重新查询。",1); return; }
         gui_show_page(app,GUI_SEATS);
         time.wYear=(WORD)(date/10000); time.wMonth=(WORD)(date/100%100); time.wDay=(WORD)(date%100);
         SendMessageW(app->date_picker,DTM_SETSYSTEMTIME,GDT_VALID,(LPARAM)&time);
         SendMessageW(app->slot_picker,CB_SETCURSEL,(WPARAM)slot,0);
+        SendMessageW(GetDlgItem(app->window,GUI_BOOK_DURATION),CB_SETCURSEL,(WPARAM)(duration-1),0);
         gui_booking_refresh(app); gui_booking_command(app,GUI_SEAT_FIRST+no-1);
-        if(app->selected==no) { gui_notice(app,L"已高亮推荐座位。当前座位页按一小时时段确认预约。",0); }
+        if(app->selected==no) { gui_notice(app,L"已高亮推荐座位及连续区间。确认时将重新检查并一次保存全部预约。",0); }
     }
 }

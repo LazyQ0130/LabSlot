@@ -1,0 +1,191 @@
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS read-only precheck 1
+PASS probe exits successfully
+PASS exact complete one-hour group 1
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS restart reads every record
+PASS only reservation target changes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS read-only precheck 2
+PASS probe exits successfully
+PASS exact complete one-hour group 2
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS restart reads every record
+PASS only reservation target changes
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS read-only precheck 3
+PASS probe exits successfully
+PASS exact complete one-hour group 3
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS restart reads every record
+PASS only reservation target changes
+PASS probe exits successfully
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS single cancellation preserves other group slots
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS each allocation fails safely
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS any covered seat/student conflict rejects entire group
+PASS probe exits successfully
+PASS 17:00 boundary (7, 2)
+PASS probe exits successfully
+PASS 17:00 boundary (6, 3)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (8, 2)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (7, 3)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (-1, 2)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (0, 0)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS 17:00 boundary (0, 4)
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch session gate none
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch session gate admin
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch session gate ghost
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch date/window gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch date/window gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch date/window gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch invalid computer
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS batch invalid computer
+PASS probe exits successfully
+PASS historical cancelled maximum not reused
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS fault device refused
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS commit clock recheck rejects start equality
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS clock error explicit
+PASS probe exits successfully
+PASS cross-year valid window
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS P3 maintenance gate
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS bad reservation input
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS INT_MAX allocation boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS INT_MAX allocation boundary
+PASS probe exits successfully
+PASS INT_MAX allocation boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS exact capacity boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS exact capacity boundary
+PASS probe exits successfully
+PASS exact capacity boundary
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none write
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none flush
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none close
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS save failure is all-or-none exclusive
+PASS probe exits successfully
+PASS rejected batch preserves every original source
+PASS real Windows replacement lock preserves original
+PASS probe exits successfully
+PASS batch GUI initialize
+PASS batch GUI window
+PASS batch GUI auth
+PASS batch GUI actual clock
+PASS continuous range free seats
+PASS owned confirmation answered / defaults No
+PASS declined group saves zero
+PASS owned confirmation answered / defaults No
+PASS two-hour GUI commit exact ids / summary
+PASS owned confirmation answered / defaults No
+PASS commit success / refresh failure distinguished
+PASS refresh retry recovers full saved group
+PASS personal list receives five one-hour records
+PASS stats receives five future hours
+PASS continuous out of bounds disables seats
+PASS recommendation carries complete duration
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch DPI no overlap / all controls fit
+PASS batch GDI stable
+PASS batch USER stable
+PASS batch all GUI resources released
+PASS GUI persists all five original-format rows
+PASS GUI only reservation file changes
+PASS real development data hashes / mtimes unchanged
+189 passed, 0 failed
+Report: tests\runs\p6-3-20261019-151407-a6b7a03e\TEST_RESULTS.md

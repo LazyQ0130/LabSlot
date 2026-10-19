@@ -27,8 +27,13 @@ void gui_booking_create(GuiApp *app)
     SendMessageW(app->slot_picker,CB_SETCURSEL,(WPARAM)app->slot,0);
     gui_button(app,L"刷新座位",GUI_REFRESH);
     for (i=0;i<COMPUTER_COUNT;++i) { gui_button(app,L"",GUI_SEAT_FIRST+i); }
-    if (app->session.role==ROLE_STUDENT) { gui_button(app,L"确认预约",GUI_RESERVE); gui_button(app,L"智能推荐",GUI_SMART_OPEN); gui_button(app,L"本周预约热度",GUI_HEAT_OPEN); }
-    gui_booking_refresh(app);
+    if (app->session.role==ROLE_STUDENT) { gui_button(app,L"确认预约",GUI_RESERVE); gui_button(app,L"智能推荐",GUI_SMART_OPEN); gui_button(app,L"本周预约热度",GUI_HEAT_OPEN);
+        { HWND duration=gui_control(app,L"COMBOBOX",L"",WS_TABSTOP | CBS_DROPDOWNLIST,GUI_BOOK_DURATION);
+          SendMessageW(duration,CB_ADDSTRING,0,(LPARAM)L"连续 1 小时");
+          SendMessageW(duration,CB_ADDSTRING,0,(LPARAM)L"连续 2 小时");
+          SendMessageW(duration,CB_ADDSTRING,0,(LPARAM)L"连续 3 小时");
+          SendMessageW(duration,CB_SETCURSEL,0,0); } }
+    app->booking_duration=1; gui_booking_refresh(app);
 }
 /* 功能：按 5×8 和可用空间布局座位；参数应用；无返回。 */
 void gui_booking_layout(GuiApp *app)
@@ -43,6 +48,7 @@ void gui_booking_layout(GuiApp *app)
     }
     gui_move(app,GUI_HEAT_OPEN,app->width-184,106,152,38);
     gui_move(app,GUI_SMART_OPEN,app->width-352,106,152,38);
+    gui_move(app,GUI_BOOK_DURATION,840,193,104,180);
     gui_move(app,GUI_RESERVE,app->width-204,app->height-132,148,42);
 }
 /* 功能：同步座位文本、可用性及预约按钮；参数应用；无返回。 */
@@ -74,7 +80,24 @@ void gui_booking_refresh(GuiApp *app)
     }
     app->date=time.wYear*10000+time.wMonth*100+time.wDay;
     app->slot=(int)SendMessageW(app->slot_picker,CB_GETCURSEL,0,0);
-    result=booking_get_seats(app->date,app->slot,&app->seats);
+    app->booking_duration=app->session.role==ROLE_STUDENT ?
+        (int)SendMessageW(GetDlgItem(app->window,GUI_BOOK_DURATION),CB_GETCURSEL,0,0)+1 : 1;
+    if(app->booking_duration>1) {
+        BookingAvailability view; unsigned int mask=booking_range_mask(app->slot,app->booking_duration); int i;
+        result=mask ? booking_availability(NULL,&app->session,app->date,&view) : BOOKING_INVALID_INPUT;
+        if(result==BOOKING_OK) { result=booking_check_time(NULL,app->date,app->slot,1); }
+        if(result==BOOKING_OK) {
+            if(result==BOOKING_OK) {
+                app->seats.free_count=app->seats.booked_count=app->seats.fault_count=0;
+                for(i=0;i<COMPUTER_COUNT;++i) {
+                    if(view.statuses[i]==COMPUTER_FAULT) { app->seats.symbols[i]='!'; ++app->seats.fault_count; }
+                    else if((view.masks[i]&mask)!=mask) { app->seats.symbols[i]='#'; ++app->seats.booked_count; }
+                    else { app->seats.symbols[i]='*'; ++app->seats.free_count; }
+                }
+            }
+        }
+    } else { result=booking_get_seats(app->date,app->slot,&app->seats); }
+    SetWindowTextW(GetDlgItem(app->window,GUI_RESERVE),app->booking_duration>1 ? L"连续预约" : L"确认预约");
     if (result==BOOKING_OK) {
         app->seats_valid=1; gui_notice(app,L"座位状态已更新。切换日期或时段后会清除旧选择。",0);
     } else { gui_notice_utf8(app,booking_result_message(result),1); }
@@ -89,10 +112,15 @@ void gui_booking_paint(GuiApp *app, HDC dc)
     gui_text(app,dc,L"选择日期与时段，查看实验室的真实座位状态。",256,146,width,26,app->body,GUI_MUTED,0);
     gui_card(app,dc,256,178,width,app->height-258,RGB(255,255,255));
     if (app->seats_valid) {
-        swprintf(text,160,L"共 40 台   ·   空闲 %d   ·   已预约 %d   ·   故障 %d",
+        swprintf(text,160,app->booking_duration>1 ? L"空闲 %d / 区间冲突 %d / 故障 %d" : L"共 40 台   ·   空闲 %d   ·   已预约 %d   ·   故障 %d",
                  app->seats.free_count,app->seats.booked_count,app->seats.fault_count);
     } else { wcscpy(text,L"座位状态不可用：未展示旧数据，请检查错误提示并刷新。"); }
-    gui_text(app,dc,text,280,241,width-48,24,app->body,app->seats_valid ? GUI_INK : GUI_RED,0);
+    gui_text(app,dc,text,280,241,app->booking_duration>1 ? width-300 : width-48,24,app->small,app->seats_valid ? GUI_INK : GUI_RED,0);
+    if(app->booking_duration>1) {
+        swprintf(text,160,L"覆盖 %02d:00–%02d:00 · %d 小时",OPEN_HOUR+app->slot,OPEN_HOUR+app->slot+app->booking_duration,app->booking_duration);
+        gui_card(app,dc,app->width-300,239,244,26,RGB(239,246,255));
+        gui_text(app,dc,text,app->width-296,241,236,24,app->small,GUI_BLUE,DT_CENTER);
+    }
     gui_card(app,dc,280,268,width-48,20,RGB(239,246,255));
     gui_text(app,dc,L"讲台 / 实验室前方 · 5 排 × 8 列",280,270,width-48,16,app->small,GUI_BLUE,DT_CENTER);
     if (app->selected) { swprintf(text,160,L"已选择 %02d 号电脑  ·  蓝色高亮",app->selected); }
@@ -104,26 +132,30 @@ void gui_booking_paint(GuiApp *app, HDC dc)
 static void reserve(GuiApp *app)
 {
     BookingResult result;
-    Reservation created={0};
-    int no=app->selected, date=app->date, slot=app->slot;
-    wchar_t prompt[256], user[ID_LEN];
-    if (app->busy || !auth_session_has_role(&app->session,ROLE_STUDENT) || !app->seats_valid || no<1) { return; }
+    Reservation created={0}; BatchBooking batch={0};
+    int no=app->selected, date=app->date, slot=app->slot, duration=app->booking_duration;
+    wchar_t prompt[320], user[ID_LEN], numbers[80];
+    if(app->busy || !auth_session_has_role(&app->session,ROLE_STUDENT) || !app->seats_valid || no<1) { return; }
     app->busy=1; EnableWindow(GetDlgItem(app->window,GUI_RESERVE),FALSE);
-    if (!storage_writes_allowed()) {
-        gui_notice(app,L"维护恢复未完成，不能预约。请检查数据并重新启动。",1); goto done;
-    }
-    result=booking_check_create(NULL,&app->session,date,slot,no);
-    if (result!=BOOKING_OK) { gui_booking_refresh(app); gui_notice_utf8(app,booking_result_message(result),1); goto done; }
+    result=duration==1 ? booking_check_create(NULL,&app->session,date,slot,no) :
+        booking_check_batch(NULL,&app->session,date,slot,duration,no);
+    if(result!=BOOKING_OK) { gui_booking_refresh(app); gui_notice_utf8(app,booking_result_message(result),1); goto done; }
     gui_wide(app->session.user_id,user,ID_LEN);
-    swprintf(prompt,256,L"学号：%ls\n日期：%04d-%02d-%02d\n时段：%02d:00–%02d:00\n电脑：%02d\n\n确认创建这一小时的预约？",
-             user,date/10000,date/100%100,date%100,OPEN_HOUR+slot,OPEN_HOUR+slot+1,no);
-    if (MessageBoxW(app->window,prompt,L"确认预约",MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2)!=IDYES) { goto done; }
-    result=booking_create(NULL,&app->session,date,slot,no,&created);
+    swprintf(prompt,320,L"学号：%ls\n日期：%04d-%02d-%02d\n完整时段：%02d:00–%02d:00\n连续时长：%d 小时\n电脑：%02d\n\n确认创建以上预约？全部时段成功保存后才返回编号。",
+        user,date/10000,date/100%100,date%100,OPEN_HOUR+slot,OPEN_HOUR+slot+duration,duration,no);
+    if(MessageBoxW(app->window,prompt,L"确认预约",MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2)!=IDYES) { goto done; }
+    result=duration==1 ? booking_create(NULL,&app->session,date,slot,no,&created) :
+        booking_create_batch(NULL,&app->session,date,slot,duration,no,&batch);
     gui_booking_refresh(app);
-    if (result==BOOKING_OK) {
+    if(result==BOOKING_OK) {
         gui_student_stats_refresh(app);
-        swprintf(prompt,256,L"预约成功，编号 %d。座位状态已重新查询。",created.id);
-        gui_notice(app,prompt,0);
+        if(duration==1) { swprintf(numbers,80,L"%d",created.id); }
+        else if(duration==2) { swprintf(numbers,80,L"%d、%d",batch.records[0].id,batch.records[1].id); }
+        else { swprintf(numbers,80,L"%d、%d、%d",batch.records[0].id,batch.records[1].id,batch.records[2].id); }
+        swprintf(prompt,320,L"预约已保存：电脑 %02d / %08d / %02d:00–%02d:00 / %d 小时，编号 %ls。%ls",
+            no,date,OPEN_HOUR+slot,OPEN_HOUR+slot+duration,duration,numbers,
+            app->seats_valid && app->stats_result==STATS_OK ? L"座位及统计已刷新。" : L"刷新失败，请手动刷新。预约已提交成功。");
+        gui_notice(app,prompt,!app->seats_valid || app->stats_result!=STATS_OK);
     } else { gui_notice_utf8(app,booking_result_message(result),1); }
 done:
     app->busy=0; update_seats(app);

@@ -56,6 +56,8 @@ try {
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         & python 'tests/test_p6_2.py' '--cc' $Compiler
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        & python 'tests/test_p6_3.py' '--cc' $Compiler
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
     if ($GuiTest) {
         $env:PYTHONIOENCODING = 'utf-8'

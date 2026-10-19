@@ -228,7 +228,7 @@ static void command(GuiApp *app, int id, int code)
             else if (id==GUI_ADMIN_EXPORT && code==BN_CLICKED) { gui_admin_stats_export(app); }
         }
     }
-    if (id==GUI_SLOT && code==CBN_SELCHANGE && app->page==GUI_SEATS) { gui_booking_refresh(app); }
+    if ((id==GUI_SLOT || id==GUI_BOOK_DURATION) && code==CBN_SELCHANGE && app->page==GUI_SEATS) { gui_booking_refresh(app); }
     else if (code==BN_CLICKED) {
         if (id==GUI_LOGOUT) {
             auth_logout(&app->session); gui_show_page(app,GUI_LOGIN);

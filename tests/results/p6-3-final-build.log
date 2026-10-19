@@ -1,0 +1,34 @@
+Build OK: smart-lab.exe (C11, warnings treated as errors)
+Build OK: LabSlot-GUI.exe (Win32 C11, PerMonitorV2)
+Analyze src/admin.c
+Analyze src/auth.c
+Analyze src/booking.c
+Analyze src/fault.c
+Analyze src/heatmap.c
+Analyze src/lab.c
+Analyze src/main.c
+Analyze src/recommend.c
+Analyze src/stats.c
+Analyze src/storage.c
+Analyze src/ui.c
+Analyze src/utils.c
+Analyze src/gui/gui_admin_common.c
+Analyze src/gui/gui_admin_dashboard.c
+Analyze src/gui/gui_admin_lab.c
+Analyze src/gui/gui_admin_reports.c
+Analyze src/gui/gui_admin_stats.c
+Analyze src/gui/gui_admin_students.c
+Analyze src/gui/gui_admin_usage.c
+Analyze src/gui/gui_app.c
+Analyze src/gui/gui_booking.c
+Analyze src/gui/gui_dashboard.c
+Analyze src/gui/gui_fault.c
+Analyze src/gui/gui_heatmap.c
+Analyze src/gui/gui_login.c
+Analyze src/gui/gui_main.c
+Analyze src/gui/gui_recommend.c
+Analyze src/gui/gui_reservations.c
+Analyze src/gui/gui_student_stats.c
+Analyze src/gui/gui_theme.c
+Analyze src/gui/gui_widgets.c
+PASS GCC static analysis: 31 production C files; warnings treated as errors.

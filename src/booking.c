@@ -329,6 +329,7 @@ static BookingResult availability_at(const ReservationList *list, const Lab comp
         if (utils_slot_future(now,date,slot)) { time_mask |= 1u << slot; }
     }
     for (no=0; no<COMPUTER_COUNT; ++no) {
+        view.statuses[no]=computers[no].status;
         view.masks[no] = computers[no].status == COMPUTER_FAULT ? 0 : time_mask;
     }
     for (i=0; i<list->count; ++i) {
@@ -359,4 +360,95 @@ BookingResult booking_availability(const BookingContext *context, const AuthSess
     result=from_storage(storage_load_reservations(&list));
     if (result==BOOKING_OK) { result=availability_at(&list,computers,session->user_id,&now,date,out); }
     storage_free_reservations(&list); return result;
+}
+
+static BookingResult batch_base(const BookingContext *context, const AuthSession *session,
+                                 int date, int start, int duration, int no, LabTime *now, Lab computers[COMPUTER_COUNT])
+{
+    BookingResult result;
+    int slot;
+    if(!storage_writes_allowed()) { return BOOKING_RECOVERY_REQUIRED; }
+    result=require_student(session);
+    if(result!=BOOKING_OK) { return result; }
+    if(!read_now(context,now)) { return BOOKING_CLOCK_ERROR; }
+    for(slot=start;slot<start+duration;++slot) {
+        result=check_time_at(now,date,slot,1);
+        if(result!=BOOKING_OK) { return result; }
+    }
+    if(storage_load_computers(computers)!=1) { return BOOKING_STORAGE_ERROR; }
+    if(computers[no-1].status==COMPUTER_FAULT) { return BOOKING_COMPUTER_FAULT; }
+    return BOOKING_OK;
+}
+static BookingResult batch_snapshot(const AuthSession *session, int date, int start, int duration, int no,
+                                     const ReservationList *list, const LabTime *now, const Lab computers[COMPUTER_COUNT])
+{
+    BookingAvailability view;
+    unsigned int request=booking_range_mask(start,duration);
+    BookingResult result=availability_at(list,computers,session->user_id,now,date,&view);
+    if(result!=BOOKING_OK) { return result; }
+    if(view.own_conflicts & request) { return BOOKING_STUDENT_CONFLICT; }
+    return (view.masks[no-1] & request)==request ? BOOKING_OK : BOOKING_SEAT_OCCUPIED;
+}
+static BookingResult prepare_batch(const BookingContext *context, const AuthSession *session,
+                                    int date, int start, int duration, int no, ReservationList *list, int *maximum)
+{
+    BookingResult result;
+    LabTime now;
+    Lab computers[COMPUTER_COUNT];
+    size_t i;
+    if(!auth_session_has_role(session,ROLE_STUDENT)) { return BOOKING_UNAUTHORIZED; }
+    if(!booking_range_mask(start,duration) || !utils_valid_date(date) || no<1 || no>COMPUTER_COUNT) { return BOOKING_INVALID_INPUT; }
+    result=batch_base(context,session,date,start,duration,no,&now,computers);
+    if(result!=BOOKING_OK) { return result; }
+    /* 唯一一次预约加载。后续在同一进程操作的已验证源快照上复查。 */
+    result=from_storage(storage_load_reservations(list));
+    if(result!=BOOKING_OK) { return result; }
+    result=batch_snapshot(session,date,start,duration,no,list,&now,computers);
+    if(result!=BOOKING_OK) { return result; }
+    if(list->count>(size_t)(MAX_RESERVATIONS-duration)) { return BOOKING_CAPACITY; }
+    *maximum=0;
+    for(i=0;i<list->count;++i) { if(list->items[i].id>*maximum) { *maximum=list->items[i].id; } }
+    return *maximum>INT_MAX-duration ? BOOKING_ID_EXHAUSTED : BOOKING_OK;
+}
+BookingResult booking_check_batch(const BookingContext *context, const AuthSession *session,
+                                  int date, int start, int duration, int no)
+{
+    ReservationList list={0}; int maximum;
+    BookingResult result=prepare_batch(context,session,date,start,duration,no,&list,&maximum);
+    storage_free_reservations(&list); return result;
+}
+BookingResult booking_create_batch(const BookingContext *context, const AuthSession *session,
+                                   int date, int start, int duration, int no, BatchBooking *out)
+{
+    ReservationList list={0}, source;
+    BatchBooking result={0};
+    BookingResult status;
+    StorageResult saved;
+    LabTime now;
+    Lab computers[COMPUTER_COUNT];
+    int maximum, i;
+    size_t original;
+    if(!out) { return BOOKING_INVALID_INPUT; }
+    status=prepare_batch(context,session,date,start,duration,no,&list,&maximum);
+    if(status!=BOOKING_OK) { goto done; }
+    original=list.count;
+    status=from_storage(storage_reserve_reservations(&list,list.count+(size_t)duration));
+    if(status!=BOOKING_OK) { goto done; }
+    for(i=0;i<duration;++i) {
+        Reservation record={0};
+        record.id=maximum+i+1; strcpy(record.student_id,session->user_id);
+        record.date=date; record.slot_index=start+i; record.computer_no=no; record.status=BOOKING_ACTIVE;
+        list.items[list.count++]=record; result.records[i]=record;
+    }
+    /* 借用原始前缀，不释放source；包含新记录的候选不能拿来与自身做冲突判断。 */
+    source=list; source.count=original;
+    status=batch_base(context,session,date,start,duration,no,&now,computers);
+    if(status==BOOKING_OK) { status=batch_snapshot(session,date,start,duration,no,&source,&now,computers); }
+    if(status==BOOKING_OK) {
+        saved=storage_save_reservations(&list); /* 唯一提交边界，完整快照替换。 */
+        status=saved==STORAGE_RECOVERY_REQUIRED ? BOOKING_RECOVERY_REQUIRED : from_storage(saved);
+    }
+    if(status==BOOKING_OK) { result.count=duration; *out=result; }
+done:
+    storage_free_reservations(&list); return status;
 }

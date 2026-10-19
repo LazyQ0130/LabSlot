@@ -24,7 +24,7 @@ class Suite:
         if not condition:
             self.finish(False)
             raise AssertionError(name)
-    def build(self, probe, gui=False):
+    def build(self, probe, gui=False, link_flags=()):
         sources = sorted(p for p in (ROOT/'src').glob('*.c') if p.name not in ('main.c','ui.c'))
         flags = self.flags[:]
         if gui:
@@ -34,7 +34,7 @@ class Suite:
             flags += ['-include',str(ROOT/'tests/io_faults.h')]
             extra = ['-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc']
         binary=self.run/(probe+'.exe')
-        subprocess.run([*flags,*map(str,sources),str(ROOT/'tests'/(probe+'.c')),*extra,'-o',str(binary)],check=True)
+        subprocess.run([*flags,*map(str,sources),str(ROOT/'tests'/(probe+'.c')),*extra,*link_flags,'-o',str(binary)],check=True)
         return binary
     def case(self, name, reservations='', faults=(), gui=False, reports='', extra=None):
         directory=self.run/name; data=directory/'data'; data.mkdir(parents=True)
