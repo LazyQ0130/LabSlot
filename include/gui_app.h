@@ -15,6 +15,7 @@
 #include "admin.h"
 #include "recommend.h"
 #include "heatmap.h"
+#include "health.h"
 
 /* 控件编号稳定，供消息分发及独立 Windows 集成测试使用。 */
 enum {
@@ -40,13 +41,14 @@ enum {
     GUI_SMART_OPEN = 600, GUI_SMART_DATE, GUI_SMART_SLOT, GUI_SMART_DURATION,
     GUI_SMART_PREF, GUI_SMART_REFRESH, GUI_SMART_FIRST = 610,
     GUI_HEAT_OPEN=620, GUI_HEAT_DATE, GUI_HEAT_REFRESH, GUI_HEAT_GO, GUI_HEAT_GRID,
-    GUI_BOOK_DURATION=630
+    GUI_BOOK_DURATION=630,
+    GUI_HEALTH_OPEN=640, GUI_HEALTH_REFRESH, GUI_HEALTH_TABLE, GUI_HEALTH_REPORTS
 };
 typedef enum {
     GUI_LOGIN, GUI_REGISTER, GUI_DASHBOARD, GUI_SEATS,
     GUI_RESERVATIONS, GUI_FAULT, GUI_STUDENT_STATS,
     GUI_ADMIN_LAB, GUI_ADMIN_REPORTS, GUI_ADMIN_USAGE, GUI_ADMIN_STUDENTS, GUI_ADMIN_STATS,
-    GUI_RECOMMEND, GUI_HEATMAP
+    GUI_RECOMMEND, GUI_HEATMAP, GUI_HEALTH
 } GuiPage;
 
 /* 单窗口持有会话和展示投影；不持有账户表，不直接读写业务 TXT。 */
@@ -93,6 +95,8 @@ typedef struct {
     BookingHeatmap heatmap;
     int heatmap_valid, heat_day, heat_slot;
     int booking_duration;
+    HealthSummary health;
+    int health_valid;
 } GuiApp;
 
 int gui_scale(const GuiApp *app, int value);

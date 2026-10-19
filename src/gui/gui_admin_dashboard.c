@@ -22,6 +22,7 @@ void gui_admin_dashboard_refresh(GuiApp *app)
 void gui_admin_dashboard_create(GuiApp *app)
 {
     gui_button(app,L"刷新工作台",GUI_ADMIN_REFRESH);
+    gui_button(app,L"设备健康分析",GUI_HEALTH_OPEN);
     gui_button(app,L"电脑维护  →",GUI_ADMIN_QUICK_LAB);
     gui_button(app,L"处理故障报告",GUI_ADMIN_QUICK_REPORTS);
     gui_button(app,L"今日预约统计",GUI_ADMIN_QUICK_STATS);
@@ -30,6 +31,7 @@ void gui_admin_dashboard_create(GuiApp *app)
 void gui_admin_dashboard_layout(GuiApp *app)
 {
     int card=(app->width-320)/3;
+    gui_move(app,GUI_HEALTH_OPEN,app->width-352,106,152,40);
     gui_move(app,GUI_ADMIN_REFRESH,app->width-184,106,152,40);
     gui_move(app,GUI_ADMIN_QUICK_LAB,280,438,card-24,44);
     gui_move(app,GUI_ADMIN_QUICK_REPORTS,296+card,438,card-24,44);

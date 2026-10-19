@@ -47,7 +47,7 @@ class Suite:
         for k,v in files.items(): (data/k).write_text(v,encoding='utf-8',newline='\n')
         return directory
     def call(self, binary, directory, args, env=None, readonly=True):
-        before=snapshot(directory/'data')
+        before=snapshot(directory/'data') if readonly else None
         variables={k:v for k,v in os.environ.items() if not k.startswith('LAB_TEST_')};variables.update(env or {})
         result=subprocess.run([str(binary),*map(str,args)],cwd=directory,env=variables,capture_output=True,timeout=180)
         output=result.stdout.decode('utf-8').replace('\r\n','\n')

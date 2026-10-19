@@ -1,4 +1,6 @@
-# 智能实验室预约系统 · P5.4
+# 智能实验室预约系统 · P6
+
+P6 已完成可解释座位推荐、7×9周预约热力图、1–3小时原子连续预约、设备健康评分与维护建议。最终严格双目标构建、33个生产C文件静态分析和 **1950/1950** 项完整回归通过。公式、流程图、接口、精确样例及验证边界见 [P6最终报告](docs/P6_INNOVATION_FINAL_REPORT.md)，现场操作见 [演示指南](docs/DEMO_GUIDE.md)。
 
 大学 C 语言课程设计项目。使用纯 C11 和标准 C 文本文件读写，无数据库或网络服务依赖。保留完整控制台版本 `smart-lab.exe` 与原生 Win32 桌面版本 `LabSlot-GUI.exe`。P0–P4 业务已完成；P5.1/P5.2 完成认证、座位预约和学生业务；P5.3 完成管理员维护、报告处理、使用情况、学生查询、日/周统计和每日快照导出。GUI 只依赖 Windows 系统库，共用原有业务层和数据格式。
 
@@ -26,7 +28,7 @@ GUI 的数据根目录固定为 **EXE 所在目录**；将两个 EXE 保持在�
 
 所有长列表使用虚拟 ListView，查询仅发生在进入页面、刷新、筛选和业务完成后；绘制/滚动不加载业务文件，页面切换/注销/关闭释放所属集合。
 
-GUI 源码在 `src/gui/`，不会进入原控制台的 `src/*.c` 构建。MinGW 链接 `-mwindows -lcomctl32 -lgdi32 -luser32`，用 `windres` 嵌入原生主题与 PerMonitorV2 清单。Make 支持 `make gui`、`make test-gui`（四套 GUI 测试）、`make test-gui-student`、`make test-gui-admin`、`make test-gui-final` 和 `make analyze`；VS Code 完整验证任务包含静态分析。`build.ps1 -Test -GuiTest` 运行 P0–P4 与四套 GUI 测试；P5.4 新驱动使用实际时钟和实际窗口 DPI，另外检查安全演示目录准备。详见 [P5.4 验收](tests/P5_4_FINAL_GUI_TEST_CASES.md)、[P5.3 历史验收](tests/P5_3_GUI_TEST_CASES.md)、[P5.2 历史验收](tests/P5_2_GUI_TEST_CASES.md) 与 [P5.1 历史验收](tests/P5_GUI_TEST_CASES.md)。
+GUI 源码在 `src/gui/`，不会进入原控制台的 `src/*.c` 构建。MinGW 链接 `-mwindows -lcomctl32 -lgdi32 -luser32`，用 `windres` 嵌入原生主题与 PerMonitorV2 清单。Make 支持 `make gui`、`make test-gui`（四套 GUI 测试）、`make test-gui-student`、`make test-gui-admin`、`make test-gui-final` 和 `make analyze`；VS Code 完整验证任务包含静态分析。`build.ps1 -Test -GuiTest` 运行 P0–P4、P6.1–P6.4 与四套原有 GUI 测试；P5.4 新驱动使用实际时钟和实际窗口 DPI，另外检查安全演示目录准备。详见 [P5.4 验收](tests/P5_4_FINAL_GUI_TEST_CASES.md)、[P5.3 历史验收](tests/P5_3_GUI_TEST_CASES.md)、[P5.2 历史验收](tests/P5_2_GUI_TEST_CASES.md) 与 [P5.1 历史验收](tests/P5_GUI_TEST_CASES.md)。
 
 已阅读项目根目录的《智能实验室预约系统.pdf》（3 页）和《智能实验室预约系统_C语言架构设计.md》。按原题保留 40 台电脑、08:00～17:00 共 9 个一小时时段，以及 `error.txt`、`count.txt` 文件名。按本次任务的模型要求，将跨日期/时段的预约拆为独立 `Reservation`，不以电脑上的一个学生姓名表示所有预约。
 
@@ -63,7 +65,7 @@ mingw32-make test
 # 指定工具链：mingw32-make CC='C:/path/to/gcc.exe'
 ```
 
-VS Code 中用 `Ctrl+Shift+B` 构建；“运行任务”中选择 `LabSlot: Run` 启动，选择 `LabSlot: Build and test P0 + P1 + P2 + P3 + P4` 构建并运行五套测试。`build.ps1 -Test` 和 `mingw32-make test` 也会运行 P0、P1、P2、P3、P4 五套测试；可用 `mingw32-make test-p0`、`test-p1`、`test-p2`、`test-p3`、`test-p4` 单独运行。
+VS Code 中用 `Ctrl+Shift+B` 构建；“运行任务”中选择 `LabSlot: Run` 启动，选择 `LabSlot: Build and test P0-P4 and P6` 构建并运行九套业务/创新测试。`build.ps1 -Test` 和 `mingw32-make test` 也会运行 P0–P4、P6.1–P6.4；可用 `mingw32-make test-p0`、`test-p1`、`test-p2`、`test-p3`、`test-p4`、`test-p6-1` 至 `test-p6-4` 单独运行。
 
 ## 运行路径
 
@@ -128,7 +130,7 @@ LabSlot/
 └── README.md
 ```
 
-控制台仍有十个实际 `.c` 模块。`stats.h` 的旧无会话占位接口已替换为必须传入认证会话的真实接口，不保留越权导出入口。`booking_create(Reservation *)` 原占位声明已重构为带学生会话、显式时间依赖和细分结果的真实接口。构建系统只编译 `src/`，不会把测试入口/故障注入编入正式程序。
+控制台目标现在编译十三个 `src/*.c` 模块（含入口和终端UI）；新增推荐、热图与健康算法也由GUI复用。`stats.h` 的旧无会话占位接口已替换为必须传入认证会话的真实接口，不保留越权导出入口。`booking_create(Reservation *)` 原占位声明已重构为带学生会话、显式时间依赖和细分结果的真实接口。构建系统只编译 `src/`，不会把测试入口/故障注入编入正式程序。
 
 ## 当前功能
 
@@ -291,14 +293,14 @@ python tests/test_p4.py --executable smart-lab.exe --cc gcc
 
 实际运行环境为 Windows，使用 GCC 16.2.0，`-std=c11 -Wall -Wextra -Wpedantic -Werror` 构建。基线与回归结果见 `tests/TEST_CASES.md`、`tests/P1_TEST_CASES.md`、`tests/P2_TEST_CASES.md`、`tests/P3_TEST_CASES.md`、`tests/P4_TEST_CASES.md`。P3 对 P1 仅同步新增菜单流程的输入/未开放项预期；P2 仅将新业务模块链接到固定时钟 UI 驱动。账户字节/修改时间、角色隔离、密码与数据保护等断言保留，P0 无修改。P3 额外验证 10000/10001 报告、逐次分配失败、真实文件替换锁、写入/刷新/关闭失败及 `_Exit` 中断后的正式程序启动恢复。P4 测试覆盖结束时刻相等、跨月/年/闰年周、十万预约、十万日期快照、日/周去重、忽略旧缓存、快照过时/更新、真实I/O/替换失败、进程中断及P3恢复门禁；只为已开放的统计入口同步旧菜单测试输入/期望，保留原角色、文件内容和修改时间等断言。Linux/macOS、不同 MinGW 发行版、实际磁盘耗尽和断电场景尚未验证；I/O 失败测试是可控故障注入，并非宣称测试了实际磁盘耗尽。
 
-## 下一阶段
+## 答辩准备
 
-- P0～P5.4 已完成，本阶段不编写正式 Word 课程设计报告，不扩展新业务。
-- 答辩前按 [演示指南](docs/DEMO_GUIDE.md) 重新准备新目录和有效日期，完整回归后再现场演示；对 [最终验收](tests/P5_4_FINAL_GUI_TEST_CASES.md) 中未验证的多显示器、认证输入法组合等场景补做人工检查，不把自动化结果当成人工验收。
+- P0～P6.4 已完成；本次不编写正式 Word 课程设计报告，不自动扩展后续业务。
+- 答辩前按 [演示指南](docs/DEMO_GUIDE.md) 准备新目录和有效日期，完整回归后再现场演示；新页面多实际系统缩放、多显示器、输入法组合等未覆盖的人工检查见 [P6最终报告](docs/P6_INNOVATION_FINAL_REPORT.md)，不把消息布局检查当作实际系统缩放验收。
 
-## P6 创新扩展进度
+## P6 阶段验收记录
 
-P6.0 整体设计与基线验证已完成，见 [设计说明](docs/P6_INNOVATION_DESIGN.md) 和 [基线记录](tests/results/p6-0-validation.md)。本次重新执行的九套测试合计1352项全部取得通过结果；首次学生GUI出现16项失败，未改源码及断言的独立复跑263/263，原因未确定，原始失败证据保留。后续按P6.1至P6.4独立验收推进，不能把设计视作功能完成。
+P6.0 整体设计与基线验证已完成，见 [设计说明](docs/P6_INNOVATION_DESIGN.md) 和 [基线记录](tests/results/p6-0-validation.md)。本次重新执行的九套测试合计1352项全部取得通过结果；首次学生GUI出现16项失败，未改源码及断言的独立复跑263/263，原因未确定，原始失败证据保留。P6.1至P6.4随后逐阶段完成独立验收；设计与实测证据分别归档。
 
 ### P6.1 智能推荐
 
@@ -317,3 +319,7 @@ P6.2阶段完整验收1595/1595，31个生产C文件GCC分析无警告。
 座位页选择连续1–3小时，蓝色区间展示完整覆盖时间，只有整个区间可用的电脑可选。确认摘要后一次保存完整快照，成功返回全部编号，仍用原六字段一小时记录。容量、历史最大编号、任意时段冲突和提交时刻都在业务层检查；失败没有部分预约。取消仍逐条处理，见 [P6.3验收](tests/P6_3_BATCH_BOOKING_TEST_CASES.md)。
 
 P6.3阶段完整验收1784/1784，31个生产C文件GCC分析无警告。
+
+### P6.4 设备健康分析
+
+管理员工作台“设备健康分析”展示40台电脑真实状态、健康分、等级、近30天及未处理报告数，按分数升序排列；选中查看构成并跳转相关报告。互斥日期窗口与固定扣分系数公开，当前故障明确标“已知”，无报告正常设备只显示暂无记录。分析只读，不自动维修、改状态或取消预约，见 [P6.4验收](tests/P6_4_HEALTH_SCORE_TEST_CASES.md)。新增166项通过，最终完整回归1950/1950、33个生产C文件GCC分析无警告；四功能真实GUI串联和实际截图范围见 [最终报告](docs/P6_INNOVATION_FINAL_REPORT.md)。

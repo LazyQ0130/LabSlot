@@ -1,0 +1,168 @@
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS all 40 exact scores / factors / status / warning flags
+PASS all grade totals exact
+PASS one computer and one complete report load
+PASS every health grade boundary
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS same input deterministic
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS source order cannot change repeated-report score or ranking
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure preserves output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure preserves output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure preserves output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS every allocation failure preserves output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS no reports normal exact 100 / stable ids
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS mutually exclusive age window 0
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS mutually exclusive age window 6
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS mutually exclusive age window 7
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS mutually exclusive age window 29
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS mutually exclusive age window 30
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS pending modifier distinguished
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS health real permission student
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS health real permission none
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS health real permission ghost
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS student cannot view private report detail
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS source or recovery rejection bad-report
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS source or recovery rejection bad-computer
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS source or recovery rejection recovery
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS future report rejects entire trusted output
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS duplicate report id cannot be charged twice
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS clock error explicit
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS leap-day age boundary
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS cross-year age uses day serial
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS 10000 reports exact clamped score and penalty
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS 10001 reports refuse incomplete scores
+PASS probe exits successfully
+PASS real file sharing error rejects analysis / sources unchanged
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS health GUI initialize
+PASS health GUI window
+PASS health actual student auth
+PASS forged student health entry denied
+PASS health actual admin auth
+PASS admin dashboard health entry exists
+PASS health real navigation
+PASS 40 devices exact sorted projection
+PASS grade summaries exact
+PASS current fault explicitly known
+PASS exact score through actual virtual cell
+PASS recent 30 exact aggregate
+PASS selected detail enables report navigation
+PASS related reports filters actual computer
+PASS related report belongs to chosen device
+PASS related report belongs to chosen device
+PASS related report belongs to chosen device
+PASS related report belongs to chosen device
+PASS related report belongs to chosen device
+PASS related report belongs to chosen device
+PASS health DPI bounds / table headers fit
+PASS health DPI bounds / table headers fit
+PASS health DPI bounds / table headers fit
+PASS health DPI bounds / table headers fit
+PASS health DPI bounds / table headers fit
+PASS health DPI bounds / table headers fit
+PASS health GDI stable
+PASS health USER stable
+PASS health resources and projection released
+PASS probe exits successfully
+PASS analysis preserves all source hashes / mtimes
+PASS health GUI initialize
+PASS health GUI window
+PASS health actual student auth
+PASS forged student health entry denied
+PASS health actual admin auth
+PASS admin dashboard health entry exists
+PASS health real navigation
+PASS corrupt reports no untrusted scores
+PASS health resources and projection released
+PASS probe exits successfully
+PASS P6 end-to-end isolated initialization
+PASS P6 end-to-end native window
+PASS P6 end-to-end actual clock
+PASS password edit masks input
+PASS Chinese name registration through GUI
+PASS GUI login authenticates expected role
+PASS P6 end-to-end real recommendation
+PASS P6 recommendation carries two-hour selection
+PASS owned confirmation answered / defaults No
+PASS P6 end-to-end atomic group committed
+PASS P6 heatmap reads GUI-created group
+PASS P6 heatmap navigates exact existing seats
+PASS owned confirmation answered / defaults No
+PASS P6 actual report submitted pending
+PASS password edit masks input
+PASS Chinese name registration through GUI
+PASS GUI login authenticates expected role
+PASS P6 real report produces exact normal score 88
+PASS P6 report drill-down uses actual report
+PASS owned confirmation answered / defaults No
+PASS P6 known fault preview covers both group records
+PASS P6 maintenance preserves original-format cancelled history
+PASS P6 known fault exact 27 / high risk / fact flag
+PASS P6 heatmap reflects real maintenance cancellation
+PASS owned confirmation answered / defaults No
+PASS P6 actual restore succeeds
+PASS P6 restore removes known-fault penalty / report history retained
+PASS P6 restore never resurrects group
+PASS P6 end-to-end logout clears analysis
+PASS P6 end-to-end all resources released
+PASS end-to-end original-format two cancelled records retained
+PASS end-to-end actual processed report and normal device
+PASS end-to-end no implicit statistics export or active maintenance
+PASS real development data hashes / mtimes unchanged
+166 passed, 0 failed
+Report: tests\runs\p6-4-20261019-153013-f03bda6d\TEST_RESULTS.md

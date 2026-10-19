@@ -12,7 +12,7 @@ GUI_SOURCES = $(filter-out src/main.c src/ui.c,$(SOURCES)) $(wildcard src/gui/*.
 GUI_RESOURCE = src/gui/gui_resource.o
 GUI_LIBS = -lcomctl32 -lgdi32 -luser32
 
-.PHONY: all gui test test-p0 test-p1 test-p2 test-p3 test-p4 test-gui test-gui-student test-gui-admin test-gui-final analyze
+.PHONY: all gui test test-p0 test-p1 test-p2 test-p3 test-p4 test-p6-1 test-p6-2 test-p6-3 test-p6-4 test-gui test-gui-student test-gui-admin test-gui-final analyze
 all: $(TARGET) $(GUI_TARGET)
 gui: $(GUI_TARGET)
 
@@ -25,7 +25,10 @@ $(GUI_TARGET): $(GUI_SOURCES) $(HEADERS) $(GUI_RESOURCE)
 $(TARGET): $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(SOURCES) -o $@
 
-test: test-p0 test-p1 test-p2 test-p3 test-p4 test-p6-1 test-p6-2 test-p6-3
+test: test-p0 test-p1 test-p2 test-p3 test-p4 test-p6-1 test-p6-2 test-p6-3 test-p6-4
+
+test-p6-4: $(TARGET) $(GUI_TARGET)
+	$(PYTHON) tests/test_p6_4.py --cc "$(CC)"
 
 test-p6-3: $(TARGET) $(GUI_TARGET)
 	$(PYTHON) tests/test_p6_3.py --cc "$(CC)"

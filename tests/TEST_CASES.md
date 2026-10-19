@@ -66,9 +66,13 @@ Linux/macOS 分支、不同 Windows C 运行库、磁盘实际耗尽/掉电和�
 
 ## P6 阶段验收索引
 
+- [P6最终报告](../docs/P6_INNOVATION_FINAL_REPORT.md)：完整1950/1950、33源分析、算法流程与验收边界。
+
 - [P6整体设计与基线](../docs/P6_INNOVATION_DESIGN.md)
 - [P6.1智能推荐](P6_1_RECOMMENDATION_TEST_CASES.md)：精确评分、可用掩码、过时结果及原生GUI。
 
 - [P6.2预约热力图](P6_2_HEATMAP_TEST_CASES.md)：全部63格、P4口径、跨年周、颜色、双角色GUI。
 
 - [P6.3连续预约](P6_3_BATCH_BOOKING_TEST_CASES.md)：一次快照、任意小时冲突、容量/编号、保存失败与真实GUI。
+
+- [P6.4健康分析与四功能演示](P6_4_HEALTH_SCORE_TEST_CASES.md)：精确评分/日期窗口/权限/一万报告、只读及真实GUI完整流程。

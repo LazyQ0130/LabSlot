@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "LabSlot: Verify P0-P4 and all GUI workflows",
+      "label": "LabSlot: Verify P0-P4, P6 and all GUI workflows",
       "type": "process",
       "command": "powershell.exe",
       "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Analyze", "-Test", "-GuiTest"],
@@ -37,7 +37,7 @@
       "problemMatcher": ["$gcc"]
     },
     {
-      "label": "LabSlot: Build and test P0 + P1 + P2 + P3 + P4",
+      "label": "LabSlot: Build and test P0-P4 and P6",
       "type": "process",
       "command": "powershell.exe",
       "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Test"],
