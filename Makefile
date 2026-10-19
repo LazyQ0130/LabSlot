@@ -1,14 +1,26 @@
 # Windows 使用 MinGW-w64 的 mingw32-make，或其他 GNU make。
 CC = gcc
-CFLAGS = -std=c11 -Wall -Wextra -Wpedantic
+CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Werror
 CPPFLAGS = -Iinclude
 SOURCES = $(wildcard src/*.c)
 HEADERS = $(wildcard include/*.h)
 TARGET = smart-lab.exe
 PYTHON = python
+WINDRES = windres
+GUI_TARGET = LabSlot-GUI.exe
+GUI_SOURCES = $(filter-out src/main.c src/ui.c,$(SOURCES)) $(wildcard src/gui/*.c)
+GUI_RESOURCE = src/gui/gui_resource.o
+GUI_LIBS = -lcomctl32 -lgdi32 -luser32
 
-.PHONY: all test test-p0 test-p1 test-p2 test-p3 test-p4
-all: $(TARGET)
+.PHONY: all gui test test-p0 test-p1 test-p2 test-p3 test-p4 test-gui
+all: $(TARGET) $(GUI_TARGET)
+gui: $(GUI_TARGET)
+
+$(GUI_RESOURCE): src/gui/gui.rc src/gui/gui.manifest
+	$(WINDRES) -I src/gui src/gui/gui.rc -o $@
+
+$(GUI_TARGET): $(GUI_SOURCES) $(HEADERS) $(GUI_RESOURCE)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(GUI_SOURCES) $(GUI_RESOURCE) -mwindows $(GUI_LIBS) -o $@
 
 $(TARGET): $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(SOURCES) -o $@
@@ -29,5 +41,8 @@ test-p3: $(TARGET)
 
 test-p4: $(TARGET)
 	$(PYTHON) tests/test_p4.py --executable $(TARGET) --cc "$(CC)"
+
+test-gui: $(GUI_TARGET)
+	$(PYTHON) tests/test_gui.py --cc "$(CC)"
 
 # 不提供批量删除的 clean 目标；测试输出与运行数据由使用者按需保留。

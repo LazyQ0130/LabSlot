@@ -1,0 +1,105 @@
+PASS storage initializes isolated fixture
+PASS local clock
+PASS real Unicode Win32 window created
+PASS login controls created
+PASS password uses ES_PASSWORD
+PASS Unicode UTF8 roundtrip
+PASS invalid surrogate rejected
+PASS invalid UTF8 rejected
+PASS byte overflow rejected without truncation
+PASS Tab advances id to password
+PASS confirmation mismatch stays on registration
+PASS student registration returns to login
+PASS duplicate student rejected
+PASS wrong password rejected and session empty
+PASS wrong password preserves id and clears password
+PASS Enter runs primary authentication action
+PASS student login creates correct session
+PASS real dashboard statistics
+PASS 40 real seat controls / counts
+PASS date and slot selections consumed
+PASS free seat selectable
+PASS hover feedback tracked
+PASS slot change clears old selection
+PASS date change clears old selection
+PASS confirmation worker created
+PASS real confirmation dialog answered
+PASS confirmation located owned dialog
+PASS cancel confirmation preserves selection / no write
+PASS confirmation worker created
+PASS real confirmation dialog answered
+PASS confirmation located owned dialog
+PASS real booking success refreshes occupied seat
+PASS booking persisted using logged student
+PASS occupied seat cannot be selected
+PASS fixture fault saved
+PASS fault real state / cannot select
+PASS second fixture student
+PASS competing booking outside stale view
+PASS stale conflict rejected / refreshed
+PASS confirmation worker created
+PASS real confirmation dialog answered
+PASS confirmation located owned dialog
+PASS conflict introduced during confirmation rejected
+PASS expired slot rejected
+PASS logout clears all session fields
+PASS admin registration succeeds
+PASS admin login correct role
+PASS role navigation names / admin has no reserve control
+PASS forged admin booking messages denied
+PASS DPI 96 size 0 page 0 controls inside client / seats aligned
+PASS DPI 96 size 0 page 1 controls inside client / seats aligned
+PASS DPI 96 size 0 page 2 controls inside client / seats aligned
+PASS DPI 96 size 0 page 3 controls inside client / seats aligned
+PASS DPI 96 size 1 page 0 controls inside client / seats aligned
+PASS DPI 96 size 1 page 1 controls inside client / seats aligned
+PASS DPI 96 size 1 page 2 controls inside client / seats aligned
+PASS DPI 96 size 1 page 3 controls inside client / seats aligned
+PASS DPI 120 size 0 page 0 controls inside client / seats aligned
+PASS DPI 120 size 0 page 1 controls inside client / seats aligned
+PASS DPI 120 size 0 page 2 controls inside client / seats aligned
+PASS DPI 120 size 0 page 3 controls inside client / seats aligned
+PASS DPI 120 size 1 page 0 controls inside client / seats aligned
+PASS DPI 120 size 1 page 1 controls inside client / seats aligned
+PASS DPI 120 size 1 page 2 controls inside client / seats aligned
+PASS DPI 120 size 1 page 3 controls inside client / seats aligned
+PASS DPI 144 size 0 page 0 controls inside client / seats aligned
+PASS DPI 144 size 0 page 1 controls inside client / seats aligned
+PASS DPI 144 size 0 page 2 controls inside client / seats aligned
+PASS DPI 144 size 0 page 3 controls inside client / seats aligned
+PASS DPI 144 size 1 page 0 controls inside client / seats aligned
+PASS DPI 144 size 1 page 1 controls inside client / seats aligned
+PASS DPI 144 size 1 page 2 controls inside client / seats aligned
+PASS DPI 144 size 1 page 3 controls inside client / seats aligned
+PASS 80 page cycles / no GDI object growth
+PASS 80 page cycles / no USER object growth
+PASS destroy releases resources and session
+PASS restart storage preserves state
+PASS restart login restored
+PASS restart real occupied and fault states
+79/79 passed
+startup-new
+PASS startup uses existing initialization
+1/1 passed
+PASS fixture source bytes preserved
+startup-corrupt
+PASS startup recovery/data error blocks GUI
+1/1 passed
+PASS fixture source bytes preserved
+startup-maintenance
+PASS startup recovery/data error blocks GUI
+1/1 passed
+PASS fixture source bytes preserved
+account-corrupt
+PASS error fixture initializes without reset
+PASS account corruption is visible / no session
+2/2 passed
+PASS fixture source bytes preserved
+seats-corrupt
+PASS error fixture initializes without reset
+PASS dashboard reports unavailable stats
+PASS corrupt seats never displayed as free
+PASS corrupt seats cannot reserve
+4/4 passed
+PASS fixture source bytes preserved
+Development data unchanged; report: tests\runs\p5-20261019-111406-6b899c9c\TEST_RESULTS.md

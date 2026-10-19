@@ -5,3 +5,5 @@ data/*.tmp
 data/*.txt
 tests/runs/
 tests/reference-preview/
+# 按仓库约定，验收截图仅保留本地；Git 归档脱敏文本。
+docs/screenshots/

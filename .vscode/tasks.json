@@ -2,6 +2,23 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "LabSlot: Build GUI and test",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-GuiTest"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "group": "test",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "LabSlot: Run GUI",
+      "type": "process",
+      "command": "${workspaceFolder}/LabSlot-GUI.exe",
+      "dependsOn": "LabSlot: Build C11",
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
       "label": "LabSlot: Build C11",
       "type": "process",
       "command": "powershell.exe",

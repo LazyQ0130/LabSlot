@@ -1,0 +1,3 @@
+<MinGW>/gcc.exe -std=c11 -Wall -Wextra -Wpedantic -Werror -Iinclude src/admin.c src/auth.c src/booking.c src/fault.c src/lab.c src/main.c src/stats.c src/storage.c src/ui.c src/utils.c -o smart-lab.exe
+<MinGW>/windres.exe -I src/gui src/gui/gui.rc -o src/gui/gui_resource.o
+<MinGW>/gcc.exe -std=c11 -Wall -Wextra -Wpedantic -Werror -Iinclude src/admin.c src/auth.c src/booking.c src/fault.c src/lab.c src/stats.c src/storage.c src/utils.c src/gui/gui_app.c src/gui/gui_booking.c src/gui/gui_dashboard.c src/gui/gui_login.c src/gui/gui_main.c src/gui/gui_theme.c src/gui/gui_widgets.c src/gui/gui_resource.o -mwindows -lcomctl32 -lgdi32 -luser32 -o LabSlot-GUI.exe
