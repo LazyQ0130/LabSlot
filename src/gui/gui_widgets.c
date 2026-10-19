@@ -105,6 +105,46 @@ void gui_clear_controls(GuiApp *app)
     app->child_count=0;
     app->id=app->name=app->password=app->confirmation=NULL;
     app->date_picker=app->slot_picker=NULL;
+    app->table=app->filter=app->fault_computer=app->fault_detail=NULL;
+    storage_free_reservations(&app->reservations);
+    storage_free_reports(&app->reports);
+    app->reservations_valid=app->reports_valid=0;
+}
+/* 功能：建立只读虚拟 ListView；参数应用/编号/列名/列数；失败返回 NULL。 */
+HWND gui_table(GuiApp *app, int id, const wchar_t *const *columns, int count)
+{
+    HWND table=gui_control(app,WC_LISTVIEWW,L"",WS_TABSTOP | WS_BORDER | LVS_REPORT |
+                          LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDATA | LVS_NOSORTHEADER,id);
+    int i; /* 列序号。 */
+    if (!table) { return NULL; }
+    SendMessageW(table,LVM_SETUNICODEFORMAT,TRUE,0);
+    ListView_SetExtendedListViewStyle(table,LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES);
+    ListView_SetBkColor(table,RGB(255,255,255)); ListView_SetTextBkColor(table,RGB(255,255,255));
+    ListView_SetTextColor(table,GUI_INK);
+    for (i=0;i<count;++i) {
+        LVCOLUMNW column={0}; /* 只复制列名，不复制业务记录。 */
+        column.mask=LVCF_TEXT | LVCF_WIDTH; column.pszText=(LPWSTR)columns[i]; column.cx=100;
+        SendMessageW(table,LVM_INSERTCOLUMNW,(WPARAM)i,(LPARAM)&column);
+    }
+    return table;
+}
+/* 功能：按实际客户区分配列宽；参数应用/百分比权重/列数；无返回。 */
+void gui_table_layout(GuiApp *app, const int *weights, int count)
+{
+    RECT rect; /* 表格物理客户区，不按顶层宽度猜测。 */
+    int i, width;
+    if (!app->table) { return; }
+    GetClientRect(app->table,&rect); width=rect.right-gui_scale(app,24);
+    for (i=0;i<count;++i) { ListView_SetColumnWidth(app->table,i,MulDiv(width,weights[i],100)); }
+    SendMessageW(ListView_GetHeader(app->table),WM_SETFONT,(WPARAM)app->body,TRUE);
+}
+/* 功能：有界写入 ListView 请求的文本缓冲；参数通知/完整宽文本；无返回。 */
+void gui_table_text(NMLVDISPINFOW *info, const wchar_t *text)
+{
+    if ((info->item.mask & LVIF_TEXT) && info->item.pszText && info->item.cchTextMax>0) {
+        wcsncpy(info->item.pszText,text,(size_t)info->item.cchTextMax-1);
+        info->item.pszText[info->item.cchTextMax-1]=L'\0';
+    }
 }
 /* 功能：按业务投影绘制按钮/座位状态；参数应用/绘制通知；无返回。 */
 void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
@@ -114,8 +154,11 @@ void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
     int active = (id==GUI_STUDENT && app->role==ROLE_STUDENT) ||
         (id==GUI_ADMIN && app->role==ROLE_ADMIN) ||
         (id==GUI_HOME && app->page==GUI_DASHBOARD) ||
-        (id==GUI_BOOKING && app->page==GUI_SEATS);
-    int primary = id==GUI_SUBMIT || id==GUI_QUICK || id==GUI_RESERVE;
+        (id==GUI_BOOKING && app->page==GUI_SEATS) ||
+        (id==GUI_NAV_RESERVATIONS && app->page==GUI_RESERVATIONS) ||
+        (id==GUI_NAV_FAULT && app->page==GUI_FAULT) ||
+        (id==GUI_NAV_STATS && app->page==GUI_STUDENT_STATS);
+    int primary = id==GUI_SUBMIT || id==GUI_QUICK || id==GUI_RESERVE || id==GUI_FAULT_SUBMIT;
     int hover = GetPropW(item->hwndItem,L"hover") != NULL;
     COLORREF bg=RGB(255,255,255), fg=GUI_INK, border=GUI_LINE;
     RECT rect=item->rcItem;
@@ -125,6 +168,7 @@ void gui_draw_button(GuiApp *app, const DRAWITEMSTRUCT *item)
     HGDIOBJ old_brush, old_pen, old_font;
     if (primary) { bg=hover ? RGB(29,78,216) : GUI_BLUE; fg=RGB(255,255,255); border=bg; }
     else if (active || hover) { bg=RGB(239,246,255); fg=GUI_BLUE; border=RGB(191,219,254); }
+    if (id==GUI_RES_CANCEL) { bg=hover ? RGB(254,226,226) : RGB(254,242,242); fg=GUI_RED; border=RGB(254,202,202); }
     if (seat>=0 && seat<COMPUTER_COUNT) {
         char symbol=app->seats_valid ? app->seats.symbols[seat] : '?';
         bg=RGB(240,253,244); fg=RGB(21,128,61); border=RGB(187,247,208);

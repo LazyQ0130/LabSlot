@@ -7,3 +7,5 @@
 运行 `build.ps1 -Test` 或 `mingw32-make test` 可在独立目录复现测试。
 
 P5.1 基线为 577/577；最终完整回归 577/577，新增 GUI 检查 93 项通过（含 24 个 DPI/尺寸布局场景及 5 个夹具原字节保护）。详见 `p5-baseline.log`、`p5-final-verification.log`、`p5-analysis.log` 和 `p5-make-build.log`。`build.ps1 -Test -GuiTest` 复现双目标构建与全部测试；人工/系统 DPI 验证边界见 [GUI 验收记录](../P5_GUI_TEST_CASES.md)。
+
+P5.2 开发前基线 577+93 全部通过；最终仍为 P0–P4 577/577、P5.1 GUI 93/93，新增学生 GUI 263/263。见 `p5-2-baseline.log`、`p5-2-final-verification.log`、`p5-2-student-final.md`、`p5-2-analysis.log`、`p5-2-make-build.log`。新增统计包括 253 项 C 驱动检查与 10 项 Python 文件保护检查；实际系统 DPI/多显示器人工验收边界见 [P5.2 记录](../P5_2_GUI_TEST_CASES.md)。

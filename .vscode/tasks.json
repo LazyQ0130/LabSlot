@@ -2,6 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "LabSlot: Verify P0-P4 and student GUI",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Test", "-GuiTest"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "group": "test",
+      "problemMatcher": ["$gcc"]
+    },
+    {
       "label": "LabSlot: Build GUI and test",
       "type": "process",
       "command": "powershell.exe",

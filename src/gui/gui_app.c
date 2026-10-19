@@ -4,6 +4,9 @@
 #include "gui_login.h"
 #include "gui_dashboard.h"
 #include "gui_booking.h"
+#include "gui_reservations.h"
+#include "gui_fault.h"
+#include "gui_student_stats.h"
 #include "utils.h"
 #include "storage.h"
 #include <limits.h>
@@ -62,6 +65,9 @@ void gui_layout(GuiApp *app)
     else {
         gui_shell_layout(app);
         if (app->page==GUI_SEATS) { gui_booking_layout(app); }
+        else if (app->page==GUI_RESERVATIONS) { gui_reservations_layout(app); }
+        else if (app->page==GUI_FAULT) { gui_fault_layout(app); }
+        else if (app->page==GUI_STUDENT_STATS) { gui_student_stats_layout(app); }
         else { gui_dashboard_layout(app); }
     }
     InvalidateRect(app->window,NULL,FALSE);
@@ -69,16 +75,25 @@ void gui_layout(GuiApp *app)
 /* 功能：销毁旧控件、检查会话并建立目标页面；参数应用/页面；无返回。 */
 void gui_show_page(GuiApp *app, GuiPage page)
 {
+    if (page<GUI_LOGIN || page>GUI_STUDENT_STATS) { return; }
     if (page>GUI_REGISTER && !auth_session_has_role(&app->session,app->session.role)) { page=GUI_LOGIN; }
+    if (page>=GUI_RESERVATIONS && !auth_session_has_role(&app->session,ROLE_STUDENT)) {
+        gui_notice(app,L"需要学生登录权限，管理员不能进入学生业务页面。",1); return;
+    }
     if (page<=GUI_REGISTER) { auth_logout(&app->session); }
+    app->changing_page=1;
     gui_clear_controls(app);
     app->page=page; app->notice[0]=L'\0'; app->selected=0; app->seats_valid=0;
     if (page<=GUI_REGISTER) { gui_login_create(app); }
     else {
         gui_shell_create(app);
         if (page==GUI_SEATS) { gui_booking_create(app); }
+        else if (page==GUI_RESERVATIONS) { gui_reservations_create(app); }
+        else if (page==GUI_FAULT) { gui_fault_create(app); }
+        else if (page==GUI_STUDENT_STATS) { gui_student_stats_create(app); }
         else { gui_dashboard_create(app); }
     }
+    app->changing_page=0;
     gui_layout(app);
     SetFocus(GetDlgItem(app->window,page<=GUI_REGISTER ? GUI_ID : page==GUI_SEATS ? GUI_DATE : GUI_HOME));
 }
@@ -154,6 +169,7 @@ static void command(GuiApp *app, int id, int code)
         return;
     }
     if (app->busy) { return; }
+    if (!auth_session_has_role(&app->session,app->session.role)) { gui_show_page(app,GUI_LOGIN); return; }
     if (id==GUI_SLOT && code==CBN_SELCHANGE && app->page==GUI_SEATS) { gui_booking_refresh(app); }
     else if (code==BN_CLICKED) {
         if (id==GUI_LOGOUT) {
@@ -161,8 +177,23 @@ static void command(GuiApp *app, int id, int code)
             gui_notice(app,L"已退出登录，会话已清除。",0);
         } else if (id==GUI_HOME) { gui_show_page(app,GUI_DASHBOARD); }
         else if (id==GUI_BOOKING || id==GUI_QUICK) { gui_show_page(app,GUI_SEATS); }
+        else if (id==GUI_NAV_RESERVATIONS || id==GUI_QUICK_RESERVATIONS) { gui_show_page(app,GUI_RESERVATIONS); }
+        else if (id==GUI_NAV_FAULT || id==GUI_QUICK_FAULT) { gui_show_page(app,GUI_FAULT); }
+        else if (id==GUI_NAV_STATS) { gui_show_page(app,GUI_STUDENT_STATS); }
+        else if (id==GUI_STATS_REFRESH && app->page==GUI_STUDENT_STATS) {
+            gui_student_stats_refresh(app);
+            if (app->stats_result==STATS_OK) { gui_notice(app,L"个人统计已刷新。",0); }
+            else { gui_notice_utf8(app,stats_result_message(app->stats_result),1); }
+        }
+        else if (id==GUI_HOME_REFRESH && app->page==GUI_DASHBOARD && app->session.role==ROLE_STUDENT) {
+            gui_student_stats_refresh(app);
+            if (app->stats_result==STATS_OK) { gui_notice(app,L"工作台统计已刷新。",0); }
+            else { gui_notice_utf8(app,stats_result_message(app->stats_result),1); }
+        }
         else if (app->page==GUI_SEATS) { gui_booking_command(app,id); }
     }
+    if (app->page==GUI_RESERVATIONS) { gui_reservations_command(app,id,code); }
+    else if (app->page==GUI_FAULT) { gui_fault_command(app,id,code); }
 }
 /* 功能：处理顶层 Win32 消息；参数窗口/消息/wp/lp；返回对应 LRESULT。 */
 static LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wp, LPARAM lp)
@@ -188,6 +219,9 @@ static LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wp, LPARAM
     }
     case WM_COMMAND: command(app,LOWORD(wp),HIWORD(wp)); return 0;
     case WM_NOTIFY:
+        if (app->changing_page) { return 0; }
+        if (app->page==GUI_RESERVATIONS) { return gui_reservations_notify(app,(NMHDR *)lp); }
+        if (app->page==GUI_FAULT) { return gui_fault_notify(app,(NMHDR *)lp); }
         if (((NMHDR *)lp)->idFrom==GUI_DATE && ((NMHDR *)lp)->code==DTN_DATETIMECHANGE &&
             app->page==GUI_SEATS && !app->busy) { gui_booking_refresh(app); }
         return 0;
@@ -220,6 +254,7 @@ static LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wp, LPARAM
         return 0;
     }
     case WM_DESTROY:
+        app->changing_page=1;
         auth_logout(&app->session); gui_clear_controls(app); gui_theme_destroy(app);
         PostQuitMessage(0); return 0;
     }
@@ -229,7 +264,7 @@ static LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wp, LPARAM
 HWND gui_create(GuiApp *app, HINSTANCE instance)
 {
     WNDCLASSEXW type={0};
-    INITCOMMONCONTROLSEX controls={sizeof controls,ICC_DATE_CLASSES | ICC_STANDARD_CLASSES};
+    INITCOMMONCONTROLSEX controls={sizeof controls,ICC_DATE_CLASSES | ICC_STANDARD_CLASSES | ICC_LISTVIEW_CLASSES};
     RECT rect;
     HDC dc;
     HWND window;

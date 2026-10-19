@@ -2,6 +2,7 @@
 #include "gui_widgets.h"
 #include "gui_theme.h"
 #include "storage.h"
+#include "gui_student_stats.h"
 #include <wchar.h>
 
 /* 功能：创建日期、时段和 40 个原生座位控件；参数应用；无返回。 */
@@ -117,6 +118,7 @@ static void reserve(GuiApp *app)
     result=booking_create(NULL,&app->session,date,slot,no,&created);
     gui_booking_refresh(app);
     if (result==BOOKING_OK) {
+        gui_student_stats_refresh(app);
         swprintf(prompt,256,L"预约成功，编号 %d。座位状态已重新查询。",created.id);
         gui_notice(app,prompt,0);
     } else { gui_notice_utf8(app,booking_result_message(result),1); }

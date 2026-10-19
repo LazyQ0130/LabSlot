@@ -52,6 +52,8 @@ try {
         $env:PYTHONIOENCODING = 'utf-8'
         & python 'tests/test_gui.py' '--cc' $Compiler
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        & python 'tests/test_gui_student.py' '--cc' $Compiler
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 } finally {
     Pop-Location

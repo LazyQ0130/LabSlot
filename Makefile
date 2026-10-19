@@ -12,7 +12,7 @@ GUI_SOURCES = $(filter-out src/main.c src/ui.c,$(SOURCES)) $(wildcard src/gui/*.
 GUI_RESOURCE = src/gui/gui_resource.o
 GUI_LIBS = -lcomctl32 -lgdi32 -luser32
 
-.PHONY: all gui test test-p0 test-p1 test-p2 test-p3 test-p4 test-gui
+.PHONY: all gui test test-p0 test-p1 test-p2 test-p3 test-p4 test-gui test-gui-student
 all: $(TARGET) $(GUI_TARGET)
 gui: $(GUI_TARGET)
 
@@ -44,5 +44,9 @@ test-p4: $(TARGET)
 
 test-gui: $(GUI_TARGET)
 	$(PYTHON) tests/test_gui.py --cc "$(CC)"
+	$(PYTHON) tests/test_gui_student.py --cc "$(CC)"
+
+test-gui-student: $(GUI_TARGET)
+	$(PYTHON) tests/test_gui_student.py --cc "$(CC)"
 
 # 不提供批量删除的 clean 目标；测试输出与运行数据由使用者按需保留。
