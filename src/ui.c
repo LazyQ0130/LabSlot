@@ -7,6 +7,8 @@
 #include "lab.h"
 #include "utils.h"
 #include "storage.h"
+#include "fault.h"
+#include "admin.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -243,12 +245,214 @@ done:
     return input;
 }
 
+
+/* 功能：从存储刷新公共基础座位，防止维护后继续显示启动快照。参数：无。返回：无。 */
+static void show_current_computers(void)
+{
+    Lab current[COMPUTER_COUNT];
+    if (storage_writes_allowed() && storage_load_computers(current) == 1) { ui_print_seat_map(current); }
+    else { puts("座位读取失败，请检查数据或重启恢复维护。"); }
+}
+
+/* 功能：打印无凭据报告。参数：report。返回：无。 */
+static void print_report(const FaultReport *report)
+{
+    printf("报告 %d | 学号 %s | 电脑 %02d | 日期 %08d | %s\n说明：%s\n", report->id,
+           report->student_id, report->computer_no, report->date,
+           report->status == REPORT_PENDING ? "待处理" : "已处理", report->detail);
+}
+
+/* 功能：按权限显示报告。参数：会话/电脑0全部/状态-1全部。返回：无。 */
+static void show_reports(const AuthSession *session, int no, int status)
+{
+    FaultReportList reports = {0};
+    FaultResult result = fault_query_reports(session, no, status, &reports);
+    size_t i;
+    if (result != FAULT_OK) { printf("查询失败：%s。\n", fault_result_message(result)); }
+    else {
+        if (reports.count == 0) { puts("暂无符合条件的故障报告。"); }
+        for (i = 0; i < reports.count; ++i) { print_report(&reports.items[i]); }
+    }
+    storage_free_reports(&reports);
+}
+
+/* 功能：学生查看本机历史并确认上报，身份来自会话。参数：时钟/会话。返回：InputResult。 */
+static InputResult submit_fault_flow(const BookingContext *context, const AuthSession *session)
+{
+    Lab computers[COMPUTER_COUNT];
+    FaultReport created;
+    char detail[DETAIL_LEN];
+    int no, confirm;
+    FaultResult result;
+    InputResult input = utils_read_int_range("电脑编号（1～40）：", 1, COMPUTER_COUNT, &no);
+    if (input != INPUT_OK) { return input; }
+    result = fault_read_computers(session, computers);
+    if (result != FAULT_OK) { printf("读取失败：%s。\n", fault_result_message(result)); return INPUT_OK; }
+    printf("电脑 %02d 当前状态：%s。\n", no, computers[no-1].status == COMPUTER_FAULT ? "故障" : "正常");
+    puts("本人在该电脑的历史报告："); show_reports(session, no, -1);
+    if (computers[no-1].status == COMPUTER_FAULT) { puts("电脑已有故障，无需重复提交。"); return INPUT_OK; }
+    input = utils_read_field("故障说明（UTF-8 最多255字节）：", detail, sizeof detail, 0);
+    if (input != INPUT_OK) { return input; }
+    printf("报告人：%s；电脑：%02d；说明：%s\n", session->user_id, no, detail);
+    puts("1. 确认上报\n0. 放弃");
+    input = read_menu(1, &confirm);
+    if (input != INPUT_OK || !confirm) { return input; }
+    result = fault_submit(context, session, no, detail, &created);
+    if (result == FAULT_OK) { printf("上报成功，报告编号：%d。\n", created.id); }
+    else { printf("上报失败：%s。\n", fault_result_message(result)); }
+    return INPUT_OK;
+}
+
+/* 功能：展示确认前受影响预约及学号。参数：affected。返回：无。 */
+static void print_affected(const ReservationList *affected)
+{
+    size_t i;
+    printf("确认后将取消 %zu 条尚未开始的有效预约：\n", affected->count);
+    for (i = 0; i < affected->count; ++i) {
+        print_reservation(&affected->items[i]);
+        printf("学号：%s\n", affected->items[i].student_id);
+    }
+}
+
+/* 功能：管理员预览并确认电脑维护。参数：时钟/会话/目标状态。返回：InputResult。 */
+static InputResult change_computer_flow(const BookingContext *context, const AuthSession *session, ComputerStatus target)
+{
+    ReservationList affected = {0};
+    int no, confirm;
+    FaultResult result;
+    InputResult input = utils_read_int_range("电脑编号（1～40）：", 1, COMPUTER_COUNT, &no);
+    if (input != INPUT_OK) { return input; }
+    result = fault_preview_change(context, session, no, target, &affected);
+    if (result != FAULT_OK) { printf("维护未执行：%s。\n", fault_result_message(result)); goto done; }
+    printf("电脑 %02d 将%s。\n", no, target == COMPUTER_FAULT ? "标记故障" : "恢复正常（不恢复已取消预约）");
+    print_affected(&affected);
+    puts("1. 确认维护\n0. 放弃");
+    input = read_menu(1, &confirm);
+    if (input != INPUT_OK || !confirm) { goto done; }
+    result = fault_change_computer(context, session, no, target);
+    printf("维护%s：%s。\n", result == FAULT_OK ? "成功" : "未确认成功", fault_result_message(result));
+done:
+    storage_free_reservations(&affected); return input;
+}
+
+/* 功能：管理员处理报告，报告更新晚于关联维护。参数：时钟/会话。返回：InputResult。 */
+static InputResult process_report_flow(const BookingContext *context, const AuthSession *session)
+{
+    FaultReport report;
+    ReservationList affected = {0};
+    int id, action, confirm;
+    FaultResult result;
+    InputResult input = utils_read_int_range("报告编号：", 1, INT_MAX, &id);
+    if (input != INPUT_OK) { return input; }
+    result = fault_get_report(session, id, &report);
+    if (result != FAULT_OK) { printf("查询失败：%s。\n", fault_result_message(result)); return INPUT_OK; }
+    print_report(&report);
+    puts("1. 确认故障并标记电脑故障\n2. 电脑已维修，恢复正常后关闭报告\n3. 未发现故障，仅关闭报告\n0. 返回");
+    input = read_menu(3, &action);
+    if (input != INPUT_OK || action == 0) { return input; }
+    result = fault_preview_process(context, session, id, (FaultAction)action, &report, &affected);
+    if (result != FAULT_OK) { printf("处理未执行：%s。\n", fault_result_message(result)); goto done; }
+    print_affected(&affected);
+    puts("1. 确认处理\n0. 放弃");
+    input = read_menu(1, &confirm);
+    if (input != INPUT_OK || !confirm) { goto done; }
+    result = fault_process(context, session, id, (FaultAction)action);
+    printf("报告处理%s：%s。\n", result == FAULT_OK ? "成功" : "未确认成功", fault_result_message(result));
+done:
+    storage_free_reservations(&affected); return input;
+}
+
+/* 功能：报告过滤菜单。参数：管理员会话。返回：InputResult。 */
+static InputResult report_list_flow(const AuthSession *session)
+{
+    show_reports(session, 0, REPORT_PENDING);
+    for (;;) {
+        int choice, no;
+        InputResult input;
+        puts("1. 待处理报告\n2. 已处理报告\n3. 指定电脑全部报告\n4. 全部报告\n0. 返回维护菜单");
+        input = read_menu(4, &choice);
+        if (input != INPUT_OK || choice == 0) { return input; }
+        if (choice == 3) {
+            input = utils_read_int_range("电脑编号：", 1, COMPUTER_COUNT, &no);
+            if (input != INPUT_OK) { return input; }
+            show_reports(session, no, -1);
+        } else { show_reports(session, 0, choice == 4 ? -1 : (choice == 1 ? REPORT_PENDING : REPORT_PROCESSED)); }
+    }
+}
+
+/* 功能：管理员维护二级菜单，每轮检查权限。参数：时钟/会话。返回：InputResult。 */
+static InputResult maintenance_flow(const BookingContext *context, const AuthSession *session)
+{
+    for (;;) {
+        int choice;
+        InputResult input;
+        FaultResult result = fault_require_role(session, ROLE_ADMIN);
+        if (result != FAULT_OK) { printf("维护访问失败：%s。\n", fault_result_message(result)); return INPUT_OK; }
+        puts("\n电脑状态维护\n1. 查看全部电脑状态\n2. 标记电脑故障\n3. 恢复电脑正常\n4. 查看待处理故障报告\n5. 处理故障报告\n0. 返回");
+        input = read_menu(5, &choice);
+        if (input != INPUT_OK || choice == 0) { return input; }
+        if (choice == 1) { show_current_computers(); }
+        else if (choice == 2 || choice == 3) { input = change_computer_flow(context, session, choice == 2 ? COMPUTER_FAULT : COMPUTER_NORMAL); }
+        else if (choice == 4) { input = report_list_flow(session); }
+        else { input = process_report_flow(context, session); }
+        if (input == INPUT_EOF || input == INPUT_ERROR) { return input; }
+        if (input == INPUT_INVALID) { puts("输入无效，本次维护操作已取消。"); }
+    }
+}
+
+/* 功能：查询真实预约人数并展示关联学生。参数：管理员会话。返回：InputResult。 */
+static InputResult admin_usage_flow(const AuthSession *session)
+{
+    AdminUsage usage;
+    int date, slot;
+    size_t i;
+    FaultResult result;
+    InputResult input = read_booking_target(&date, &slot);
+    if (input != INPUT_OK) { return input; }
+    result = admin_query_usage(session, date, slot, &usage);
+    if (result != FAULT_OK) { printf("查询失败：%s。\n", fault_result_message(result)); return INPUT_OK; }
+    puts("实验室预约情况（预约人数不代表签到或实际到场人数）：");
+    printf("电脑总数：40；有效预约人数：%zu；空闲电脑：%d；故障电脑：%d。\n",
+           usage.count, usage.seats.free_count, usage.seats.fault_count);
+    print_booking_seats(date, slot, &usage.seats);
+    if (usage.count == 0) { puts("暂无有效预约。"); }
+    for (i = 0; i < usage.count; ++i) {
+        printf("学号 %s | 姓名 %s | 电脑 %02d\n", usage.rows[i].student_id, usage.rows[i].name, usage.rows[i].computer_no);
+    }
+    return INPUT_OK;
+}
+
+/* 功能：精确学生查询，默认有效，可查看全部历史。参数：管理员会话。返回：InputResult。 */
+static InputResult admin_student_flow(const AuthSession *session)
+{
+    char id[ID_LEN];
+    AdminStudentInfo info = {0};
+    FaultResult result;
+    int choice;
+    InputResult input = utils_read_field("精确学号：", id, sizeof id, 0);
+    if (input != INPUT_OK) { return input; }
+    result = admin_query_student(session, id, BOOKING_QUERY_ACTIVE, &info);
+    if (result != FAULT_OK) { printf("查询失败：%s。\n", fault_result_message(result)); goto done; }
+    printf("学号：%s；姓名：%s；有效预约：%zu；历史预约总数（含有效和已取消）：%zu。\n",
+           info.student_id, info.name, info.active_count, info.history_count);
+    puts("有效预约："); print_reservations(&info.records);
+    puts("累计实验时间统计尚未开放（P4）。\n1. 查看全部历史预约\n0. 返回管理员菜单");
+    input = read_menu(1, &choice);
+    if (input != INPUT_OK || !choice) { goto done; }
+    result = admin_query_student(session, id, BOOKING_QUERY_ALL, &info);
+    if (result == FAULT_OK) { print_reservations(&info.records); }
+    else { printf("查询失败：%s。\n", fault_result_message(result)); }
+done:
+    admin_free_student(&info); return input;
+}
+
 /* 功能：显示已认证角色菜单，进入及每轮均检查同一角色权限。
  * 参数：role 预期角色；session 当前会话；computers 座位；context 时钟。返回：InputResult。
  */
 static InputResult user_menu(UserRole role, AuthSession *session,
                              const Lab computers[COMPUTER_COUNT], const BookingContext *context)
 {
+    (void)computers; /* 维护后必须刷新文件，不能复用启动快照。 */
     for (;;) {
         int choice; /* 当前角色菜单选项。 */
         InputResult input; /* EOF/ERROR 必须退出并清除会话。 */
@@ -284,10 +488,15 @@ static InputResult user_menu(UserRole role, AuthSession *session,
             else { input = cancel_booking_flow(context, session); }
             if (input == INPUT_EOF || input == INPUT_ERROR) { auth_logout(session); return input; }
             if (input == INPUT_INVALID) { puts("输入无效，本次预约操作已取消。"); }
-        } else if (choice == 1) {
-            ui_print_seat_map(computers);
         } else {
-            puts("该功能尚未开放");
+            if (role == ROLE_STUDENT && choice == 5) { input = submit_fault_flow(context, session); }
+            else if (role == ROLE_ADMIN && choice == 1) { show_current_computers(); }
+            else if (role == ROLE_ADMIN && choice == 2) { input = maintenance_flow(context, session); }
+            else if (role == ROLE_ADMIN && choice == 3) { input = admin_usage_flow(session); }
+            else if (role == ROLE_ADMIN && choice == 4) { input = admin_student_flow(session); }
+            else { puts("该功能尚未开放"); }
+            if (input == INPUT_EOF || input == INPUT_ERROR) { auth_logout(session); return input; }
+            if (input == INPUT_INVALID) { puts("输入无效，本次操作已取消。"); }
         }
     }
 }
@@ -393,7 +602,7 @@ int ui_run_with_context(const Lab computers[COMPUTER_COUNT], const BookingContex
             break;
         }
         if (choice == 3) {
-            ui_print_seat_map(computers);
+            show_current_computers();
         } else {
             input = role_entry(choice == 1 ? ROLE_ADMIN : ROLE_STUDENT, &session, computers, context);
         }

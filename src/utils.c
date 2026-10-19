@@ -182,7 +182,7 @@ int utils_valid_field(const char *text, size_t capacity)
 /* 功能：读取完整字段并保护密码回显；参数、返回值见 utils.h。 */
 InputResult utils_read_field(const char *prompt, char *buffer, size_t capacity, int secret)
 {
-    char line[INPUT_LINE_CAPACITY] = {0}; /* 包含 CR 的原始行，比字段多留空间。 */
+    char line[DETAIL_LEN + 2] = {0}; /* 可容纳 255 字节故障说明及 CR/NUL；菜单上限仍为 127。 */
     LineResult result; /* 读行状态。 */
     size_t length; /* 去掉 CR 后的完整字节数。 */
 #ifdef _WIN32
@@ -326,4 +326,19 @@ int utils_format_slot(int slot, char *buffer, size_t capacity)
     }
     written = snprintf(buffer, capacity, "%02d:00-%02d:00", OPEN_HOUR + slot, OPEN_HOUR + slot + 1);
     return written >= 0 && (size_t)written < capacity;
+}
+
+/* 功能：完整墙钟快照验证；参数、返回值见 utils.h。 */
+int utils_time_valid(const LabTime *now)
+{
+    return now != NULL && utils_valid_date(now->date) && now->hour >= 0 && now->hour < 24 &&
+        now->minute >= 0 && now->minute < 60 && now->second >= 0 && now->second < 60;
+}
+
+/* 功能：基于已确认的固定时刻判断未来时段，供维护重放使用；契约见 utils.h。 */
+int utils_slot_future(const LabTime *now, int date, int slot)
+{
+    if (!utils_time_valid(now) || !utils_valid_date(date) || slot < 0 || slot >= SLOT_COUNT) { return 0; }
+    return date > now->date || (date == now->date &&
+        (OPEN_HOUR + slot) * 3600 > now->hour * 3600 + now->minute * 60 + now->second);
 }

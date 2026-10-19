@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include <stddef.h>
+#include "utils.h"
 
 /* 路径相对于进程工作目录；应先 cd 到项目根目录再启动。 */
 #define DATA_DIRECTORY "data"
@@ -16,10 +17,14 @@
 #define ADMINS_TEMP_PATH DATA_DIRECTORY "/admins.txt.tmp"
 #define STUDENTS_TEMP_PATH DATA_DIRECTORY "/students.txt.tmp"
 #define RESERVATIONS_TEMP_PATH DATA_DIRECTORY "/reservations.txt.tmp"
+#define REPORTS_TEMP_PATH DATA_DIRECTORY "/error.txt.tmp"
+#define MAINTENANCE_PATH DATA_DIRECTORY "/maintenance.txt"
+#define MAINTENANCE_TEMP_PATH DATA_DIRECTORY "/maintenance.txt.tmp"
+#define MAINTENANCE_DONE_PATH DATA_DIRECTORY "/maintenance.done.txt"
 
 /* 功能：检查/创建数据目录与文件并加载电脑；只有缺失或零字节时初始化。
  * 参数：computers 为输出数组，失败时保持不变。返回：成功 1，失败 0（stderr 有原因）。
- * 初始化仅检查其他五个文件可读；账户/预约由各业务按需解析，不清空已有记录。
+ * 先重放未完成维护，失败则阻止补建；无日志时仅检查其他五文件可读，不清空记录。
  */
 int storage_initialize(Lab computers[COMPUTER_COUNT]);
 
@@ -53,7 +58,8 @@ typedef enum {
     STORAGE_OK = 0,       /* 成功。 */
     STORAGE_ERROR,        /* I/O、参数或损坏数据。 */
     STORAGE_NO_MEMORY,    /* 动态内存不足，原对象不变。 */
-    STORAGE_CAPACITY     /* 条数超过上限。 */
+    STORAGE_CAPACITY,    /* 条数超过上限。 */
+    STORAGE_RECOVERY_REQUIRED /* 未完成维护，必须恢复后才能继续相关业务。 */
 } StorageResult;
 
 /* 功能：安全扩容（含 realloc 失败和乘法溢出检查）。参数：list 有效集合；needed 所需条数。
@@ -78,5 +84,37 @@ StorageResult storage_load_reservations(ReservationList *list);
  * 失败不先删除原文件，可能保留 .tmp；不得直接将失败返回值当成功。
  */
 StorageResult storage_save_reservations(const ReservationList *list);
+
+/* 功能：安全扩容报告集合。参数：list 已初始化自有集合；needed 所需条数。返回：StorageResult。 */
+StorageResult storage_reserve_reports(FaultReportList *list, size_t needed);
+/* 功能：释放并清零报告集合。参数：list 可空。返回：无。 */
+void storage_free_reports(FaultReportList *list);
+/* 功能：完整字段、编号/待处理同学生同电脑去重。参数：list 只读。返回：StorageResult。 */
+StorageResult storage_validate_reports(const FaultReportList *list);
+/* 功能：严格读 error.txt，成功才替换输出。参数：list 已初始化/自有集合。返回：StorageResult。 */
+StorageResult storage_load_reports(FaultReportList *list);
+/* 功能：完整校验后安全保存报告。参数：list 只读。返回：StorageResult，未完成维护时拒绝。 */
+StorageResult storage_save_reports(const FaultReportList *list);
+
+/* 小型故障维护日志的三种确定性重放动作。 */
+typedef enum {
+    STORAGE_MARK_FAULT = 1, /* 标故障，取消确认时刻尚未开始的该电脑有效预约。 */
+    STORAGE_RESTORE = 2,    /* 恢复正常，绝不恢复已取消预约。 */
+    STORAGE_CLOSE_REPORT = 3 /* 仅关闭报告，不改变电脑或预约。 */
+} MaintenanceAction;
+
+/* 功能：检查有无未完成操作日志。参数：无。返回：可正常操作 1，否则 0 并报错。
+ * 所有公开保存接口都检查此门禁；底层读取保留供恢复使用。
+ */
+int storage_writes_allowed(void);
+/* 功能：启动/显式重试时重放未完成维护；无日志时不创建额外文件。
+ * 参数：无。返回：StorageResult；无法恢复时保留日志、阻止后续写入。
+ */
+StorageResult storage_recover_maintenance(void);
+/* 功能：预验证相关文件后发布意图并确定性完成维护，供已授权业务调用。
+ * 参数：action/no/report_id（0 无关联报告）/cutoff 确认时刻。返回：StorageResult。
+ * 不提供数据库事务；意图发布后失败返回 RECOVERY_REQUIRED，启动时继续而非假装成功。
+ */
+StorageResult storage_apply_maintenance(MaintenanceAction action, int no, int report_id, const LabTime *cutoff);
 
 #endif

@@ -173,6 +173,7 @@ static FILE *open_snapshot(const char *temporary)
 }
 
 /* 功能：读取电脑完整快照，先在局部数组校验再发布；参数及返回值见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_load_computers 的契约。 */
 int storage_load_computers(Lab computers[COMPUTER_COUNT])
 {
     Lab loaded[COMPUTER_COUNT]; /* 临时快照，读取失败不污染调用方数据。 */
@@ -227,6 +228,33 @@ int storage_load_computers(Lab computers[COMPUTER_COUNT])
     return result;
 }
 
+/* 功能：同目录替换或归档一个明确文件；参数：源/目标路径。返回：成功 1，否则 0。 */
+static int replace_path(const char *temporary, const char *target)
+{
+#ifdef _WIN32
+    DWORD error_code = ERROR_SUCCESS;
+    int attempt;
+    /* Windows 索引/扫描可能短暂占用刚关闭的文件；只重试三类瞬时拒绝，最多等待100毫秒。
+     * 持续锁仍返回失败，绝不先删除目标；本操作和单文件快照共用此规则。
+     */
+    for (attempt = 0; attempt < 5; ++attempt) {
+        if (MoveFileExA(temporary, target, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) { return 1; }
+        error_code = GetLastError();
+        if (error_code != ERROR_SHARING_VIOLATION && error_code != ERROR_LOCK_VIOLATION &&
+            error_code != ERROR_ACCESS_DENIED) { break; }
+        if (attempt < 4) { Sleep((DWORD)(10 * (attempt + 1))); }
+    }
+    fprintf(stderr, "替换 '%s' 失败：Windows 错误 %lu；临时文件已保留。\n",
+            target, (unsigned long)error_code);
+    return 0;
+#else
+    if (rename(temporary, target) != 0) {
+        report_file_error("替换文件（临时文件已保留）", target);
+        return 0;
+    }
+#endif
+    return 1;
+}
 /* 功能：统一刷新/关闭/替换快照，电脑和账户共用。
  * 参数：file 输出流（一定关闭）；target 目标；temporary 临时路径；success 之前写入结果。
  * 返回：全部成功 1，否则 0，旧目标不先删除，临时文件留供检查。
@@ -244,25 +272,11 @@ static int finish_snapshot(FILE *file, const char *target, const char *temporary
     if (!success) {
         return 0; /* 保留旧目标与临时文件，便于检查失败原因。 */
     }
-#ifdef _WIN32
-    /* Windows 的标准 rename 不能覆盖已有目标；同目录移动不先删除旧文件。 */
-    if (!MoveFileExA(temporary, target,
-                     MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
-        fprintf(stderr, "替换 '%s' 失败：Windows 错误 %lu；临时文件已保留。\n",
-                target, (unsigned long)GetLastError());
-        return 0;
-    }
-#else
-    if (rename(temporary, target) != 0) {
-        report_file_error("替换文件（临时文件已保留）", target);
-        return 0;
-    }
-#endif
-    return 1;
+    return replace_path(temporary, target);
 }
 
 /* 功能：保存电脑快照，复用统一文件替换逻辑；参数与返回值见 storage.h。 */
-int storage_save_computers(const Lab computers[COMPUTER_COUNT])
+static int save_computers_raw(const Lab computers[COMPUTER_COUNT])
 {
     FILE *file; /* 独占新建的临时流。 */
     int i; /* 写入下标。 */
@@ -357,6 +371,7 @@ static int parse_account(char *line, UserRole role, AccountRecords *records, siz
 }
 
 /* 功能：事务式发布读取结果，不将损坏文件当空表；参数与返回值见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_load_accounts 的契约。 */
 int storage_load_accounts(UserRole role, AccountRecords *accounts, size_t *count)
 {
     const char *path = account_path(role); /* 当前角色文件。 */
@@ -417,6 +432,7 @@ int storage_load_accounts(UserRole role, AccountRecords *accounts, size_t *count
 }
 
 /* 功能：校验并保存账户集合，不在认证模块直接访问文件；契约见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_save_accounts 的契约。 */
 int storage_save_accounts(UserRole role, const AccountRecords *accounts, size_t count)
 {
     const char *path = account_path(role); /* 目标路径。 */
@@ -426,6 +442,7 @@ int storage_save_accounts(UserRole role, const AccountRecords *accounts, size_t 
     size_t j; /* 查重下标。 */
     FILE *file; /* 校验完成后才独占创建的输出流。 */
     int success = 1; /* 写入状态。 */
+    if (!storage_writes_allowed()) { return 0; }
     if (path == NULL || accounts == NULL || count > capacity) {
         fputs("账户保存参数无效。\n", stderr);
         return 0;
@@ -470,6 +487,7 @@ int storage_save_accounts(UserRole role, const AccountRecords *accounts, size_t 
 }
 
 /* 功能：启动时准备文件并加载数据，仅在电脑缺失或零字节时初始化；契约见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_initialize 的契约。 */
 int storage_initialize(Lab computers[COMPUTER_COUNT])
 {
     static const char *const paths[] = {
@@ -482,6 +500,7 @@ int storage_initialize(Lab computers[COMPUTER_COUNT])
     if (computers == NULL || !ensure_data_directory()) {
         return 0;
     }
+    if (storage_recover_maintenance() != STORAGE_OK) { return 0; }
     for (i = 0; i < sizeof paths / sizeof paths[0]; ++i) {
         if (!ensure_readable_file(paths[i])) {
             return 0;
@@ -514,6 +533,7 @@ static int reservation_shape(const ReservationList *list)
 }
 
 /* 功能：有界动态扩容；参数、返回值见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_reserve_reservations 的契约。 */
 StorageResult storage_reserve_reservations(ReservationList *list, size_t needed)
 {
     size_t capacity; /* 候选容量，失败时不发布。 */
@@ -534,6 +554,7 @@ StorageResult storage_reserve_reservations(ReservationList *list, size_t needed)
 }
 
 /* 功能：释放并清空预约集合；参数、返回值见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_free_reservations 的契约。 */
 void storage_free_reservations(ReservationList *list)
 {
     if (list != NULL) {
@@ -572,6 +593,7 @@ static int reservation_student_order(const void *left, const void *right)
 }
 
 /* 功能：完整快照校验，只排序指针索引，不改原记录顺序；契约见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_validate_reservations 的契约。 */
 StorageResult storage_validate_reservations(const ReservationList *list)
 {
     const Reservation **index; /* 堆上索引，避免 n² 查重与大栈数组。 */
@@ -654,6 +676,7 @@ static int parse_reservation(char *line, Reservation *record)
 }
 
 /* 功能：严格加载，部分失败不发布，也不覆盖源文件；契约见 storage.h。 */
+/* 功能、参数及返回值：见 storage.h 中 storage_load_reservations 的契约。 */
 StorageResult storage_load_reservations(ReservationList *list)
 {
     ReservationList loaded = {0}; /* 本次读取的独立快照。 */
@@ -694,7 +717,7 @@ StorageResult storage_load_reservations(ReservationList *list)
 }
 
 /* 功能：验证并安全保存预约；契约见 storage.h。 */
-StorageResult storage_save_reservations(const ReservationList *list)
+static StorageResult save_reservations_raw(const ReservationList *list)
 {
     StorageResult result = storage_validate_reservations(list); /* 保存前重新全量校验。 */
     FILE *file; /* 独占临时流。 */
@@ -713,4 +736,337 @@ StorageResult storage_save_reservations(const ReservationList *list)
         }
     }
     return finish_snapshot(file, RESERVATIONS_PATH, RESERVATIONS_TEMP_PATH, success) ? STORAGE_OK : STORAGE_ERROR;
+}
+
+/* 功能：验证报告集合内存形状；参数：list。返回：有效 1，否则 0。 */
+static int report_shape(const FaultReportList *list)
+{
+    return list != NULL && list->count <= list->capacity && list->capacity <= MAX_REPORTS &&
+        ((list->capacity == 0 && list->items == NULL) || (list->capacity > 0 && list->items != NULL));
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_reserve_reports 的契约。 */
+StorageResult storage_reserve_reports(FaultReportList *list, size_t needed)
+{
+    size_t capacity;
+    FaultReport *grown;
+    if (needed > MAX_REPORTS) { return STORAGE_CAPACITY; }
+    if (!report_shape(list)) { return STORAGE_ERROR; }
+    if (needed <= list->capacity) { return STORAGE_OK; }
+    capacity = list->capacity == 0 ? 32 : list->capacity;
+    while (capacity < needed) { capacity = capacity > MAX_REPORTS / 2 ? MAX_REPORTS : capacity * 2; }
+    if (capacity > SIZE_MAX / sizeof *grown) { return STORAGE_CAPACITY; }
+    grown = realloc(list->items, capacity * sizeof *grown);
+    if (grown == NULL) { return STORAGE_NO_MEMORY; }
+    list->items = grown; list->capacity = capacity;
+    return STORAGE_OK;
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_free_reports 的契约。 */
+void storage_free_reports(FaultReportList *list)
+{
+    if (list != NULL) { free(list->items); memset(list, 0, sizeof *list); }
+}
+
+/* 功能：报告指针按编号比较；参数：a/b 索引项。返回：顺序。 */
+static int report_id_order(const void *a, const void *b)
+{
+    const FaultReport *x = *(const FaultReport *const *)a;
+    const FaultReport *y = *(const FaultReport *const *)b;
+    return (x->id > y->id) - (x->id < y->id);
+}
+
+/* 功能：待处理报告按学生及电脑比较；参数：a/b 索引项。返回：顺序。 */
+static int report_key_order(const void *a, const void *b)
+{
+    const FaultReport *x = *(const FaultReport *const *)a;
+    const FaultReport *y = *(const FaultReport *const *)b;
+    int order = strcmp(x->student_id, y->student_id);
+    return order != 0 ? order : (x->computer_no > y->computer_no) - (x->computer_no < y->computer_no);
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_validate_reports 的契约。 */
+StorageResult storage_validate_reports(const FaultReportList *list)
+{
+    const FaultReport **index;
+    size_t i, pending = 0;
+    StorageResult result = STORAGE_ERROR;
+    if (list != NULL && list->count > MAX_REPORTS) { return STORAGE_CAPACITY; }
+    if (!report_shape(list)) { return STORAGE_ERROR; }
+    if (list->count == 0) { return STORAGE_OK; }
+    for (i = 0; i < list->count; ++i) {
+        const FaultReport *r = &list->items[i];
+        if (r->id <= 0 || !utils_valid_id(r->student_id) || r->computer_no < 1 ||
+            r->computer_no > COMPUTER_COUNT || !utils_valid_date(r->date) ||
+            !utils_valid_field(r->detail, DETAIL_LEN) ||
+            (r->status != REPORT_PENDING && r->status != REPORT_PROCESSED)) { return STORAGE_ERROR; }
+    }
+    index = malloc(list->count * sizeof *index);
+    if (index == NULL) { return STORAGE_NO_MEMORY; }
+    for (i = 0; i < list->count; ++i) { index[i] = &list->items[i]; }
+    qsort(index, list->count, sizeof *index, report_id_order);
+    for (i = 1; i < list->count; ++i) { if (index[i-1]->id == index[i]->id) { goto done; } }
+    for (i = 0; i < list->count; ++i) {
+        if (list->items[i].status == REPORT_PENDING) { index[pending++] = &list->items[i]; }
+    }
+    qsort(index, pending, sizeof *index, report_key_order);
+    for (i = 1; i < pending; ++i) { if (report_key_order(&index[i-1], &index[i]) == 0) { goto done; } }
+    result = STORAGE_OK;
+done:
+    free(index); return result;
+}
+
+/* 功能：严格拆分固定字段数，兼容 CRLF。参数：line 可改；fields 输出；count 字段数。返回：有效 1。 */
+static int split_fields(char *line, char **fields, size_t count)
+{
+    size_t i, length = strlen(line);
+    if (length > 0 && line[length-1] == '\r') { line[length-1] = '\0'; }
+    fields[0] = line;
+    for (i = 1; i < count; ++i) {
+        char *next = strchr(fields[i-1], '|');
+        if (next == NULL) { return 0; }
+        *next = '\0'; fields[i] = next + 1;
+    }
+    return strchr(fields[count-1], '|') == NULL;
+}
+
+/* 功能：解析六字段报告。参数：line 可改；r 输出。返回：有效 1，否则 0。 */
+static int parse_report(char *line, FaultReport *r)
+{
+    char *f[6];
+    int status;
+    if (!split_fields(line, f, 6) || !reservation_number(f[0], 1, INT_MAX, &r->id) ||
+        !utils_valid_id(f[1]) || !reservation_number(f[2], 1, COMPUTER_COUNT, &r->computer_no) ||
+        strlen(f[3]) != 8 || !reservation_number(f[3], 10000101, 99991231, &r->date) ||
+        !utils_valid_date(r->date) || !utils_valid_field(f[4], DETAIL_LEN) ||
+        !reservation_number(f[5], REPORT_PENDING, REPORT_PROCESSED, &status)) { return 0; }
+    strcpy(r->student_id, f[1]); strcpy(r->detail, f[4]); r->status = (ReportStatus)status;
+    return 1;
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_load_reports 的契约。 */
+StorageResult storage_load_reports(FaultReportList *list)
+{
+    FaultReportList loaded = {0};
+    StorageResult result = STORAGE_OK;
+    char line[ID_LEN + DETAIL_LEN + 64];
+    FILE *file;
+    if (!report_shape(list) || check_path(REPORTS_PATH, 0) != 1) { return STORAGE_ERROR; }
+    file = fopen(REPORTS_PATH, "rb");
+    if (file == NULL) { report_file_error("打开报告", REPORTS_PATH); return STORAGE_ERROR; }
+    for (;;) {
+        FaultReport r = {0};
+        LineResult read = utils_read_line(file, line, sizeof line);
+        if (read == LINE_EOF) { break; }
+        if (read != LINE_OK || !parse_report(line, &r)) {
+            fprintf(stderr, "报告文件 '%s' 第 %zu 行损坏或读取失败。\n", REPORTS_PATH, loaded.count+1);
+            result = STORAGE_ERROR; break;
+        }
+        result = storage_reserve_reports(&loaded, loaded.count+1);
+        if (result != STORAGE_OK) { break; }
+        loaded.items[loaded.count++] = r;
+    }
+    if (!close_input(file, REPORTS_PATH)) { result = STORAGE_ERROR; }
+    if (result == STORAGE_OK) { result = storage_validate_reports(&loaded); }
+    if (result == STORAGE_OK) { storage_free_reports(list); *list = loaded; }
+    else { fputs("报告加载失败，未改动原文件。\n", stderr); storage_free_reports(&loaded); }
+    return result;
+}
+
+/* 功能：恢复专用的报告快照保存，不通过待恢复门禁；参数：完整集合。返回：StorageResult。 */
+static StorageResult save_reports_raw(const FaultReportList *list)
+{
+    StorageResult result = storage_validate_reports(list);
+    FILE *file;
+    size_t i;
+    int success = 1;
+    if (result != STORAGE_OK) { return result; }
+    file = open_snapshot(REPORTS_TEMP_PATH);
+    if (file == NULL) { return STORAGE_ERROR; }
+    for (i = 0; i < list->count; ++i) {
+        const FaultReport *r = &list->items[i];
+        if (fprintf(file, "%d|%s|%d|%08d|%s|%d\n", r->id, r->student_id, r->computer_no,
+                    r->date, r->detail, (int)r->status) < 0) { success = 0; break; }
+    }
+    return finish_snapshot(file, REPORTS_PATH, REPORTS_TEMP_PATH, success) ? STORAGE_OK : STORAGE_ERROR;
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_writes_allowed 的契约。 */
+int storage_writes_allowed(void)
+{
+    if (check_path(MAINTENANCE_PATH, 0) == 0) { return 1; }
+    fputs("维护尚未完成或日志不可访问：请重启恢复；已阻止相关业务写入/查询。\n", stderr);
+    return 0;
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_save_computers 的契约。 */
+int storage_save_computers(const Lab computers[COMPUTER_COUNT])
+{
+    return storage_writes_allowed() && save_computers_raw(computers);
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_save_reservations 的契约。 */
+StorageResult storage_save_reservations(const ReservationList *list)
+{
+    return storage_writes_allowed() ? save_reservations_raw(list) : STORAGE_RECOVERY_REQUIRED;
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_save_reports 的契约。 */
+StorageResult storage_save_reports(const FaultReportList *list)
+{
+    return storage_writes_allowed() ? save_reports_raw(list) : STORAGE_RECOVERY_REQUIRED;
+}
+
+/* 单条日志对应一个确定性操作；已确认时间在恢复中固定，不采用重启时刻。 */
+typedef struct {
+    MaintenanceAction action;
+    int no;
+    int report_id;
+    LabTime cutoff;
+} MaintenanceIntent;
+
+/* 功能：验证日志字段组合。参数：intent。返回：有效 1。 */
+static int valid_intent(const MaintenanceIntent *intent)
+{
+    return intent != NULL && intent->action >= STORAGE_MARK_FAULT && intent->action <= STORAGE_CLOSE_REPORT &&
+        intent->no >= 1 && intent->no <= COMPUTER_COUNT && intent->report_id >= 0 &&
+        (intent->action != STORAGE_CLOSE_REPORT || intent->report_id > 0) && utils_time_valid(&intent->cutoff);
+}
+
+/* 功能：预读完整相关快照、校验关联报告；参数：intent/输出集合/replay 是否恢复。返回：StorageResult。 */
+static StorageResult load_maintenance(const MaintenanceIntent *intent, Lab computers[COMPUTER_COUNT],
+                                    ReservationList *bookings, FaultReportList *reports, int replay)
+{
+    size_t i;
+    StorageResult result;
+    if (!valid_intent(intent)) { return STORAGE_ERROR; }
+    if (intent->action != STORAGE_CLOSE_REPORT) {
+        if (storage_load_computers(computers) != 1) { return STORAGE_ERROR; }
+        result = storage_load_reservations(bookings);
+        if (result != STORAGE_OK) { return result; }
+    }
+    if (intent->report_id == 0) { return STORAGE_OK; }
+    result = storage_load_reports(reports);
+    if (result != STORAGE_OK) { return result; }
+    for (i = 0; i < reports->count; ++i) {
+        const FaultReport *r = &reports->items[i];
+        if (r->id == intent->report_id) {
+            return r->computer_no == intent->no && (replay || r->status == REPORT_PENDING) ? STORAGE_OK : STORAGE_ERROR;
+        }
+    }
+    return STORAGE_ERROR;
+}
+
+/* 功能：逐个归档本次已发布意图产生的残留快照，绝不批量删除。
+ * 参数：path 唯一临时文件；archive 明确备份路径。返回：可继续 1，否则 0。
+ */
+static int archive_draft(const char *path, const char *archive)
+{
+    int exists = check_path(path, 0);
+    return exists == 0 || (exists == 1 && replace_path(path, archive));
+}
+
+/* 功能：按电脑、预约、报告顺序重放，再归档意图。参数：intent；replay 恢复模式。返回：StorageResult。 */
+static StorageResult execute_maintenance(const MaintenanceIntent *intent, int replay)
+{
+    Lab computers[COMPUTER_COUNT];
+    ReservationList bookings = {0};
+    FaultReportList reports = {0};
+    StorageResult result = load_maintenance(intent, computers, &bookings, &reports, replay);
+    size_t i;
+    int computer_changed = 0, bookings_changed = 0, report_changed = 0;
+    if (result != STORAGE_OK) { goto done; }
+    if (replay &&
+        ((intent->action != STORAGE_CLOSE_REPORT &&
+          (!archive_draft(COMPUTERS_TEMP_PATH, DATA_DIRECTORY "/computers.recovery.txt") ||
+           !archive_draft(RESERVATIONS_TEMP_PATH, DATA_DIRECTORY "/reservations.recovery.txt"))) ||
+         (intent->report_id > 0 && !archive_draft(REPORTS_TEMP_PATH, DATA_DIRECTORY "/error.recovery.txt")))) {
+        result = STORAGE_ERROR; goto done;
+    }
+    if (intent->action != STORAGE_CLOSE_REPORT) {
+        ComputerStatus target = intent->action == STORAGE_MARK_FAULT ? COMPUTER_FAULT : COMPUTER_NORMAL;
+        computer_changed = computers[intent->no-1].status != target;
+        if (!lab_set_status(computers, intent->no, target)) { result = STORAGE_ERROR; goto done; }
+    }
+    if (intent->action == STORAGE_MARK_FAULT) {
+        for (i = 0; i < bookings.count; ++i) {
+            Reservation *r = &bookings.items[i];
+            if (r->computer_no == intent->no && r->status == BOOKING_ACTIVE &&
+                utils_slot_future(&intent->cutoff, r->date, r->slot_index)) {
+                r->status = BOOKING_CANCELLED; bookings_changed = 1;
+            }
+        }
+    }
+    for (i = 0; i < reports.count; ++i) {
+        if (reports.items[i].id == intent->report_id && reports.items[i].status == REPORT_PENDING) {
+            reports.items[i].status = REPORT_PROCESSED; report_changed = 1;
+        }
+    }
+    if ((computer_changed && !save_computers_raw(computers)) ||
+        (bookings_changed && save_reservations_raw(&bookings) != STORAGE_OK) ||
+        (report_changed && save_reports_raw(&reports) != STORAGE_OK) ||
+        !replace_path(MAINTENANCE_PATH, MAINTENANCE_DONE_PATH)) { result = STORAGE_ERROR; }
+done:
+    storage_free_reservations(&bookings); storage_free_reports(&reports);
+    if (result != STORAGE_OK) {
+        fputs("维护未完成：保留意图日志，需重启恢复，禁止报告操作成功。\n", stderr);
+        return STORAGE_RECOVERY_REQUIRED;
+    }
+    return STORAGE_OK;
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_apply_maintenance 的契约。 */
+StorageResult storage_apply_maintenance(MaintenanceAction action, int no, int report_id, const LabTime *cutoff)
+{
+    MaintenanceIntent intent;
+    Lab computers[COMPUTER_COUNT];
+    ReservationList bookings = {0};
+    FaultReportList reports = {0};
+    StorageResult result;
+    FILE *file;
+    int written;
+    if (cutoff == NULL) { return STORAGE_ERROR; }
+    intent.action = action; intent.no = no; intent.report_id = report_id; intent.cutoff = *cutoff;
+    if (!storage_writes_allowed()) { return STORAGE_RECOVERY_REQUIRED; }
+    result = load_maintenance(&intent, computers, &bookings, &reports, 0);
+    storage_free_reservations(&bookings); storage_free_reports(&reports);
+    if (result != STORAGE_OK) { return result; }
+    /* 发布意图前不得有不属于本操作的残留快照；不覆盖、不删除。 */
+    if ((action != STORAGE_CLOSE_REPORT &&
+         (check_path(COMPUTERS_TEMP_PATH, 0) != 0 || check_path(RESERVATIONS_TEMP_PATH, 0) != 0)) ||
+        (report_id > 0 && check_path(REPORTS_TEMP_PATH, 0) != 0)) { return STORAGE_ERROR; }
+    file = open_snapshot(MAINTENANCE_TEMP_PATH);
+    if (file == NULL) { return STORAGE_ERROR; }
+    written = fprintf(file, "P3|1|%d|%d|%d|%08d|%d|%d|%d\n", (int)action, no, report_id,
+                      cutoff->date, cutoff->hour, cutoff->minute, cutoff->second);
+    if (!finish_snapshot(file, MAINTENANCE_PATH, MAINTENANCE_TEMP_PATH, written >= 0)) { return STORAGE_ERROR; }
+    return execute_maintenance(&intent, 0);
+}
+
+/* 功能、参数及返回值：见 storage.h 中 storage_recover_maintenance 的契约。 */
+StorageResult storage_recover_maintenance(void)
+{
+    MaintenanceIntent intent = {0};
+    FILE *file;
+    char line[160], extra[4], *f[9];
+    int action, valid, exists = check_path(MAINTENANCE_PATH, 0);
+    if (exists == 0) { return STORAGE_OK; }
+    if (exists != 1) { return STORAGE_RECOVERY_REQUIRED; }
+    file = fopen(MAINTENANCE_PATH, "rb");
+    if (file == NULL) { return STORAGE_RECOVERY_REQUIRED; }
+    valid = utils_read_line(file, line, sizeof line) == LINE_OK && split_fields(line, f, 9) &&
+        strcmp(f[0], "P3") == 0 && strcmp(f[1], "1") == 0 &&
+        reservation_number(f[2], STORAGE_MARK_FAULT, STORAGE_CLOSE_REPORT, &action) &&
+        reservation_number(f[3], 1, COMPUTER_COUNT, &intent.no) &&
+        reservation_number(f[4], 0, INT_MAX, &intent.report_id) && strlen(f[5]) == 8 &&
+        reservation_number(f[5], 10000101, 99991231, &intent.cutoff.date) &&
+        reservation_number(f[6], 0, 23, &intent.cutoff.hour) &&
+        reservation_number(f[7], 0, 59, &intent.cutoff.minute) &&
+        reservation_number(f[8], 0, 59, &intent.cutoff.second) &&
+        utils_read_line(file, extra, sizeof extra) == LINE_EOF;
+    if (!close_input(file, MAINTENANCE_PATH)) { valid = 0; }
+    if (!valid) { fputs("维护日志损坏，阻止启动与相关写入。\n", stderr); return STORAGE_RECOVERY_REQUIRED; }
+    intent.action = (MaintenanceAction)action;
+    if (!valid_intent(&intent)) { return STORAGE_RECOVERY_REQUIRED; }
+    return execute_maintenance(&intent, 1);
 }

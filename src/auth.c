@@ -156,3 +156,23 @@ const char *auth_result_message(AuthResult result)
     }
     return "未知认证结果";
 }
+
+/* 功能：会话与真实账户检查，供 P3 共用；参数与返回值见 auth.h。 */
+AuthResult auth_validate_session(const AuthSession *session, UserRole role)
+{
+    AccountRecords *records; /* 只在短暂操作内持有完整账户表。 */
+    size_t count = 0, i; /* 数量与查找下标。 */
+    AuthResult result = AUTH_NOT_FOUND; /* 必须成功加载后才能返回不存在。 */
+    if (!auth_session_has_role(session, role)) { return AUTH_INVALID_INPUT; }
+    records = malloc(sizeof *records);
+    if (records == NULL) { return AUTH_NO_MEMORY; }
+    if (!storage_load_accounts(role, records, &count)) { result = AUTH_STORAGE_ERROR; }
+    else {
+        for (i = 0; i < count; ++i) {
+            const char *id = role == ROLE_ADMIN ? records->admins[i].id : records->students[i].id; /* 当前角色成员。 */
+            if (strcmp(id, session->user_id) == 0) { result = AUTH_OK; break; }
+        }
+    }
+    utils_clear_secret(records, sizeof *records); free(records);
+    return result;
+}

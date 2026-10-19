@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define INPUT_LINE_CAPACITY 128 /* 单行最大 127 字节，不含换行。 */
+#define INPUT_LINE_CAPACITY 128 /* 菜单/短记录单行最大127字节；说明字段另按DETAIL_LEN处理。 */
 
 /* 有界读行的结果，区分 EOF、非法字节与 I/O 错误。 */
 typedef enum {
@@ -81,5 +81,11 @@ int utils_date_add(int date, int days);
 
 /* 功能：格式化时段。参数：slot 0～8；buffer 输出；capacity 字节数。返回：成功 1，否则 0。 */
 int utils_format_slot(int slot, char *buffer, size_t capacity);
+
+/* 功能：验证完整本地时间快照。参数：now 可为 NULL。返回：合法 1，否则 0。 */
+int utils_time_valid(const LabTime *now);
+
+/* 功能：用固定时间快照判断时段是否严格未开始。参数：now/date/slot。返回：未开始 1，否则 0。 */
+int utils_slot_future(const LabTime *now, int date, int slot);
 
 #endif

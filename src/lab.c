@@ -37,3 +37,15 @@ char lab_seat_symbol(const Lab *computer)
 {
     return computer->status == COMPUTER_FAULT ? '!' : '*';
 }
+
+/* 功能：只负责内存状态变更；参数与返回值见 lab.h。 */
+int lab_set_status(Lab computers[COMPUTER_COUNT], int no, ComputerStatus status)
+{
+    int i; /* 支持完整但乱序的集合，不能把未校验编号直接作下标。 */
+    if (no < 1 || no > COMPUTER_COUNT || (status != COMPUTER_NORMAL && status != COMPUTER_FAULT) ||
+        !lab_validate_computers(computers)) { return 0; }
+    for (i = 0; i < COMPUTER_COUNT; ++i) {
+        if (computers[i].no == no) { computers[i].status = status; return 1; }
+    }
+    return 0;
+}

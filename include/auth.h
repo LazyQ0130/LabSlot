@@ -53,4 +53,9 @@ int auth_session_has_role(const AuthSession *session, UserRole role);
 /* 功能：不含凭据的结果说明。参数：result 结果码。返回：静态只读文本。 */
 const char *auth_result_message(AuthResult result);
 
+/* 功能：检查角色会话并重新确认对应账户仍存在，不返回密码。
+ * 参数：session/role 要求身份。返回：AUTH_OK、INVALID_INPUT、NOT_FOUND、STORAGE_ERROR 或 NO_MEMORY。
+ */
+AuthResult auth_validate_session(const AuthSession *session, UserRole role);
+
 #endif

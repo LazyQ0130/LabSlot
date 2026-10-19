@@ -1,0 +1,4 @@
+Compiler: gcc.exe (GCC) 16.2.0
+Command: gcc -std=c11 -Wall -Wextra -Wpedantic -Werror -fanalyzer -Iinclude src/admin.c src/auth.c src/booking.c src/fault.c src/lab.c src/main.c src/storage.c src/ui.c src/utils.c -o tests/runs/p3-analyzed-final.exe
+Exit code: 0
+Diagnostics: none

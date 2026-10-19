@@ -13,7 +13,8 @@ static BookingResult from_storage(StorageResult result)
     case STORAGE_OK: return BOOKING_OK;
     case STORAGE_NO_MEMORY: return BOOKING_NO_MEMORY;
     case STORAGE_CAPACITY: return BOOKING_CAPACITY;
-    case STORAGE_ERROR: return BOOKING_STORAGE_ERROR;
+    case STORAGE_ERROR:
+    case STORAGE_RECOVERY_REQUIRED: return BOOKING_STORAGE_ERROR;
     }
     return BOOKING_STORAGE_ERROR;
 }
@@ -57,6 +58,7 @@ static BookingResult require_student(const AuthSession *session)
     size_t count = 0, i; /* 学生数量与查找下标。 */
     BookingResult result = BOOKING_STUDENT_NOT_FOUND; /* 仅成功读取后允许未找到。 */
     if (!auth_session_has_role(session, ROLE_STUDENT)) { return BOOKING_UNAUTHORIZED; }
+    if (!storage_writes_allowed()) { return BOOKING_STORAGE_ERROR; }
     accounts = malloc(sizeof *accounts);
     if (accounts == NULL) { return BOOKING_NO_MEMORY; }
     if (!storage_load_accounts(ROLE_STUDENT, accounts, &count)) {
@@ -255,6 +257,7 @@ done:
 /* 功能：重新加载指定视图，故障优先；参数、返回值见 booking.h。 */
 BookingResult booking_get_seats(int date, int slot, BookingSeats *seats)
 {
+    if (!storage_writes_allowed()) { return BOOKING_STORAGE_ERROR; }
     Lab computers[COMPUTER_COUNT]; /* 当前真实电脑状态。 */
     ReservationList list = {0}; /* 当前真实预约。 */
     BookingSeats view = {0}; /* 成功后才发布。 */

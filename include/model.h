@@ -93,14 +93,21 @@ typedef struct {
     size_t capacity;    /* 实际分配条数，最多 MAX_RESERVATIONS。 */
 } ReservationList;
 
-/* 故障报告；后续保存于题目指定的 error.txt。 */
+/* 故障报告；保存于题目指定的 error.txt。 */
 typedef struct {
     int id;                 /* 正整数报告编号。 */
     char student_id[ID_LEN]; /* 报告人的学号。 */
     int computer_no;         /* 被报告的电脑编号。 */
     int date;               /* 报告日期 YYYYMMDD。 */
-    char detail[DETAIL_LEN]; /* UTF-8 故障说明，后续应拒绝换行及字段分隔符。 */
+    char detail[DETAIL_LEN]; /* UTF-8 故障说明，拒绝换行及字段分隔符。 */
     ReportStatus status;    /* 待处理或已处理。 */
 } FaultReport;
+
+/* 堆上故障报告集合，使用前零初始化，最终 storage_free_reports；禁止浅复制后重复释放。 */
+typedef struct {
+    FaultReport *items; /* 动态记录数组。 */
+    size_t count;      /* 已初始化条数。 */
+    size_t capacity;   /* 已分配条数，上限 MAX_REPORTS。 */
+} FaultReportList;
 
 #endif

@@ -11,7 +11,7 @@ int main(void)
     int success; /* 主循环是否正常结束。 */
     ui_initialize_console();
     if (!storage_initialize(computers)) {
-        fputs("启动失败：请检查上述数据错误；已有电脑数据未被覆盖。\n", stderr);
+        fputs("启动失败：请检查上述数据错误及未完成维护日志。\n", stderr);
         return EXIT_FAILURE;
     }
     puts("数据目录：当前工作目录下的 data/（请从项目根目录启动）。");
